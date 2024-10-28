@@ -8,55 +8,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post 1: IdeologiesOverflow</title>
     <style>
+                * {
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: "Tajawal",Helvetica, Arial, sans-serif;
-            background-color: #020a01; 
-            color: #ffffff; 
-            line-height: 1.3;
-            font-size: 20px;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 60ch;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            font: 18px/1.5 system-ui;
+            color: #222;
         }
 
         h1 {
-            color: #47ff66; 
-            border-bottom: 2px solid #47ff66;
-            padding-bottom: 10px;
-            font-size: 33px; 
+            font-size: 2em;
+            margin: 1rem 0;
         }
 
         h3 {
-            color: #47ff66; 
-            margin-top: 20px;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        a {
+            text-decoration: none;
         }
 
         .comment {
-            background-color: #011202; 
-            border-left: 4px solid #033001; 
-            padding: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.5rem;
         }
 
         .author {
             font-weight: bold;
-            color: #47ff66; 
         }
 
         .date {
             font-size: 0.9em;
-            color: #ccc; 
+            color: #666;
             margin-top: -10px;
             margin-bottom: 20px;
         }
 
-        p {
-            color: #ffffff; 
+        .reply {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
         }
-        a {
-            color: #47ff66;
-            text-decoration: none;
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #ddd;
+                background: #222;
+            }
+            
+            a {
+                color: #6bf;
+            }
+            
+            a:hover {
+                color: #fff;
+            }
+            
+            .date {
+                color: #999;
+            }
         }
     </style>
 </head>
