@@ -1,0 +1,573 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../guides/coding.html">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>The Woe Machine Halts - datavorous</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Google Sans";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/custom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="datavorous" class="md-header__button md-logo" aria-label="datavorous" data-md-component="logo">
+      
+  <img src="../assets/images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            datavorous
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              The Woe Machine Halts
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="black"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="datavorous" class="md-nav__button md-logo" aria-label="datavorous" data-md-component="logo">
+      
+  <img src="../assets/images/logo.png" alt="logo">
+
+    </a>
+    datavorous
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/coding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Coding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Blogs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Blogs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="woe-machine.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    The Woe Machine Halts
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<article class="post">
+  <header class="post-header">
+    <h1>The Woe Machine Halts.</h1>
+    <p class="subtitle">The machine is rusty, but will it halt?</p>
+    <div class="post-meta">
+      <span class="author">datavorous</span>
+      <time datetime="2025-06-24" class="date">June 25, 2025</time>
+    </div>
+  </header>
+
+  <section class="post-content">
+      <p>
+      Every new academic session brings the same question, "How do I get started with programming? Most answers I see are robotic checklists. Install this or that IDE, follow these tutorials, complete these courses, rinse and repeat. That approach turns humans into code monkeys, not thinkers.<br>
+      I believe that before you start chasing lectures or deadlines, you should first ask yourself <b>WHY</b> you want to pursue Computer Science. One should try out things that help them understand why they wish to pursue it in the first place. These simple questions carry more weight than any syllabus.<br><br>
+
+
+      I felt compelled to write <a href="https://archive.ph/n01CB">this post</a> to offer an alternate lens, one rarely seen in beginner programming guides. Most such guides begin with a catchy hook and end with a paid promotion. That’s not how exploration begins.<br> 
+      Art and the natural sciences, for they came long before, must entail a faint fragrance of the Computational Mindset.
+      <img src="../assets/reddit_ss.png">
+      I tried to gently push a new flock of brains towards that path, although their main interests are very evident, so that particular niche had to be discussed substantially. Otherwise the post would have been downvoted to oblivion.<br>
+
+      Most people think programming equals computer science, but that's like saying knowing how to use a paintbrush makes you an artist. Programming is merely the symbolic language we use to express our ideas, while computer science is really about how we interpret and synthesize information in meaningful ways.<br><br>
+
+      This is a personal blog, so I’ll also share how I wandered into this field and why I stayed.
+      </p>
+
+      <h1 id="path-1-">Woe of the Naive's Mind</h1>
+
+      <p>
+        Curiosity precedes exploration. In 2017, the 10 year old me loved to paint, break devices, and play silly games on WinXP. After losing repeatedly in Minesweeper, I was compelled to make a game of my own, where I could atleast win once. By the turn of events, I laid my hand on a book about QBasic (QB64).<br>My first program printed odd numbers in an infinite loop. I had the <code>/examples</code> folder that came with QB64, besides that book, to my aid. Initially, I would copy, edit, and merge snippets from various examples to build something unique.<br><br>
+        <img src="https://qb64.com/images/qbjs.png">
+        <figcaption><center>This was present as one of the examples!</center></figcaption>
+        One day, I managed to render a circle. 
+        Then I rendered a few more. 
+        And then 100s, this time with random (x,y) coordinates.<br><br>
+        Questions. Questions flooded.<br>
+        "Is my random same as the computer's random?"<br>
+        "If pixels are arranged in a particular way, I can make a painting, maybe?"<br>
+        A vague, tickling sensation would tell me, a computer might be able to generate abstract paintings. I just did not know how. (Generative Art was a foreign concept) 
+      </p>
+
+      <p>
+        Every day, after returning from school, I would try to mess around with the example programs and try to create something new. With a faulty way of self-taught trignometry, I managed to render a rotating triangle after a long wrestle with the sin() and cos() functions.<br>
+        "sin theta would mean perpendicular divided by hypotenuse or a triangle, then HOW would THIS MACHINE know the value of all such angles?" (I didn't even know there could be something beyond 90°, so it came as a shock) <br><br>
+
+        I ended up partially implementing an ad hoc Doppler effect simulation (QB offered a BEEP() function), basic equations of motion and created lots of generative art using RAND() and trig functions.<br><br>
+
+        <img src="../assets/woe/frac.png">
+
+        I was an avid reader of science fiction stories and novels. I remember reading a story named "Compu" (A spherical shaped robot, which self-destructed after announcing that it has discovered what comes after death (Satyajit Ray -> Professor Shonku (Compu) ). It claimed to be conscious, as well.). 
+        Now, naive me, wrote almost 200 (183 to be exact) if-else-if statements, hoping that I could build a sentient being. (Okay, this is hilarious!) The fascination of creating an entity which nature could not, would keep anyone awake at night.
+        <br><br>
+        2019, I had to learn C, because I wanted to make use of an Arduino UNO. Same process, reading an offline manual and a bunch of examples. 
+        Well, nothing special happened that year, except a few mishaps while dealing with an SSTC and red phosphorus. But that's a different story.
+      </p>
+
+      <h1 id="path-2-">The Woe Machine Awakens</h1>
+      <p>
+        In 2020, I stumbled upon a rather obscure YouTube playlist where a computational physicist demonstrated how he used VPython in his work. I got hooked. I tinkered around with Arduino, VPython, ultrasonic sensors, and a few servo motors to build a crude 3D scanner (could capture only a single surface). The surface construction procedure was an abomination, and was duct-taped.  
+        <br><br>
+        At one point, I became obsessed with Euler's Disk and wanted to experiment with various disks of different radii and friction coefficients. The only way was to simulate that somehow. During that ongoing quest, I found Daniel Shiffman’s Nature of Code playlist. Probably it was one of the best things that ever happened to me.<br><br>
+
+        Shiffman introduced me to agent-based models, fractals, and emergent behaviours. Simple iterative rules spawning ever complicated patterns. 
+        Hours and hours of staring into the black and white coloured cells of cellular automata, ever increasing entropy. It was mesmerising and beautiful. Everything seems to be connected. Somehow, somehow. It needs to be comprehended. Somehow.
+        <img src="../assets/woe/tadpoles.png">
+        <br><br>
+        This could be the language in which other domains could be remodeled, re-presented and maybe..re-written.
+        <br>
+        Physics, could become a matter of simulation, states and information exchange. (or could atleast assist)<br>
+        Biology, could become an algorithmic evolution of state machines, albeit chaotic and unpredictable.<br>
+        Art? Rules, transformations, information densities.<br><br>
+        I had discovered this notion of "Thinking in Systems", not as frankensteining code snippets, but as tracing the invisible connections or making sure the filaments run through every entity and process.
+      </p>
+
+      <h1 id="path-3-">Rust o' Woe</h1> 
+      <p>
+        Lately I feel something hardening in my throat, an unspoken rage, too heavy to shout and too diffuse to name.<br>
+        It lurks there, a crystallized form of apathy that I can’t get rid of. (Is this what disappointment smells like? Or is it just exhaustion?)
+        <img src="../assets/woe/4.png">
+        <figcaption><center>Seriously?</center></figcaption>
+
+        The world has shifted.<br>I see legions of aspirants rallying behind this same manifesto.
+
+        Is this what the “Woe Machine” has become?<br> Rusted away, churning out drones who’ve traded curiosity for checkpoints? 
+        <img src="../assets/woe/2.png">
+
+         Maybe it’s just me. Maybe I’m the one out of sync. Because everywhere I turn, there's someone grinding, optimizing, hustling like life is a competitive programming leaderboard.<br><br>
+         Oh WAIT! Something happened last weekend. 
+         <img src="../assets/woe/7.png">
+         Haha.<br>
+         What happened to wandering? To play aimlessly? To writing code without worrying if it’ll make it to GitHub or HackerNews? 
+         I remember building ugly tools that made me laugh. No frameworks. No deadlines.
+         That’s gone now, buried.<br><br>
+
+         The kid from the first image wants to succeed, perhaps using a metric which everyone of us has come to value more.<br> Well, so did I, once. So do I, still. But something about the way we frame success now; it tastes synthetic. Empty.
+
+         I have met way too many people, whose sole aim is to "crack" [insert anything which was never meant to be a competition, for example GSoC]. I have found great people as well, but they are as rare as Red Camellias. The tide would still be stronger on the other side.
+
+        <img src="../assets/woe/3.png">
+
+      </p> 
+      <br>
+
+      <h1 id="path-3-">The Woe Machine...Pauses</h1> 
+      <p>
+
+        My musings lack rigour, and are to be taken lightly. My eyelids feel heavy. This has become a collection of my stream of thoughts, instead of a well articulated essay.<br><br>
+        "Woe Machine", is my metaphor for the brain, the collective hive mind, which you probably have guessed by now.
+        It questions its own foundations, confronts its own knowledge gaps and iterates endlessly.
+        True halting is impossible; each answer breeds new questions.
+        <br>
+        This machine isn't silicon, but human curiosity. It converts confusion into models, then models into deeper inquiries. We pause, reflect, and reboot.<br><br>
+        Collectively, we will rediscover the joy of wondering and exploring, once again.<br><br>
+        For the machine never really halts, just ... pauses.
+      </p>
+
+      <h1 id="dump">Read More</h1>
+      <p>
+        <ol><a href="https://www.reddit.com/r/Class29Thirty/comments/1li6t80/a_small_guide_to_exploring_computational_sciences/">A Reddit Post, written by Me</a> / <a href="https://archive.ph/n01CB">Archive</a></ol>
+        <ol><a href="https://cpu.land">CPU Land</a></ol>
+        <ol><a href="https://natureofcode.com/">Nature of Code</a></ol>
+        <ol><a href="https://www.lesswrong.com/">LessWrong</a></ol>
+      </p> 
+
+  </section>
+</article>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/datavorous" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://x.com/datavorous314" target="_blank" rel="noopener" title="x.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M357.2 48h70.6L273.6 224.2 455 464H313L201.7 318.6 74.5 464H3.8l164.9-188.5L-5.2 48h145.6l100.5 132.9zm-24.8 373.8h39.1L119.1 88h-42z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["toc.integrate", "content.code.annotate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.50899def.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+      
+    
+  </body>
+</html>

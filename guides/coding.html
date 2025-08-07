@@ -1,0 +1,596 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../index.html" rel="prev"/>
+<link href="../blogs/woe-machine.html" rel="next"/>
+<link href="../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
+<title>Coding - datavorous</title>
+<link href="../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
+<link href="../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Google+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Google Sans";--md-code-font:"JetBrains Mono"}</style>
+<link href="../assets/custom.css" rel="stylesheet"/>
+<script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="white" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#perchance-the-lines-of-woe">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header md-header--shadow" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="datavorous" class="md-header__button md-logo" data-md-component="logo" href="../index.html" title="datavorous">
+<img alt="logo" src="../assets/images/logo.png"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            datavorous
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Coding
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="white" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="black" data-md-color-media="" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="datavorous" class="md-nav__button md-logo" data-md-component="logo" href="../index.html" title="datavorous">
+<img alt="logo" src="../assets/images/logo.png"/>
+</a>
+    datavorous
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../index.html">
+<span class="md-ellipsis">
+    Home
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    Guides
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    Coding
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="coding.html">
+<span class="md-ellipsis">
+    Coding
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#absolute-beginner">
+<span class="md-ellipsis">
+      Absolute Beginner
+    </span>
+</a>
+<nav aria-label="Absolute Beginner" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#building-mental-models">
+<span class="md-ellipsis">
+      Building Mental Models
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#typing-glyphs-on-screen">
+<span class="md-ellipsis">
+      Typing Glyphs on Screen
+    </span>
+</a>
+<nav aria-label="Typing Glyphs on Screen" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#setup-a-code-editor">
+<span class="md-ellipsis">
+      Setup a Code Editor
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#learn-a-basic-language">
+<span class="md-ellipsis">
+      Learn a Basic Language:
+    </span>
+</a>
+<nav aria-label="Learn a Basic Language:" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#python">
+<span class="md-ellipsis">
+      Python
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#the-c-language">
+<span class="md-ellipsis">
+      The C Language
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#flowchart">
+<span class="md-ellipsis">
+      Flowchart
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#you-are-not-scared-anymore">
+<span class="md-ellipsis">
+      You are Not Scared Anymore
+    </span>
+</a>
+<nav aria-label="You are Not Scared Anymore" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#git-and-collaboration">
+<span class="md-ellipsis">
+      Git and Collaboration
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#linting-and-formatting">
+<span class="md-ellipsis">
+      Linting and Formatting
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#more">
+<span class="md-ellipsis">
+      More
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#the-art-of-technical-questioning">
+<span class="md-ellipsis">
+      The Art of Technical Questioning
+    </span>
+</a>
+<nav aria-label="The Art of Technical Questioning" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stop-asking-like-this">
+<span class="md-ellipsis">
+      Stop Asking Like This
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ask-like-this-instead">
+<span class="md-ellipsis">
+      Ask Like This Instead
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ending-note">
+<span class="md-ellipsis">
+      Ending Note
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tldr">
+<span class="md-ellipsis">
+      TLDR
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    Blogs
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            Blogs
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../blogs/woe-machine.html">
+<span class="md-ellipsis">
+    The Woe Machine Halts
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="perchance-the-lines-of-woe">Perchance, the Lines of Woe</h1>
+<p>A general guide to stop asking vague questions related to programming. A universal plug-n-play blueprint for pretty much everything.</p>
+<h2 id="absolute-beginner">Absolute Beginner</h2>
+<h3 id="building-mental-models">Building Mental Models</h3>
+<ul>
+<li>
+<p>Video Playlist: <a href="https://youtube.com/playlist?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo&amp;si=n3GuvgSLc-y5V5x8">Computer Science Crash Course</a><br/>
+<strong>Reason:</strong> To build a foundational understanding of core computer science concepts before diving into programming, which helps develop context and motivation for learning syntax and logic.  </p>
+</li>
+<li>
+<p>Articles: <a href="https://griffithunilibrary.github.io/intro-computational-thinking/content/0-intro.html">Introduction to Computational Thinking</a><br/>
+<strong>Reason:</strong> To develop problem solving skills by learning how to break down complex tasks, recognize patterns, create step-by-step solutions (algorithms), and apply abstractions.</p>
+<ul>
+<li>Identify the steps involved in computational thinking</li>
+<li>Break a problem down into more manageable parts</li>
+<li>Develop a series of steps (also known an algorithm) to solve a problem</li>
+<li>Generalise important detail so that algorithms can be made re-usable (this process is called abstraction)  </li>
+</ul>
+</li>
+<li>
+<p>Claude Article: <a href="https://claude.ai/share/be708a47-dbe6-43c6-9604-eab96d35c4f8">Modelling Real Life Situations</a> with data, algorithms and behaviors. IF you don't read and try out the examples, you're not gonna make it far.</p>
+</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Suggested For You</p>
+<p>When you encounter any system (a coffee shop, a library, a video game), ask yourself:<br/>
+What are the key entities here?<br/>
+How do they interact?<br/>
+What rules govern their behavior?<br/>
+How would I represent them in a flowchart?  </p>
+</div>
+<pre class="mermaid"><code>graph TD
+    A[Programming Learning Journey] --&gt; B{Have Programming Experience?}
+    B --&gt;|No| C[Build Foundational Mental Models]
+    B --&gt;|Yes| D[Apply Transfer Learning]
+
+    C --&gt; C1[Study Computer Science Fundamentals]
+    C --&gt; C2[Develop Computational Thinking]
+    C --&gt; C3[Setup Development Environment]
+
+    D --&gt; D1[Map Existing Knowledge to New Syntax]
+    D --&gt; D2[Identify Knowledge Gaps]
+
+    C1 --&gt; E[Learn Programming Language]
+    C2 --&gt; E
+    C3 --&gt; E
+    D1 --&gt; F[Learn Specific Language Features]
+    D2 --&gt; F
+</code></pre>
+<h3 id="typing-glyphs-on-screen">Typing Glyphs on Screen</h3>
+<h4 id="setup-a-code-editor">Setup a Code Editor</h4>
+<ul>
+<li><a href="https://youtu.be/D2cwvpJSBX4?si=M-n-rClsXlgaTTpm">VSCode</a> (Add Extensions: Python, Flake8, Pylance)</li>
+<li>Sublime Text (Download, <a href="https://www.geeksforgeeks.org/linux-unix/how-to-use-terminal-in-sublime-text-editor/">Add Terminal</a>, Change Theme)</li>
+</ul>
+<h4 id="learn-a-basic-language">Learn a Basic Language:</h4>
+<h5 id="python">Python</h5>
+<ul>
+<li>Install the Python Interpreter. Remember to check the "Add Python to PATH" while installing.  </li>
+<li>Learn the basics from <a href="https://youtu.be/8KCuHHeC_M0?si=_-k4oFfBxjpst_wV">this tutorial</a></li>
+<li>Try out <a href="https://www.youtube.com/watch?v=HGOBQPFzWKo">intermediate</a> level python programming.</li>
+<li>Learn Basic Data Structures and Algorithms - List, Tuple, Queues, Sets, Stacks, Dictionaries (hashmaps)</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Come back again, and learn more about data structures and algorithms. There are thousands of articles and videos on the internet covering DSA. I recommend reading the book called <a href="https://www.cs.mcgill.ca/~akroit/math/compsci/Cormen%20Introduction%20to%20Algorithms.pdf">Introduction to Algorithms</a>. Read <a href="https://www.reddit.com/r/algorithms/comments/cw7m5h/how_to_read_book_introduction_to_algorithms/">this</a> thread on how you should read it.<br/>
+Can't stress this enough, just <a href="https://chatgpt.com/share/68947f7b-ca04-800d-a5d0-96d7e3de0c83">search</a> for it.</p>
+</div>
+<ul>
+<li>Understand <a href="https://www.youtube.com/watch?v=JeznW_7DlB0">Object Oriented Programming in Python</a></li>
+<li><a href="https://youtu.be/QFvqStqPCRU?si=_xvcC0xm51I3iUCr">Build the Snake Game</a> with <code>pygame</code></li>
+</ul>
+<p>You should be thinking, <em>"Now I know what lists, tuples, classes, methods, loops, and libraries like Pygame are. I already have the fundamentals laid out in front of me. So now, I should build some projects to truly understand whether I can bring something to fruition from just a mere idea."</em>. If you're not thinking this way, you may need to slow down and reflect more.</p>
+<p>Your next station should be <code>google.com</code> or <code>chatgpt.com</code>.<br/>
+Ask questions/for suggestions/ideas. Form questions like:  </p>
+<ul>
+<li><em>I already know <code>{insert whatever you know here}</code>, what things do I need to learn for making <code>{insert name}</code>?</em> </li>
+<li><em>I have structured my project like this: <code>{insert your project directory structure}</code>, how can I improve from here? Is there any standard procedure to initiate new projects?</em> </li>
+<li><em>I am using Object Oriented Programming for my <code>{insert project name}</code>, viz. <code>{some code snipppet}</code>. Are there other ways to structuring my code?</em> </li>
+<li>Or funnily enough: <em>I am an intermediate python programmer, generate more questions for me, which will help me improve. Some examples: <code>{insert the 3 points which I have mentioned above}</code></em> </li>
+<li>Google: <em>python libraries for {anything you desire: eg: webscrapping/api/faster matrix multiplication}</em>, <em>standard guidelines for writting python code</em> etc.  </li>
+</ul>
+<div class="admonition danger">
+<p class="admonition-title">LISTEN CAREFULLY</p>
+<p>In this way, you'll be able to understand that most of it is just <strong>planning out</strong> what you wish to build on a piece of paper, finding the <strong>right tools</strong>, and then <strong>expressing the logical flow</strong> of instructions using a particular syntax.<br/>
+It is highly recommended to use LLMs like ChatGPT, Claude, Qwen as <strong>mentors</strong>, who won't code for you, but engage in brainstorming sessions.</p>
+</div>
+<h5 id="the-c-language">The C Language</h5>
+<ul>
+<li>Install GCC compiler.</li>
+<li>Assuming that you have already done Python: <a href="https://chatgpt.com/share/689429d4-88fc-800d-bfb1-f04dd60092c7">Brief overview on how you can map one language's syntax with another</a> and a <a href="https://claude.ai/share/ef8db348-d74b-4145-9b35-1f1e556b69b6">Comprehensive Guide</a></li>
+<li>Learn how to scaffold a C project, and use a Makefile. <a href="https://claude.ai/share/6e19775a-d923-435b-a182-87c89a69d311">Read More</a></li>
+<li><a href="https://beej.us/guide/bgc/">Beej's Guide to learn C</a></li>
+<li><a href="https://www.youtube.com/watch?v=MIL2BK02X8A">Pointers in C</a> and <a href="https://www.youtube.com/watch?v=rJrd2QMVbGM">Memory Management</a></li>
+<li><a href="https://youtu.be/lMvFWKHhVZ0?si=tF9r3T9kPgjYwglN">My 2 Year Journey of Learning C - VoxelRifts</a> : A good watch, get some idea on what you can build.</li>
+</ul>
+<h3 id="flowchart">Flowchart</h3>
+<pre class="mermaid"><code>graph TD
+    E[Learn Programming Language] --&gt; E1{First Language?}
+    F[Advanced Language Features] --&gt; I[Advanced Concepts and Patterns]
+
+    E1 --&gt;|Yes| G[Follow Basic to Intermediate Tutorials]
+    E1 --&gt;|No| H[Focus on Language-Specific Features]
+
+    G --&gt; G1[Basic Syntax and Control Structures]
+    G1 --&gt; G2[Data Structures and Algorithms]
+    G2 --&gt; G3[Object-Oriented Programming]
+    G3 --&gt; G4[Build Practical Project]
+
+    H --&gt; I[Advanced Concepts and Patterns]
+    G4 --&gt; I
+
+    I --&gt; J{Comfortable with Core Concepts?}
+    J --&gt;|No| K[Identify Weak Areas]
+    J --&gt;|Yes| L[Prepare to Collaborate with Others]
+
+    K --&gt; K1[Make Something and Review]
+    K1 --&gt; J
+</code></pre>
+<p>Moving forward from here, be retrospective.<br/>
+Ask yourself:  </p>
+<ul>
+<li>
+<p><em>What am I having a problem with? What can I create that will help me understand the nuances of C programming even better?</em></p>
+</li>
+<li>
+<p><em>What are the unique features of a language like C? One of them is that it gives me full control over my machine. Well, since it gives me full control, I should be able to create something that interacts with or operates on my machine at a considerably lower level... hmm, maybe a notification daemon that runs continuously to remind me to drink water? I could use Python as well, but hey, that would consume much more resources than C! Okay, that’s it, I’m going to make it in C!</em></p>
+</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Recreate</p>
+<p>Brainstorm more questions all by yourself.    </p>
+</div>
+<div class="admonition warnings">
+<p class="admonition-title">How to Debug?</p>
+<p>Well, that's a very good question. You'll discover it along the way. To put it in short: First read error messages systematically, then isolate problem areas, use print statements strategically and/or use IDE debuggers. Anyway, you'll realise the importance of writing Unit Tests eventually. (I realised that very late)</p>
+</div>
+<h2 id="you-are-not-scared-anymore">You are Not Scared Anymore</h2>
+<p><strong>Needs:</strong> Collaborate, Versioning, Linting, Docs and More</p>
+<h3 id="git-and-collaboration">Git and Collaboration</h3>
+<p>This is a VERY IMPORTANT section.</p>
+<ul>
+<li>Learn about <a href="https://youtu.be/DVRQoVRzMIY?si=uRfudzDI6spRfguS">Git and Github</a>. They are not the same, don't let their names fool you. As a beginner, at least know these:
+<code>git init, git config, git status, git add, git commit, git log, git clone, git branch, git checkout (or git switch), git merge, git pull, git push, git remote -v, git fetch, git rebase, git diff, git stash,git reset, git tag, git pull upstream</code><br/>
+<strong>Reason:</strong> Centralize your code, track every change, and enable team collaboration via pull/merge requests.</li>
+<li>Write clear commit messages, examples:<ul>
+<li><code>feat: add user authentication module</code></li>
+<li><code>fix: resolve race condition in data loader</code></li>
+<li>Use issue trackers to plan and discuss tasks</li>
+</ul>
+</li>
+</ul>
+<h3 id="linting-and-formatting">Linting and Formatting</h3>
+<ul>
+<li>
+<p>Use <strong>formatters</strong> like <a href="https://prettier.io/">Prettier</a> (JS/CSS), <a href="https://black.readthedocs.io/">Black</a> (Python) and <strong>linters</strong> like ESLint, Flake8
+  <strong>Reason:</strong> Maintain a consistent code style and catch potential errors before runtime.</p>
+</li>
+<li>
+<p>Add pre-commit hooks with <a href="https://pre-commit.com/">pre-commit</a></p>
+</li>
+<li>Configure IDE extensions to autoformat on save</li>
+</ul>
+<div class="admonition danger">
+<p class="admonition-title">REMEMBER</p>
+<p>Agree on a style guide (e.g., Airbnb for JavaScript, PEP 8 for Python) at the project’s outset to avoid endless debates about semicolons or indentation.</p>
+</div>
+<h3 id="more">More</h3>
+<p>Learn how to write tests, build systems, automations, CI/CD pipelines, logging, profiling, design patterns etc. There are numerous resources on the internet, and you already know how to search and learn from them.</p>
+<h2 id="the-art-of-technical-questioning">The Art of Technical Questioning</h2>
+<p>Your growth as a programmer is directly tied to <strong>how well you form questions</strong>, both for search engines and AI assistants.</p>
+<h3 id="stop-asking-like-this">Stop Asking Like This</h3>
+<blockquote>
+<p><em>"How do I make a calculator in Python?"</em><br/>
+<em>"Fix my code."</em></p>
+</blockquote>
+<p>These are dead-end prompts. They attract shallow answers and teach you nothing.</p>
+<h3 id="ask-like-this-instead">Ask Like This Instead</h3>
+<blockquote>
+<p><em>"I want to build a calculator that handles complex mathematical expressions. I understand basic arithmetic operations, but I'm unsure how to parse expressions like <code>(2 + 3) \ 4</code>. What concepts should I research? What algorithms should I look for?"</em></p>
+<p><em>"I'm implementing binary search. My code works for sorted arrays, but fails with duplicate values. Here's my logic: <code>{explain it}</code>. What am I overlooking about how binary search handles duplicates?"</em></p>
+</blockquote>
+<div class="admonition tip">
+<p class="admonition-title">Try</p>
+<p>Always mention what you <strong>already know</strong>, what you've <strong>already tried</strong>, and what you're <strong>actually confused about</strong>.</p>
+</div>
+<p>Here are additional examples:</p>
+<blockquote>
+<p><em>"My recursive Fibonacci function becomes slow for inputs over 35. I suspect it's recalculating values. Can you walk me through with any technique to minimize recalculation?"</em></p>
+<p><em>"Here’s my inventory management system using OOP. Here’s the class structure: <code>{insert code}</code>. What design patterns could simplify this?"</em></p>
+<p><em>"I think using a dictionary for user preferences will be faster than a list, since dict lookups are O(1) and list searches are O(n). Is there any better way?"</em></p>
+</blockquote>
+<div class="admonition warnings">
+<p class="admonition-title">Read Code Written By Others</p>
+<p>What you'll need: A pen and a notebook. Go and peek into the code of any Github repository you find.</p>
+</div>
+<pre class="mermaid"><code>graph TD
+    L[Prepare to Collaborate with Others] --&gt; L1[Version Control]
+    L --&gt; L2[Code Quality and Standards]
+    L --&gt; L3[Testing and Automation]
+
+    L1 --&gt; M[Learn to Communicate]
+    L2 --&gt; M
+    L3 --&gt; M
+
+    M --&gt; M1{Can Form Precise Questions?}
+    M1 --&gt;|No| N[Learn Question Formulation]
+    M1 --&gt;|Yes| O[Continuous Learning Loop]
+
+    N --&gt; N1[Context + Known Information]
+    N --&gt; N2[Specific Problem Statement]
+    N --&gt; N3[Clear Confusion Point]
+
+    N1 --&gt; O
+    N2 --&gt; O
+    N3 --&gt; O
+</code></pre>
+<h2 id="ending-note">Ending Note</h2>
+<p>From my experience, I've learned that the main bottlenecks in programming are <em>problem-solving time</em> and <em>persistence</em>. With consistent effort, both can be improved. I'm still learning myself and have only scratched the surface. All the information presented here is the culmination of lots of trials and errors, copy pasting from StackOverflow, being embarrassed on Discord servers, subreddits, forums, code reviews and general discussions with other programmers. I did not know what linting meant, or why should I use <code>uv</code> in the first place. I didn't understand the importance of Git and assumed that the GitHub web UI would be sufficient for a long time. 10 months ago, I did not know how to handle a CI pipeline for Github Actions. But as humans, we're capable of learning quickly. Learning Never Stops.</p>
+<pre class="mermaid"><code>graph TD
+    O[Continuous Learning Loop] --&gt; O1[Analyze Others' Code]
+    O --&gt; O2[Build Complex Projects]
+    O --&gt; O3[Mentor Others]
+
+    O1 --&gt; P{Ready for Greater Challenges?}
+    O2 --&gt; P
+    O3 --&gt; P
+
+    P --&gt;|No| Q[Identify Next Learning Goal]
+    P --&gt;|Yes| R[Explore a New Domain]
+
+    Q --&gt; O
+    R --&gt; S[Fuck around and Find Out.]
+</code></pre>
+<h2 id="tldr">TLDR</h2>
+<p><strong>Understand and Plan:</strong> Build core CS mental models (videos/articles + flowcharts) before coding.<br/>
+<strong>Setup and Learn:</strong> Configure your editor, pick a first language (Python), master basics (syntax, data structures, simple projects). <br/>
+<strong>Ask Precisely:</strong> When stuck, state what you know, tried, and exactly where you’re stuck, use Google/AI for guidance, not answers<br/>
+<strong>Collaborate and Iterate:</strong> Use Git, linters, tests, CI/CD; review others’ code, build projects, mentor.<br/>
+Repeat the learning loop.</p>
+<p><pre class="mermaid"><code>flowchart TD
+    A[Look Around and Identify a Problem] --&gt; B[Identify Entities, Their Operations, and State Changes]
+    B --&gt; C[Build a Flowchart]
+    C --&gt; D[Express in Code]
+    D --&gt; E{Need Additional Libraries?}
+    E --&gt;|Yes| F[Integrate Libraries]
+    E --&gt;|No| G[Proceed]
+    F --&gt; G
+    G --&gt; H{Stuck?}
+    H --&gt;|Yes| I[Formulate Questions: What, Where, When, How, What If…]
+    I --&gt; J[Research: Google / Ask People / AI]
+    J --&gt; B
+    H --&gt;|No| K[Test and Iterate]
+    K --&gt; B
+</code></pre>
+There is no end.  </p>
+<p>For suggestions/corrections, please <a href="mailto:datavorous.work@gmail.com">email</a> me.</p>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/datavorous" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2" fill="currentColor"></path></svg>
+</a>
+<a class="md-social__link" href="https://x.com/datavorous314" rel="noopener" target="_blank" title="x.com">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M357.2 48h70.6L273.6 224.2 455 464H313L201.7 318.6 74.5 464H3.8l164.9-188.5L-5.2 48h145.6l100.5 132.9zm-24.8 373.8h39.1L119.1 88h-42z" fill="currentColor"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "..", "features": ["toc.integrate", "content.code.annotate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../assets/javascripts/bundle.50899def.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+window.mermaidConfig = {default: {
+    startOnLoad: false
+}};</script></body>
+</html>
