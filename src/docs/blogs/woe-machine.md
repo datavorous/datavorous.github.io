@@ -1,0 +1,127 @@
+
+<article class="post">
+  <header class="post-header">
+    <h1>The Woe Machine Halts.</h1>
+    <p class="subtitle">The machine is rusty, but will it halt?</p>
+    <div class="post-meta">
+      <span class="author">datavorous</span>
+      <time datetime="2025-06-24" class="date">June 25, 2025</time>
+    </div>
+  </header>
+
+  <section class="post-content">
+      <p>
+      Every new academic session brings the same question, "How do I get started with programming? Most answers I see are robotic checklists. Install this or that IDE, follow these tutorials, complete these courses, rinse and repeat. That approach turns humans into code monkeys, not thinkers.<br>
+      I believe that before you start chasing lectures or deadlines, you should first ask yourself <b>WHY</b> you want to pursue Computer Science. One should try out things that help them understand why they wish to pursue it in the first place. These simple questions carry more weight than any syllabus.<br><br>
+
+
+      I felt compelled to write <a href="https://archive.ph/n01CB">this post</a> to offer an alternate lens, one rarely seen in beginner programming guides. Most such guides begin with a catchy hook and end with a paid promotion. That’s not how exploration begins.<br> 
+      Art and the natural sciences, for they came long before, must entail a faint fragrance of the Computational Mindset.
+      <img src="../assets/reddit_ss.png">
+      I tried to gently push a new flock of brains towards that path, although their main interests are very evident, so that particular niche had to be discussed substantially. Otherwise the post would have been downvoted to oblivion.<br>
+
+      Most people think programming equals computer science, but that's like saying knowing how to use a paintbrush makes you an artist. Programming is merely the symbolic language we use to express our ideas, while computer science is really about how we interpret and synthesize information in meaningful ways.<br><br>
+
+      This is a personal blog, so I’ll also share how I wandered into this field and why I stayed.
+      </p>
+
+      <h1 id="path-1-">Woe of the Naive's Mind</h1>
+      
+      <p>
+        Curiosity precedes exploration. In 2017, the 10 year old me loved to paint, break devices, and play silly games on WinXP. After losing repeatedly in Minesweeper, I was compelled to make a game of my own, where I could atleast win once. By the turn of events, I laid my hand on a book about QBasic (QB64).<br>My first program printed odd numbers in an infinite loop. I had the <code>/examples</code> folder that came with QB64, besides that book, to my aid. Initially, I would copy, edit, and merge snippets from various examples to build something unique.<br><br>
+        <img src="https://qb64.com/images/qbjs.png">
+        <figcaption><center>This was present as one of the examples!</center></figcaption>
+        One day, I managed to render a circle. 
+        Then I rendered a few more. 
+        And then 100s, this time with random (x,y) coordinates.<br><br>
+        Questions. Questions flooded.<br>
+        "Is my random same as the computer's random?"<br>
+        "If pixels are arranged in a particular way, I can make a painting, maybe?"<br>
+        A vague, tickling sensation would tell me, a computer might be able to generate abstract paintings. I just did not know how. (Generative Art was a foreign concept) 
+      </p>
+
+      <p>
+        Every day, after returning from school, I would try to mess around with the example programs and try to create something new. With a faulty way of self-taught trignometry, I managed to render a rotating triangle after a long wrestle with the sin() and cos() functions.<br>
+        "sin theta would mean perpendicular divided by hypotenuse or a triangle, then HOW would THIS MACHINE know the value of all such angles?" (I didn't even know there could be something beyond 90°, so it came as a shock) <br><br>
+
+        I ended up partially implementing an ad hoc Doppler effect simulation (QB offered a BEEP() function), basic equations of motion and created lots of generative art using RAND() and trig functions.<br><br>
+
+        <img src="../assets/woe/frac.png">
+
+        I was an avid reader of science fiction stories and novels. I remember reading a story named "Compu" (A spherical shaped robot, which self-destructed after announcing that it has discovered what comes after death (Satyajit Ray -> Professor Shonku (Compu) ). It claimed to be conscious, as well.). 
+        Now, naive me, wrote almost 200 (183 to be exact) if-else-if statements, hoping that I could build a sentient being. (Okay, this is hilarious!) The fascination of creating an entity which nature could not, would keep anyone awake at night.
+        <br><br>
+        2019, I had to learn C, because I wanted to make use of an Arduino UNO. Same process, reading an offline manual and a bunch of examples. 
+        Well, nothing special happened that year, except a few mishaps while dealing with an SSTC and red phosphorus. But that's a different story.
+      </p>
+
+      <h1 id="path-2-">The Woe Machine Awakens</h1>
+      <p>
+        In 2020, I stumbled upon a rather obscure YouTube playlist where a computational physicist demonstrated how he used VPython in his work. I got hooked. I tinkered around with Arduino, VPython, ultrasonic sensors, and a few servo motors to build a crude 3D scanner (could capture only a single surface). The surface construction procedure was an abomination, and was duct-taped.  
+        <br><br>
+        At one point, I became obsessed with Euler's Disk and wanted to experiment with various disks of different radii and friction coefficients. The only way was to simulate that somehow. During that ongoing quest, I found Daniel Shiffman’s Nature of Code playlist. Probably it was one of the best things that ever happened to me.<br><br>
+
+        Shiffman introduced me to agent-based models, fractals, and emergent behaviours. Simple iterative rules spawning ever complicated patterns. 
+        Hours and hours of staring into the black and white coloured cells of cellular automata, ever increasing entropy. It was mesmerising and beautiful. Everything seems to be connected. Somehow, somehow. It needs to be comprehended. Somehow.
+        <img src="../assets/woe/tadpoles.png">
+        <br><br>
+        This could be the language in which other domains could be remodeled, re-presented and maybe..re-written.
+        <br>
+        Physics, could become a matter of simulation, states and information exchange. (or could atleast assist)<br>
+        Biology, could become an algorithmic evolution of state machines, albeit chaotic and unpredictable.<br>
+        Art? Rules, transformations, information densities.<br><br>
+        I had discovered this notion of "Thinking in Systems", not as frankensteining code snippets, but as tracing the invisible connections or making sure the filaments run through every entity and process.
+      </p>
+
+      <h1 id="path-3-">Rust o' Woe</h1> 
+      <p>
+        Lately I feel something hardening in my throat, an unspoken rage, too heavy to shout and too diffuse to name.<br>
+        It lurks there, a crystallized form of apathy that I can’t get rid of. (Is this what disappointment smells like? Or is it just exhaustion?)
+        <img src="../assets/woe/4.png">
+        <figcaption><center>Seriously?</center></figcaption>
+
+        The world has shifted.<br>I see legions of aspirants rallying behind this same manifesto.
+
+        Is this what the “Woe Machine” has become?<br> Rusted away, churning out drones who’ve traded curiosity for checkpoints? 
+        <img src="../assets/woe/2.png">
+
+         Maybe it’s just me. Maybe I’m the one out of sync. Because everywhere I turn, there's someone grinding, optimizing, hustling like life is a competitive programming leaderboard.<br><br>
+         Oh WAIT! Something happened last weekend. 
+         <img src="../assets/woe/7.png">
+         Haha.<br>
+         What happened to wandering? To play aimlessly? To writing code without worrying if it’ll make it to GitHub or HackerNews? 
+         I remember building ugly tools that made me laugh. No frameworks. No deadlines.
+         That’s gone now, buried.<br><br>
+
+         The kid from the first image wants to succeed, perhaps using a metric which everyone of us has come to value more.<br> Well, so did I, once. So do I, still. But something about the way we frame success now; it tastes synthetic. Empty.
+
+         I have met way too many people, whose sole aim is to "crack" [insert anything which was never meant to be a competition, for example GSoC]. I have found great people as well, but they are as rare as Red Camellias. The tide would still be stronger on the other side.
+
+        <img src="../assets/woe/3.png">
+
+      </p> 
+      <br>
+
+      <h1 id="path-3-">The Woe Machine...Pauses</h1> 
+      <p>
+
+        My musings lack rigour, and are to be taken lightly. My eyelids feel heavy. This has become a collection of my stream of thoughts, instead of a well articulated essay.<br><br>
+        "Woe Machine", is my metaphor for the brain, the collective hive mind, which you probably have guessed by now.
+        It questions its own foundations, confronts its own knowledge gaps and iterates endlessly.
+        True halting is impossible; each answer breeds new questions.
+        <br>
+        This machine isn't silicon, but human curiosity. It converts confusion into models, then models into deeper inquiries. We pause, reflect, and reboot.<br><br>
+        Collectively, we will rediscover the joy of wondering and exploring, once again.<br><br>
+        For the machine never really halts, just ... pauses.
+      </p>
+
+      <h1 id="dump">Read More</h1>
+      <p>
+        <ol><a href="https://www.reddit.com/r/Class29Thirty/comments/1li6t80/a_small_guide_to_exploring_computational_sciences/">A Reddit Post, written by Me</a> / <a href="https://archive.ph/n01CB">Archive</a></ol>
+        <ol><a href="https://cpu.land">CPU Land</a></ol>
+        <ol><a href="https://natureofcode.com/">Nature of Code</a></ol>
+        <ol><a href="https://www.lesswrong.com/">LessWrong</a></ol>
+      </p> 
+    
+  </section>
+</article>
