@@ -1,4 +1,0 @@
-mkdocs-material
-mkdocs-charts-plugin
-pymdown-extensions
-mkdocs-mermaid2-plugin==1.2.1
