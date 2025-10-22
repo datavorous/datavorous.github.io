@@ -43,7 +43,7 @@
     <br><br>
     That's exactly the model I used for my implementation. Now that the "why" and "where it came from" is clear, let's look at the "how" - starting with the basic blocks of the collector.<br><br>
 
-    The code can be found <a href="https://github.com/datavorous/garbage-collector-py">here.</a> Personally, I prefer visually understanding something over throwing around syntax all around.
+    The code can be found <a href="https://github.com/datavorous/garbage-collector-py">here</a>. Personally, diagrams make sense to me much faster than piles of syntax. So we will take that route.
 </p>
 
 
@@ -222,7 +222,10 @@ _Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])</code></pre>
 
 <p><strong>SWEEP PHASE:</strong> A, B, C all are marked, so keep. X, Y, Z none of them are marked, so all three of them get deleted.</p>
 
-<p>That's it.</p>
+<h3>Wrapping It Up</h3>
+<p>That's it.<br>
+    This toy implementation is intentionally simple. It runs in one thread, pauses the world, doesn’t handle fragmentation, and skips real-world optimizations like generations, compaction, or tri-color marking.<br>The next steps on this journey could be implementing a copying collector, adding generations, or experimenting with incremental "stop-less" GC, etc.<br><br>Maybe, someday...
+</p>
 
 </body>
 </html>
