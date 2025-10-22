@@ -15,10 +15,44 @@
 
 <h2>Garbage Collector</h2>
 
-<p>This garbage collector automates memory management by marking all objects reachable from roots (like global variables), then sweeping away everything that was not marked (unreachable = garbage).</p>
+<p>
+    On a boring saturday night, right after my midterm exams ended, I sat down with a strange urge to build a garbage collector from scratch. We all benefit from it, but most of us never question <i>how</i>. This is the summary of what I found, and what I understood.
+</p>
+<p>
+    If a program has no way to access a piece of memory anymore, that memory is garbage, so the garbage collector should reclaim it. In low level languages like C/C++, we allocate and free memory manually. If we forget to free memory, we leak it, or if we free the wrong thing, we crash. <br>
+    The GC automates this, so the programmer does not need to track memory lifetime, explicitly.<br>
+    Programs create tons of temporary objects, we only want to keep memory for data that is reachable and still needed. <br>
+    A GC asks two questions:<br>
+    1. What memory is still in use (reachable)?<br>
+    2. What can be freed safely (unreachable)?<br>
+</p>
+<p>
+    This blog is my dev-journal of understanding that system, starting from the original Mark-and-Sweep algorithm John McCarthy created for Lisp in 1959, and slowly building up a working GC of my own in Python.
+</p>
+<p>
+    I think to fully appreciate the brilliance of something, one needs to know the history of it.<br>Before diving into code, it helps to know where garbage collection actually came from. The idea is not modern, its origin goes all the way back to John McCarthy, the creator of Lisp in 1959. Lisp introduced dynamic data structures made of linked lists, but manual memory management quickly became a nightmare. He proposed a simple yet powerful idea that: <i>the system itself should detect unused objects and reclaim memory automatically</i>. His paper, <b>"Recursive Functions of Symbolic Expressions"</b> (1960), introduced what became the first widely known GC algorithm: Mark and Sweep.
+
+    From there things evolved gradually: <br>
+    1. 1959-60: Mark and Sweep (McCarthy): Trace reachable objects and delete others<br>
+    2. Early 60s: Reference counting (Colling et al.): keep a reference counter on each object<br>
+    3. Late 60s: Copying GC (Cheney, 1970): Move reachable data to a fresh space and compact it
+</p>
+<p>
+    Despite all the variations since then, the core principle has never changed.
+    Since the programs form object graphs, the rule becomes simple: whenever we can reach from the roots (globals, stack, and registers), must stay. Everything else can be collected.
+    <br><br>
+    That's exactly the model I used for my implementation. Now that the "why" and "where it came from" is clear, let's look at the "how" - starting with the basic blocks of the collector.<br><br>
+
+    The code can be found <a href="https://github.com/datavorous/garbage-collector-py">here.</a> Personally, I prefer visually understanding something over throwing around syntax all around.
+</p>
+
+
 
 <h3>The Building Blocks</h3>
 
+<p>
+    To simulate memory, I created a few simple structures:<br>
+</p>
 <p><strong>_Obj</strong> - This is like a node in a graph. It has an <code>id</code> (unique identifier), <code>value</code> (the actual data stored), <code>fields</code> (references to OTHER objects, like links in a graph), <code>marked</code> (used during GC to track 'I have been visited'), and <code>freed</code> (tracks if this object has been deleted).</p>
 
 <p><strong>ObjectRef</strong> - A wrapper that lets us safely reference objects. Nothing serious.</p>
@@ -28,6 +62,8 @@
 <h3>Creating Objects</h3>
 
 <img src="../media/gc/1.png" alt="initial objects">
+
+Before any collection happens, we need something in memory to work with. Using the GC’s <code>alloc()</code> function, we can create objects on the heap:
 
 <pre><code class="language-python">gc = MarkSweepGC()
 
