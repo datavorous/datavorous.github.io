@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Garbage Collector — datavorous</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../extra/index.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <link href="../extra/gruv.css" rel="stylesheet" />
+</head>
+<body>
+
+<header>
+    <a href="../index.html" class="resume-btn">← back to home</a>
+    <h1 class="name">garbage collector</h1>
+    <div class="subtitle"></div>
+    <div class="intro">
+
+    </div>
+</header>
+
+<section class="section">
+    <h2 class="section-title">Mark and Sweep</h2>
+    <p>This garbage collector automates memory management by:</p>
+    <p>1. Marking all objects reachable from roots (like global variables)<br>
+    2. Sweeping away everything that was not marked (unreachable = garbage)</p>
+</section>
+
+<section class="section">
+    <h2 class="section-title">The Building Blocks</h2>
+
+    <h3>1. <code>_Obj</code></h3>
+    <p>This is like a node in a graph</p>
+    <p>a. <code>id</code>: unique identifier</p>
+    <p>b. <code>value</code>: the actual data stored</p>
+    <p>c. <code>fields</code>: references to OTHER objects (like links in a graph)</p>
+    <p>d. <code>marked</code>: used during GC to track 'I have been visited'</p>
+    <p>e. <code>freed</code>: tracks if this object has been deleted</p>
+
+    <h3>2. <code>ObjectRef</code></h3>
+    <p>A wrapper that lets us safely reference objects. Nothing serious.</p>
+
+    <h3>3. MarkSweepGC</h3>
+    <p>This is the main class for memory management.</p>
+    <p>a. <code>heap</code>: where all objects live (dictionary: id -&gt; object)</p>
+    <p>b. <code>roots</code>: objects that must NOT be garbage collected</p>
+</section>
+
+<section class="section">
+    <h2 class="section-title">Example</h2>
+</section>
+
+<section class="section">
+    <h2 class="section-title">Creating Objects</h2>
+    <img src="media/1.png" alt="media/1.png">
+    <pre><code class="language-python">gc = MarkSweepGC()
+
+obj_a = gc.alloc("Node A")
+obj_b = gc.alloc("Node B")
+obj_c = gc.alloc("Node C")
+obj_d = gc.alloc("Node D")
+
+print(gc.heap_snapshot())</code></pre>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">HEAP size=4, ROOTS=[]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+
+    <p>4 objects have been allocated, and each has got a unique ID (1,2,3,4)</p>
+
+    <p>No roots yet, that means everything is eligible for garbage collection.</p>
+
+    <p>NO fields yet too, so objects are all isolated.</p>
+</section>
+
+<section class="section">
+    <h2 class="section-title">Building Graph Structure</h2>
+    <img src="media/2.png" alt="media/2.png">
+    <pre><code class="language-python">gc.set_field(obj_a, "left", obj_b)
+gc.set_field(obj_a, "right", obj_d)
+gc.set_field(obj_b, "child", obj_c)
+
+print(gc.heap_snapshot())</code></pre>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">HEAP size=4, ROOTS=[]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -&gt; #2, right -&gt; #4])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -&gt; #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+
+    <p>Still no roots, if we run GC now, EVERYTHING gets deleted.</p>
+</section>
+
+<section class="section">
+    <h2 class="section-title">Marking a Root</h2>
+    <img src="media/3.png" alt="media/3.png">
+    <pre><code class="language-python">gc.add_root(obj_a)
+print(gc.heap_snapshot())</code></pre>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">HEAP size=4, ROOTS=[1]
+... rest remain same ...</code></pre>
+
+    <p>Now object #1 (A) is a root. It's like saying "this is a global variable, don't delete it".</p>
+</section>
+
+<section class="section">
+    <h2 class="section-title">First Garbage Collection</h2>
+
+    <pre><code class="language-python">gc.gc()
+print(gc.heap_snapshot())</code></pre>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">HEAP size=4, ROOTS=[1]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -&gt; #2, right -&gt; #4])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -&gt; #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+
+    <p>Things remain same.</p>
+
+    <p>What happened when we called <code>gc()</code>?</p>
+
+    <p><strong>*MARK PHASE*</strong></p>
+    <ol>
+        <li>We start at root A (id=1), mark it</li>
+        <li>A has fields: left -&gt; B(2) and right -&gt; D(4)</li>
+        <li>Visit B, mark it. B has child -&gt; C(3)</li>
+        <li>We visit C, mark it. C has no children.</li>
+        <li>Visit D, mark it. D has no children.</li>
+    </ol>
+
+    <p><strong>*SWEEP PHASE*</strong></p>
+    <ol>
+        <li>Check Object 1: marked? YES -&gt; keep, reset mark</li>
+        <li>Check Object 2: marked? YES -&gt; keep, reset mark</li>
+        <li>Check Object 3: marked? YES -&gt; keep, reset mark</li>
+        <li>Check Object 4: marked? YES -&gt; keep, reset mark</li>
+    </ol>
+
+    <p>Everything reachable from root A(1) was kept.</p>
+</section>
+
+<section class="section">
+    <h2 class="section-title">Creating Garbage</h2>
+    <img src="media/4.png" alt="media/4.png">
+
+    <p>We create an orphan that's NOT connected to any root.
+    We remove the connection A -&gt; D</p>
+
+    <pre><code class="language-python">gc.set_field(obj_a, "right", None)
+print(gc.heap_snapshot())</code></pre>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -&gt; #2])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -&gt; #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+
+    <p>Now we do garbage collection again,</p>
+
+    <pre><code class="language-python">gc.gc()
+print(gc.heap_snapshot())</code></pre>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">HEAP size=3, ROOTS=[1]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -&gt; #2])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -&gt; #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])</code></pre>
+
+    <p>D is gone, just like ...</p>
+</section>
+
+<section class="section">
+    <h2 class="section-title">Creating a Cycle</h2>
+    <img src="media/5.png" alt="media/5.png">
+    <img src="media/6.png" alt="media/6.png">
+
+    <p>One of the key strengths of using mark-and-sweep over reference counting is that, it can handle cyclic relations.</p>
+
+    <p>say, for A -&gt; B -&gt; C -&gt; A (cycle): each object has a reference count &gt; 0, so none get deleted even if unreachable from roots.</p>
+
+    <p>Let's build a cycle.</p>
+
+    <pre><code class="language-python">node_a = gc.alloc("A")
+node_b = gc.alloc("B")
+node_c = gc.alloc("C")
+gc.add_root(node_a)
+
+gc.set_field(node_a, "next", node_b)
+gc.set_field(node_b, "next", node_c)
+gc.set_field(node_c, "next", node_a)
+print(gc.heap_snapshot())</code></pre>
+
+    <p>This cycle constitutes of the root (A(1))</p>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">HEAP size=3, ROOTS=[1]
+_Obj #1 (val='A', marked=False, freed=False, fields=[next -&gt; #2])
+_Obj #2 (val='B', marked=False, freed=False, fields=[next -&gt; #3])
+_Obj #3 (val='C', marked=False, freed=False, fields=[next -&gt; #1])</code></pre>
+
+    <p>Hence it is a <em>reachable</em> cycle, and if we run GC, all of them survive.
+    We can trace through <code>_mark()</code>:</p>
+
+    <ol>
+        <li>starting at root: A(1)
+            <ul>
+                <li>- is A marked? no.</li>
+                <li>- mark A</li>
+                <li>- A has field: next -&gt; B(2)</li>
+                <li>- recursively call <code>_mark(B)</code></li>
+            </ul>
+        </li>
+        <li>at B(2)
+            <ul>
+                <li>- is B marked? no.</li>
+                <li>- mark B</li>
+                <li>- B has field: next -&gt; C(3)</li>
+                <li>- recursively call <code>_mark(C)</code></li>
+            </ul>
+        </li>
+        <li>.. same procedure ..</li>
+        <li>Back at A(1):
+            <ul>
+                <li>- is A marked? YES (BAM!)</li>
+                <li>- return immediately (to avoid infinite loop)</li>
+            </ul>
+        </li>
+    </ol>
+
+    <img src="media/7.png" alt="media/7.png">
+
+    <p>Let's make an unreachable cycle, which will be collected:</p>
+
+    <pre><code class="language-python">orphan_x = gc.alloc("X")
+orphan_y = gc.alloc("Y")
+orphan_z = gc.alloc("Z")
+
+gc.set_field(orphan_x, "next", orphan_y)
+gc.set_field(orphan_y, "next", orphan_z)
+gc.set_field(orphan_z, "next", orphan_x)
+print(gc.heap_snapshot())</code></pre>
+
+    <p>Output:</p>
+    <pre><code class="language-bash">HEAP size=6, ROOTS=[1]
+_Obj #1 (val='A', marked=False, freed=False, fields=[next -&gt; #2])
+_Obj #2 (val='B', marked=False, freed=False, fields=[next -&gt; #3])
+_Obj #3 (val='C', marked=False, freed=False, fields=[next -&gt; #1])
+_Obj #4 (val='X', marked=False, freed=False, fields=[next -&gt; #5])
+_Obj #5 (val='Y', marked=False, freed=False, fields=[next -&gt; #6])
+_Obj #6 (val='Z', marked=False, freed=False, fields=[next -&gt; #4])</code></pre>
+
+    <p>Well, now if we run GC,</p>
+
+    <pre><code class="language-python">gc.gc()
+print(gc.heap_snapshot())</code></pre>
+
+    <p>The unreachable cycle get's removed.</p>
+
+    <pre><code class="language-bash">HEAP size=3, ROOTS=[1]
+_Obj #1 (val='A', marked=False, freed=False, fields=[next -&gt; #2])
+_Obj #2 (val='B', marked=False, freed=False, fields=[next -&gt; #3])
+_Obj #3 (val='C', marked=False, freed=False, fields=[next -&gt; #1])</code></pre>
+
+    <p><strong>*MARK PHASE*</strong></p>
+    <ol>
+        <li>We start at root A (id=1), mark it</li>
+        <li>A has fields: left -&gt; B(2) and right -&gt; C(3) (stops when hitting already-marked A(1))</li>
+        <li>X(4), Y(5), Z(6) are NEVER visited.</li>
+    </ol>
+
+    <p><strong>*SWEEP PHASE*</strong></p>
+    <ol>
+        <li>A, B, C all are marked, so keep.</li>
+        <li>X, Y, Z none of them are marked, so all three of them get deleted.</li>
+    </ol>
+</section>
+
+<section class="section">
+    <h2 class="section-title">That's it.</h2>
+</section>
+
+<script src="../extra/index.js"></script>
+</body>
+</html>
