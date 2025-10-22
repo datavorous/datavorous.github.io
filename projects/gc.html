@@ -54,7 +54,7 @@
 
 <section class="section">
     <h2 class="section-title">Creating Objects</h2>
-    <img src="media/1.png" alt="media/1.png">
+    <img src="../media/gc/1.png" alt="../media/gc/1.png">
     <pre><code class="language-python">gc = MarkSweepGC()
 
 obj_a = gc.alloc("Node A")
@@ -80,7 +80,7 @@ _Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
 
 <section class="section">
     <h2 class="section-title">Building Graph Structure</h2>
-    <img src="media/2.png" alt="media/2.png">
+    <img src="../media/gc/2.png" alt="../media/gc/2.png">
     <pre><code class="language-python">gc.set_field(obj_a, "left", obj_b)
 gc.set_field(obj_a, "right", obj_d)
 gc.set_field(obj_b, "child", obj_c)
@@ -99,7 +99,7 @@ _Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
 
 <section class="section">
     <h2 class="section-title">Marking a Root</h2>
-    <img src="media/3.png" alt="media/3.png">
+    <img src="../media/gc/3.png" alt="../media/gc/3.png">
     <pre><code class="language-python">gc.add_root(obj_a)
 print(gc.heap_snapshot())</code></pre>
 
@@ -149,7 +149,7 @@ _Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
 
 <section class="section">
     <h2 class="section-title">Creating Garbage</h2>
-    <img src="media/4.png" alt="media/4.png">
+    <img src="../media/gc/4.png" alt="../media/gc/4.png">
 
     <p>We create an orphan that's NOT connected to any root.
     We remove the connection A -&gt; D</p>
@@ -179,8 +179,8 @@ _Obj #3 (val='Node C', marked=False, freed=False, fields=[])</code></pre>
 
 <section class="section">
     <h2 class="section-title">Creating a Cycle</h2>
-    <img src="media/5.png" alt="media/5.png">
-    <img src="media/6.png" alt="media/6.png">
+    <img src="../media/gc/5.png" alt="../media/gc/5.png">
+    <img src="../media/gc/6.png" alt="../media/gc/6.png">
 
     <p>One of the key strengths of using mark-and-sweep over reference counting is that, it can handle cyclic relations.</p>
 
@@ -230,12 +230,12 @@ _Obj #3 (val='C', marked=False, freed=False, fields=[next -&gt; #1])</code></pre
         <li>Back at A(1):
             <ul>
                 <li>- is A marked? YES (BAM!)</li>
-                <li>- return immediately (to avoid infinite loop)</li>
+                <li>- return im../mediately (to avoid infinite loop)</li>
             </ul>
         </li>
     </ol>
 
-    <img src="media/7.png" alt="media/7.png">
+    <img src="../media/gc/7.png" alt="../media/gc/7.png">
 
     <p>Let's make an unreachable cycle, which will be collected:</p>
 
