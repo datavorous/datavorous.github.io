@@ -11,6 +11,10 @@
     box-sizing: border-box;
 }
 
+a {
+    color: #1772ea;
+}
+
 body {
     font-family: 'Andada Pro', monospace;
     font-weight: 300;
@@ -20,17 +24,18 @@ body {
     padding: 2rem;
     max-width: 53rem;
     margin: 0 auto;
+    font-size: 1.1rem;
 }
 
 h1 {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
     letter-spacing: -0.02em;
 }
 
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 500;
     margin: 2rem 0 1rem 0;
     border-bottom: 1px solid var(--color-border);
@@ -49,7 +54,7 @@ h3 {
 
 p {
     color: #555;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin-bottom: 1rem;
     line-height: 1.7;
 }
@@ -90,18 +95,35 @@ em {
 .subtitle {
     color: #666;
     margin-bottom: 1rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .intro {
     color: #555;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.links {
+    color: #555;
+    font-size: 1.1rem;
     margin-bottom: 2rem;
     line-height: 1.7;
 }
 
+.links a {
+    color: #1772ea;
+    text-decoration: none;
+    transition: text-decoration-color 0.2s ease;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
 .intro a {
-    color: var(--color-text);
+    color: #1772ea;
     text-decoration: none;
     transition: text-decoration-color 0.2s ease;
 }
@@ -146,19 +168,19 @@ em {
 }
 
 .item-title a {
-    color: var(--color-text);
+    color: #1772ea;
     text-decoration: none;
     transition: text-decoration-color 0.2s ease;
     text-decoration-thickness: 2px;
 }
 
 .item-title a:hover {
-    text-decoration: underline dotted var(--color-text);
+    text-decoration: underline dotted #1772ea;
 }
 
 .item-desc {
     color: #555;
-    font-size: 0.85rem;
+    font-size: 1rem;
     line-height: 1.5;
 }
 
