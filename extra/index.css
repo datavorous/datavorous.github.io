@@ -155,8 +155,36 @@ h2 {
 @media (max-width: 600px) {
     body {
         padding: 1rem;
+        font-size: 0.88rem;
     }
     h1 {
         font-size: 1.5rem;
+    }
+    h2 {
+        font-size: 0.95rem;
+    }
+    h3 {
+        font-size: 0.9rem;
+    }
+    p {
+        font-size: 0.96rem;
+    }
+    .subtitle {
+        font-size: 0.76rem;
+    }
+    .intro {
+        font-size: 0.8rem;
+    }
+    .links {
+        font-size: 0.72rem;
+    }
+    .item-title {
+        font-size: 0.8rem;
+    }
+    .item-desc {
+        font-size: 0.76rem;
+    }
+    code {
+        font-size: 0.72rem;
     }
 }
