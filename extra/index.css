@@ -156,10 +156,7 @@ h2 {
     body {
         padding: 1rem;
     }
-    p {
-        font-size: 0.95rem;
-    }
-    code {
-        font-size: 0.72rem;
+    h1 {
+        font-size: 1.5rem;
     }
 }
