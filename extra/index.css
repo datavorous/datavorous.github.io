@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 * {
     margin: 0;
     padding: 0;
@@ -26,7 +27,7 @@ p {
 }
 
 code {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Fira Code', monospace;
     font-size: 0.9rem;
 }
 
