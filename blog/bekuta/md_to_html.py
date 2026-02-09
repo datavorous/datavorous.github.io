@@ -11,6 +11,8 @@ from typing import Tuple
 
 import markdown
 
+SITE_URL = "https://datavorous.github.io"
+
 
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -143,10 +145,11 @@ def main() -> None:
     home_href = get_relative_asset_path(args.output, home_path)
     og_image = None
     if og_image_raw:
-        og_source = Path(og_image_raw)
-        if not og_source.is_absolute():
-            og_source = (repo_root / og_source).resolve()
-        og_image = get_relative_asset_path(args.output, og_source)
+        if og_image_raw.startswith("http://") or og_image_raw.startswith("https://"):
+            og_image = og_image_raw
+        else:
+            og_path = og_image_raw.lstrip("/")
+            og_image = f"{SITE_URL}/{og_path}"
 
     html = build_html(
         title=title,
