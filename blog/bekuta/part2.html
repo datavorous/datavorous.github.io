@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Building a Vector Search Library from Scratch: Part 2 - IVF (Inverted File Index)</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="We build a toy vector search library in pure python, implementing ANN algorithms along the way. Part 2: Inverted File Index and some Benchmarking">
+    <meta name="author" content="datavorous">
+    <meta property="og:image" content="https://datavorous.github.io/media/bekuta/banner.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://datavorous.github.io/media/bekuta/banner.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <link rel="stylesheet" href="../../extra/index.css">
+</head>
+<body>
+    <div class="nav-links">
+        <a href="../../index.html">home</a> | <a href="https://github.com/datavorous">github</a> | <a href="https://x.com/datavorous_">twitter</a>
+    </div>
+<h1 id="building-a-vector-search-library-from-scratch-part-2-ivf-inverted-file-index">Building a Vector Search Library from Scratch: Part 2 - IVF (Inverted File Index)</h1>
+<div class="publish-date">February 10, 2026</div>
+<h2 id="the-wall-we-hit">The Wall We Hit</h2>
+<p>Previously in <a href="part1.html">Part 1</a>, we built a working vector search engine. It was correct, small, but completely impractical. Our <code>FlatIndex</code> compared every single vector in the database.
+ALL 10M OF THEM! Taking over ~9 seconds per query.</p>
+<p>The fundamental problem is that we are searching <em>everywhere</em> when we should be searching <em>somewhere</em>.</p>
+<p>Today, we are going to fix that.</p>
+<h2 id="analogy">Analogy</h2>
+<p>Imagine you walk into a massive library looking for books about "Potato People of Plitenland". You don't check every single shelf in the building, instead, you go to the "History and Culture" section, and search ONLY in that. </p>
+<p>So you get your book in seconds instead of hours.</p>
+<p>This is exactly what IVF does with vectors. We divide our space into neighbourhoods (clusters), and when a query comes in, we only search the neighbourhoods that are likely to contain similar vectors.</p>
+<p>The trade off is that, we might miss the absolute best match if it happens to be in a cluster we did not search. But we got workarounds for that, believe me for now.</p>
+<h2 id="core-idea-clustering">Core Idea: Clustering</h2>
+<p>Try to think how vectors might naturally group together. Product descriptions for "running shoes" will cluster in one area of the vector space, while descriptions for "water bottles" cluster elsewhere.</p>
+<p>If we can identify these groupings ahead of time, we can skip entire regions during search. A query about "pineapple" probably won't find its best matches in the "Bojack Horseman Merch" cluster.</p>
+<p>Let's try to think of an algorithm.</p>
+<p>Suppose we pick K random points as cluster centers (centroid), and assign each vector to its nearest centroid. Then we nudge the centroids to the average position of its assigned vectors. If we repeat this process (step 2 and 3) sufficient times, we will find that centroids will stop moving.</p>
+<p>And that is what we want!</p>
+<p>Let's see what this looks like in practice.</p>
+<h2 id="building-the-ivf-structure">Building the IVF Structure</h2>
+<p>We need to think about what an IVF index actually stores:</p>
+<pre><code class="language-py">from .base import BaseIndex
+
+class IVFIndex(BaseIndex):
+    def __init__(self, dim, metric=&quot;cosine&quot;, n_lists=100):
+        super().__init__(dim, metric)
+        self.n_lists = n_lists
+        self.centroids = []
+        self.inverted_lists = []
+        self.inverted_ids = []
+        self.is_trained = False
+</code></pre>
+<p>Did you notice something? Each cluster should be storing its own list of vectors and IDs. So shouldn't we write something like this?</p>
+<pre><code class="language-py">from .base import BaseIndex
+
+class IVFIndex(BaseIndex):
+    def __init__(self, dim, metric=&quot;cosine&quot;, n_lists=100):
+        super().__init__(dim, metric)
+        self.n_lists = n_lists
+
+        # n_lists centroids, each is a vector
+        self.centroids = []
+
+        # vectors in each cluster
+        self.inverted_lists = [[] for _ in range(n_lists)]
+
+        # corresponding IDs
+        self.inverted_ids = [[] for _ in range(n_lists)]
+        self.is_trained = False
+</code></pre>
+<p>The term "inverted" comes from information retrieval. Normally, we map <code>vector -&gt; data</code> but here, we are inverting it to <code>cluster -&gt; vectors in cluster</code>.</p>
+<p>It is like an index at the back of a book that maps topics to page numbers.</p>
+<h2 id="finding-the-clusters">Finding the Clusters</h2>
+<p>This is that point, where the paths diverge. Unlike <code>FlatIndex</code>, before we can add vectors, we need to TRAIN the index to discover the cluster structure. This requires a sample of vectors representative of our data.</p>
+<p>Let's try to implement the algorithm which we conceptualised earlier.</p>
+<pre><code class="language-py">import random as r
+# .. other code ..
+
+def train(self, training_vectors):
+    # we are picking random samples as centroids
+    self.centroids = r.sample(training_vectors, self.n_lists)
+
+    # nudges, im going with 25 iterations, which is a common choice for k-means
+    for iters in range(25):
+
+        # assigning vectors to the nearest centroid
+        assignments = [[] for _ in range(self.n_lists)]
+        for vec in training_vectors:
+            nearest_index = self._find_nearest_centroid(vec)
+            assignments[nearest_index].append(vec)
+
+        # move centroids to the mean of their assigned vectors
+        for i in range(self.n_lists):
+            if assignments[i]:
+                self.centroids[i] = self._compute_centroid(assignments[i])
+
+    self.is_trained = True
+</code></pre>
+<p>We need to implement these two functions now: <code>_find_nearest_centroid()</code> and <code>_compute_centroid()</code>. If you had to remember one thing from this entire article, it would be the implementation of the former function stated above. That is literally the heartbeat of IVF. It will do the same thing as our search function, that is to find which cluster is closest to a vector. </p>
+<pre><code class="language-py">from .kernels import SimilarityMetric
+# .. other code ..
+
+def _find_nearest_centroid(self, vector):
+    best_score = float('-inf')
+    best_index = 0
+
+    q = vector
+
+    if self.metric == &quot;cosine&quot;:
+        q = SimilarityMetric.normalize(vector)
+
+    for i, centroid in enumerate(self.centroids):
+        score = SimilarityMetric.score(self.metric, q, centroid)
+        if score &gt; best_score:
+            best_score = score
+            best_index = i
+
+    return best_index
+</code></pre>
+<p>I have full faith on my audience that they can decipher what is being done with the code shown above.</p>
+<pre><code class="language-py">def _compute_mean(self, vectors):
+    dim = len(vectors[0])
+    mean = [0.0] * dim
+
+    for vec in vectors:
+        for i in range(dim):
+            mean[i] += vec[i]
+
+    for i in range(dim):
+        mean[i] /= len(vectors)
+
+    return mean
+</code></pre>
+<p>This is pretty straightforward as well.</p>
+<h2 id="adding-vectors-to-clusters">Adding Vectors to Clusters</h2>
+<p>Now that we can train the index, let's implement <code>add()</code>.</p>
+<pre><code class="language-py">def add(self, id, vector):
+    if not self.is_trained:
+        raise ValueError(&quot;CAN NOT ADD VECTORS BEFORE BEING TRAINED&quot;)
+
+    v = vector
+    if self.metric == &quot;cosine&quot;:
+        v = SimilarityMetric.normalize(vector)
+
+    cluster_id = self._find_nearest_centroid(v)
+    self.inverted_lists[cluster_id].append(v)
+    self.inverted_ids[cluster_id].append(id)
+</code></pre>
+<p>Each vector gets assigned to exactly one cluster - the one whose centroid is closest. Over time, each inverted list fills up with similar vectors.</p>
+<p>Well, with that, let's define the <code>__len__()</code> function now.</p>
+<pre><code class="language-py">def __len__(self):
+    total = 0
+    for inverted_list in self.inverted_lists:
+        total += len(inverted_list)
+    return total
+</code></pre>
+<h2 id="the-search">The Search</h2>
+<p>Here is where IVF shows its power. Instead of searching all vectors, we find the closest cluster(s) to our quert, and then search only the vectors in those clusters. (Remember the library analogy?)</p>
+<pre><code class="language-py">import heapq
+from .kernels import SimilarityMetric
+# .. other code ..
+
+def search(self, query_vector, k):
+    if not self.is_trained:
+        raise ValueError(&quot;MUST BE TRAINED BEFORE SEARCHING&quot;)
+
+    q = query_vector
+    if self.metric == &quot;cosine&quot;:
+        q = SimilarityMetric.normalize(query_vector)
+
+    cluster_id = self._find_nearest_centroid(q)
+
+    heap = []
+    for pos in range(len(self.inverted_lists[cluster_id])):
+        vec = self.inverted_lists[cluster_id][pos]
+        id_val = self.inverted_ids[cluster_id][pos]
+        score = SimilarityMetric.score(self.metric, q, vec)
+
+        if len(heap) &lt; k:
+            heapq.heappush(heap, (score, id_val))
+        else:
+            heapq.heappushpop(heap, (score, id_val))
+
+    return [(id_val, s) for s, id_val in sorted(heap, reverse=True)]    
+</code></pre>
+<p>Look at what we are doing here. If we have 100 clusters and our vectors are evenly distributed, we are searching ~1% of the database. That's a 100x speedup.</p>
+<p>But hey, what if the best match is in the second closest cluster? We would miss it completely.</p>
+<h2 id="searching-multiple-clusters">Searching Multiple Clusters</h2>
+<p>We will introduce a parameter called <code>n_probe</code>. This is the key parameter for tuning the accuracy-speed trade off. We need to modify our <code>IVFIndex</code> class now.</p>
+<pre><code class="language-py">class IVFIndex(BaseIndex):
+    def __init__(self, dim, metric=&quot;cosine&quot;, n_lists=100):
+        super().__init__(dim, metric)
+        # .. other code ..
+        # how many clusters to search
+        self.n_probe = n_probe
+</code></pre>
+<p>Now we need to fix our <code>search()</code> function to use <code>n_probe</code> and search the closest clusters.</p>
+<pre><code class="language-py">def search(self, query_vector, k):
+    # .. other code ..
+
+    # cluster_id = self._find_nearest_centroid(q)
+
+    cluster_scores = []
+    for i, centroid in enumerate(self.centroids):
+        score = SimilarityMetric.score(self.metric, q, centroid)
+        cluster_scores.append((score, i))
+
+    cluster_scores.sort(reverse=True)
+    clusters_to_search = [index for i, index in cluster_scores[:self.n_probe]]
+
+    heap = []
+
+    for cluster_id in clusters_to_search:
+        # we just added a new loop around it
+        for pos in range(len(self.inverted_lists[cluster_id])):
+            vec = self.inverted_lists[cluster_id][pos]
+            id_val = self.inverted_ids[cluster_id][pos]
+            score = SimilarityMetric.score(self.metric, q, vec)
+
+            if len(heap) &lt; k:
+                heapq.heappush(heap, (score, id_val))
+            else:
+                heapq.heappushpop(heap, (score, id_val))
+
+    return [(id_val, s) for s, id_val in sorted(heap, reverse=True)]  
+</code></pre>
+<p>Now we kind of have a dial, where if we set <code>n_probe=1</code>, we wil have maximum speed, or <code>n_probe=10</code> (or more than that) for better accuracy.</p>
+<p>With 100 clusters, <code>n_probe=10</code> means we search 10% of the database, that is still a 10x speedup, but with an okay-ish recall.</p>
+<h2 id="wiring-it-into-the-engine">Wiring it into the Engine</h2>
+<p>Be glad, that we had implemented this pattern beforehand.</p>
+<pre><code class="language-py">from .flat import FlatIndex
+from .ivf import IVFIndex
+
+class Engine:
+    @staticmethod
+    def create_index(dim, metric=&quot;cosine&quot;, index_type=&quot;flat&quot;, **kwargs):
+        if index_type == &quot;flat&quot;:
+            return FlatIndex(dim, metric)
+        elif index_type == &quot;ivf&quot;:
+            n_lists = kwargs.get('n_lists', 100)
+            n_probe = kwargs.get('n_probe', 1)
+            return IVFIndex(dim, metric, n_lists, n_probe)
+        raise ValueError(f&quot;Unknown index type: {index_type}&quot;)
+</code></pre>
+<h2 id="benchmarking-does-ivf-actually-deliver">Benchmarking: Does IVF actually deliver?</h2>
+<p>Time to see if all this theory translates into real performance gains. I ran benchmarks on relatively small datasets(5k and 10k vectors, 8 dimensions). These are intentionally modest, but are large enough to expose the core trade offs.</p>
+<h3 id="baseline-flatindex">Baseline: FlatIndex</h3>
+<p>First, we define the ground truth with brute force FlatIndex scan!</p>
+<p>For 5000 vectors:</p>
+<pre><code>1. Mean Latency: ~3.65ms per query
+2. Throughput: ~274 queries per second 
+3. Recall: 100% (obviously)
+</code></pre>
+<p>For 10,000 vectors:</p>
+<pre><code>1. Mean Latency: ~7.45ms per query
+2. Throughput: ~134 queries per second 
+3. Recall: 100% (obviously)
+</code></pre>
+<p>This is our reference point. Latency scales linearly with dataset size, which was expected. For a single user clicking around that would feel almost instant, BUT if we try to handle 100 concurrent users, we would struggle to serve.</p>
+<h3 id="ivf-the-first-configuration">IVF: The First Configuration</h3>
+<h4 id="n_lists50-5000-vectors">n_lists=50 (5000 vectors)</h4>
+<p>Training builds 50 k-means centroids. After that we vary the <code>n_probe</code>:</p>
+<pre><code>n_probe=1  | recall 55.0% | latency 0.128 ms | 7806 QPS | 28.5x speedup
+n_probe=2  | recall 72.0% | latency 0.211 ms | 4728 QPS | 17.3x speedup
+n_probe=4  | recall 87.5% | latency 0.357 ms | 2802 QPS | 10.2x speedup
+n_probe=8  | recall 98.5% | latency 0.646 ms | 1549 QPS |  5.7x speedup
+n_probe=16 | recall 100%  | latency 1.316 ms |  760 QPS |  2.8x speedup
+</code></pre>
+<p>Look at the progression. </p>
+<p>At <code>n_probe=1</code>, IVF is extremely aggressive: nearly 30x faster, but recall collapses to 55%. That's rarely acceptable.</p>
+<p>At <code>n_probe=4</code>, we hit a practical balance: 87.5% recall with a 10x speedup, cutting latency from 3.65 ms to 0.36 ms.</p>
+<p>By <code>n_probe=8</code>, recall is effectively exact (98.5%) while still being almost 6x faster than brute force!</p>
+<h4 id="n_lists100-10000-vectors">n_lists=100 (10,000 vectors)</h4>
+<p>Now we double both the dataset size and cluster count.</p>
+<pre><code>n_probe=1  | recall 67.5% | latency 0.168 ms | 5952 QPS | 44.3x speedup
+n_probe=2  | recall 82.5% | latency 0.249 ms | 4015 QPS | 29.9x speedup
+n_probe=4  | recall 92.0% | latency 0.407 ms | 2455 QPS | 18.3x speedup
+n_probe=8  | recall 99.0% | latency 0.729 ms | 1371 QPS | 10.2x speedup
+n_probe=16 | recall 100%  | latency 1.368 ms |  731 QPS |  5.4x speedup
+</code></pre>
+<p>Increasing <code>n_lists</code> improves both recall at low probes and overall speedups.</p>
+<p>At <code>n_probe=4</code>, we get 92% recall with an 18x speedup. That is a strong default configuration with sub-millisecond latency and (okayish) high accuracy.</p>
+<p>At <code>n_probe=8</code>, recall reaches 99% while still being 10x faster than brute force.</p>
+<p>NOTE: Training is a one time cost, and even modest query volumes amortize training very quickly. After that point, every query is cheaper and faster.</p>
+<h2 id="what-the-numbers-tell-us">What the Numbers Tell Us</h2>
+<p>The numbers make the trade-off obvious and ... really exciting! On the 10k dataset, <code>n_probe=4</code> already hits ~93% recall while cutting latency from ~7.4 ms to ~0.4 ms and boosting throughput from ~136 QPS to ~2,400 QPS, which is an 18x (!!) speedup for only a small loss in accuracy. If we push to <code>n_probe=8</code> then recall jumps to ~99% while still staying about 11x faster than brute force. </p>
+<h2 id="what-were-not-showing">What We're NOT Showing</h2>
+<p>These benchmarks use cosine similarity on randomly distributed vectors. Real-world data often clusters more naturally. Product embeddings, document vectors, image features tend to have structure. In those cases, IVF performs even better because the clusters are more coherent.</p>
+<p>Conversely, if the vectors are truly uniformly distributed (like random noise), IVF struggles. The clusters don't capture meaningful patterns, and recall suffers.
+You can try it on your own data to see how IVF performs.</p>
+<h2 id="the-memory-elephant-in-the-room">The Memory Elephant in the Room</h2>
+<p>So far, we have only talked about speed. Memory is the other half of the equation. IVF changes how we search, not what we store. That means IVF does not reduce memory usage by itself.</p>
+<p>In a realistic system, vectors are stored as dense <code>float32</code> arrays. The memory cost is easy to compute (<code>memory per vector = dimensions * 4 bytes</code>), just take a look:</p>
+<p>8D vector = 32 bytes<br />
+128D vector = 512 bytes  </p>
+<p>At scale, this will grow <em>really fast</em>.
+100 million vectors at 128 dimensions will require around 48GB!</p>
+<p>That is before accounting for metadata, indexes, or replicas. No matter how clever the indexing scheme is, storing raw embeddings becomes very expensive at large scale.</p>
+<p>Solving this requires would changing the representation itself. Instead of storing every vector exactly, we need to somewhat compress them while preserving approximate distances.</p>
+<p>And...this is where quantization enters the picture! 
+The topic of Part 3.</p>
+<h2 id="whats-next">What's Next?</h2>
+<p>We are going to address memory. 
+In Part 3 of this series, we will try to implement Product Quantization. </p>
+<p>The code is on Github, Benchmark scripts live inside the <code>benchmarks/</code> folder. Clone it and run experiments yourself!</p>
+
+<div class="blog-footer">
+    <p>Questions or feedback? Reach out at <a href="mailto:datavorous.work@gmail.com">datavorous.work@gmail.com</a> or check the <a href="https://github.com/datavorous/bekuta">project repository</a>.</p>
+</div>
+
+</body>
+</html>

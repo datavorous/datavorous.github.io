@@ -35,6 +35,9 @@ TEMPLATE = """<!DOCTYPE html>
         <a href="{home_href}">home</a> | <a href="https://github.com/datavorous">github</a> | <a href="https://x.com/datavorous_">twitter</a>
     </div>
 {content}
+    <div class="blog-footer">
+        <p>Questions or feedback? Reach out at <a href="mailto:datavorous.work@gmail.com">datavorous.work@gmail.com</a> or check the <a href="https://github.com/datavorous/bekuta">project repository</a>.</p>
+    </div>
 </body>
 </html>
 """

@@ -59,7 +59,7 @@ li {
 }
 
 h1 {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 700;
     margin-bottom: 0.2rem;
 }
@@ -113,8 +113,17 @@ h1 {
 }
 
 h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
     margin-top: 1rem;
     margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-top: 0.8rem;
+    margin-bottom: 0.5rem;
 }
 
 .item {
@@ -154,6 +163,23 @@ h2 {
 }
 
 .item-desc a:hover {
+    text-decoration: underline;
+}
+
+.blog-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.blog-footer a {
+    color: #1772ea;
+    text-decoration: none;
+}
+
+.blog-footer a:hover {
     text-decoration: underline;
 }
 
