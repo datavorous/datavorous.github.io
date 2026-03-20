@@ -2,7 +2,9 @@ body {
     max-width: 69rem;
     margin: 3rem auto;
     padding: 0 1rem;
-    font-size: 1.11rem;
+    font-family: sans-serif;
+    background-color: #fcfcfc;
+    color: #111111;
 }
 
 code {
