@@ -4,21 +4,12 @@
     <title>Rayfloat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A multithreaded, BVH-accelerated CPU path tracer built to study performance, memory behavior, and algorithmic bottlenecks on multi-core systems.">
-    <meta name="keywords" content="ray tracing, performance, C++, BVH, RNG, optimization, datavorous">
-    <meta name="author" content="datavorous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
-    <script>hljs.highlightAll();</script>
-    <link rel="stylesheet" href="../extra/index.css">
+    <link rel="stylesheet" href="../index.css">
 </head>
 <body>
-    <div class="nav-links">
-        <a href="../index.html">home</a> | <a href="https://github.com/datavorous">github</a> | <a href="https://x.com/datavorous_">twitter</a>
-    </div>
-    <h1 id="why-my-ray-tracer-got-slower-before-it-got-faster">Why My Ray Tracer Got Slower Before It Got Faster</h1>
-    <div class="publish-date">January 6, 2026</div>
+    <p><a href="../index.html">home</a> / <a href="https://github.com/datavorous/rayfloat">repo</a></p>
+    <h2 id="why-my-ray-tracer-got-slower-before-it-got-faster">Why My Ray Tracer Got Slower Before It Got Faster</h2>
+    <p>January 6, 2026</p>
     <p><img src="../media/raytracer/render2.png" alt="render"></p>
     <p>At first glance, building a CPU ray tracer in 2026 seems misguided. Modern GPUs are architected specifically for ray traversal, massive SIMD execution, and high-throughput shading. A GPU implementation would be orders of magnitude faster.</p>
     <p>That was <em>never</em> the point.</p>
@@ -45,31 +36,31 @@
     <p>After going through some QnAs on StackOverflow, a sentence from <a href="https://stackoverflow.com/a/8770030">this</a> answer caught my eye: &quot;to be able to use a random number generator in multithreaded environment you will need an implementation that allows passing in the state&quot;. </p>
     <p>Each call to <code>std::mt19937</code> mutates a large shared state spread across multiple cache lines. Under OpenMP, this caused heavy cache coherence traffic as cores repeatedly transitioned cache lines between Modified and Invalid states. With hundreds of millions of RNG calls, coherence stalls dominated execution time.</p>
     <p>Hence I made some changes and used the <code>thread_local</code> keyword. My code looked like this:</p>
-    <pre><code class="lang-cpp"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;random&gt;</span></span>
+    <pre><code>#include &lt;random&gt;
 
-    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-keyword">double</span> <span class="hljs-title">random_double</span><span class="hljs-params">()</span> </span>{
-        <span class="hljs-comment">// thread_local: each thread gets its own private copy that persists</span>
-        <span class="hljs-keyword">static</span> <span class="hljs-keyword">thread_local</span> <span class="hljs-built_in">std</span>::uniform_real_distribution&lt;<span class="hljs-keyword">double</span>&gt; distribution(<span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>);
-        <span class="hljs-keyword">static</span> <span class="hljs-keyword">thread_local</span> <span class="hljs-built_in">std</span>::mt19937 generator;  
-        <span class="hljs-keyword">return</span> distribution(generator);
+    inline double random_double() {
+        // thread_local: each thread gets its own private copy that persists
+        static thread_local std::uniform_real_distribution&lt;double&gt; distribution(0.0, 1.0);
+        static thread_local std::mt19937 generator;  
+        return distribution(generator);
     }
     </code></pre>
     <p>But I thought, what if the generator starts with the same seed in every thread? So I gave each thread a unique start or seed:</p>
-    <pre><code class="lang-cpp"><span class="hljs-selector-tag">static</span> <span class="hljs-selector-tag">thread_local</span> <span class="hljs-selector-tag">std</span><span class="hljs-selector-pseudo">::mt19937</span> <span class="hljs-selector-tag">generator</span>(<span class="hljs-attribute">std</span>::random_device{}() + omp_get_thread_num());
+    <pre><code>static thread_local std::mt19937 generator(std::random_device{}() + omp_get_thread_num());
     </code></pre>
     <p>The runtime dropped to 4.4 seconds. The CPU utilization jumped to nearly 8x scaling, as measured by the user time to real time.</p>
     <p>Although my CPU exposes 8 logical threads via hyperthreading, it has only 4 physical cores. A 6.7 s single-threaded baseline therefore suggests an ideal lower bound closer to ~1.7s. Instead, I was seeing 4.4s.</p>
     <p>Although wall clock time dropped, cumulative user time increased significantly, indicating that parallel execution introduced substantial overhead from cache misses, synchronization, and reduced single-core efficiency.</p>
     <p>I kept thinking about the RNG, to squeeze out more performance. So I implemented a new RNG called XorShift32. 
     It has only 4 bytes of state and can be fully inlined. The runtime dropped to 3.9s (11% improvement!)</p>
-    <pre><code class="lang-cpp">inline double random_double() {
-        static thread_local uint32_t <span class="hljs-keyword">state</span> = <span class="hljs-number">123456789</span> + omp_get_thread_num();
-        <span class="hljs-keyword">state</span> ^= <span class="hljs-keyword">state</span> <span class="hljs-variable">&lt;&lt; 13;
-        state ^= state &gt;</span>&gt; <span class="hljs-number">17</span>;
-        <span class="hljs-keyword">state</span> ^= <span class="hljs-keyword">state</span> <span class="hljs-variable">&lt;&lt; 5;
+    <pre><code>inline double random_double() {
+        static thread_local uint32_t state = 123456789 + omp_get_thread_num();
+        state ^= state &lt;&lt; 13;
+        state ^= state &gt;&gt; 17;
+        state ^= state &lt;&lt; 5;
         // map to [0, 1) using bit magic
         return state / 4294967296.0;
-    }</span>
+    }
     </code></pre>
     <p>Why does this matter so much? Since RNG is invoked billions of times, reducing its memory footprint allows the state to remain in registers or L1 cache, dramatically reducing latency.</p>
     <p>Similarly, while working on the <code>vec.h</code>, I made sure to pass const references for read only operations and only materialize new vectors when absolutely necessary. Otherwise I would be passing objects by value which meant copying memory around. </p>
@@ -90,7 +81,7 @@
     <p>Each recursive call to <code>ray_color()</code> introduces stack activity and constrains the compiler’s ability to keep state in registers. Although the maximum recursion depth was limited, the combination of deep call chains and billions of invocations increased register pressure, stack traffic, and instruction overhead across all threads.</p>
     <p>In addition, recursive control flow degrades branch and return prediction accuracy. Modern CPUs rely on a return stack buffer (RSB) to predict function returns efficiently, but deeply nested and irregular recursion patterns reduce prediction accuracy and increase pipeline recovery cost.</p>
     <p>The compiler could not eliminate the recursion because the ray accumulation depended on the return value:</p>
-    <pre><code class="lang-cpp"><span class="hljs-keyword">return</span> attenuation * ray_color(scattered, world, depth - <span class="hljs-number">1</span>);
+    <pre><code>return attenuation * ray_color(scattered, world, depth - 1);
     </code></pre>
     <p>Since the multiplication occurs after the recursive call returns, each stack frame must remain live, preventing tail call optimization.</p>
     <p>Refactoring <code>ray_color()</code> into an explicit iterative loop removed these constraints. Ray state and accumulated attenuation were tracked manually in local variables, allowing the compiler to keep them in registers and generate a tight inner loop with fewer memory accesses and more predictable control flow. This change alone reduced runtime from 4.4 s to 3.8 s, a ~15% improvement.</p>
@@ -119,70 +110,70 @@
     </li>
     </ol>
     <p>Here&#39;s what the construction looks like in code:</p>
-    <pre><code class="lang-cpp">BVHNode(<span class="hljs-symbol">std:</span><span class="hljs-symbol">:vector&lt;std</span><span class="hljs-symbol">:</span><span class="hljs-symbol">:shared_ptr&lt;Hittable&gt;&gt;&amp;</span> objects, size_t start, size_t <span class="hljs-keyword">end</span>) {
+    <pre><code>BVHNode(std::vector&lt;std::shared_ptr&lt;Hittable&gt;&gt;&amp; objects, size_t start, size_t end) {
 
-        int axis = random_int(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>);
-        auto comparator = (axis == <span class="hljs-number">0</span>) ? box_x_compare
-                        : (axis == <span class="hljs-number">1</span>) ? box_y_compare
+        int axis = random_int(0, 2);
+        auto comparator = (axis == 0) ? box_x_compare
+                        : (axis == 1) ? box_y_compare
                                         : box_z_compare;
-        size_t object_span = <span class="hljs-keyword">end</span> - start;
+        size_t object_span = end - start;
 
-        if (object_span == <span class="hljs-number">1</span>) {
+        if (object_span == 1) {
             left = right = objects[start];
-        } else if (object_span == <span class="hljs-number">2</span>) {
-            if (comparator(objects[start], objects[start + <span class="hljs-number">1</span>])) {
+        } else if (object_span == 2) {
+            if (comparator(objects[start], objects[start + 1])) {
                 left = objects[start];
-                right = objects[start + <span class="hljs-number">1</span>];
+                right = objects[start + 1];
             } else {
-                left = objects[start + <span class="hljs-number">1</span>];
+                left = objects[start + 1];
                 right = objects[start];
             }
         } else {
-            <span class="hljs-symbol">std:</span><span class="hljs-symbol">:sort</span>(objects.<span class="hljs-keyword">begin</span>() + start, objects.<span class="hljs-keyword">begin</span>() + <span class="hljs-keyword">end</span>, comparator);
+            std::sort(objects.begin() + start, objects.begin() + end, comparator);
 
-            size_t mid = start + object_span / <span class="hljs-number">2</span>;
-            left = <span class="hljs-symbol">std:</span><span class="hljs-symbol">:make_shared&lt;BVHNode&gt;</span>(objects, start, mid);
-            right = <span class="hljs-symbol">std:</span><span class="hljs-symbol">:make_shared&lt;BVHNode&gt;</span>(objects, mid, <span class="hljs-keyword">end</span>);
+            size_t mid = start + object_span / 2;
+            left = std::make_shared&lt;BVHNode&gt;(objects, start, mid);
+            right = std::make_shared&lt;BVHNode&gt;(objects, mid, end);
         }
 
         AABB box_left, box_right;
         if (!left-&gt;bounding_box(box_left) || !right-&gt;bounding_box(box_right))
-            throw <span class="hljs-symbol">std:</span><span class="hljs-symbol">:runtime_error</span>(<span class="hljs-string">"No bounding box in BVHNode constructor."</span>);
-        box = <span class="hljs-symbol">AABB:</span><span class="hljs-symbol">:surrounding_box</span>(box_left, box_right);
+            throw std::runtime_error("No bounding box in BVHNode constructor.");
+        box = AABB::surrounding_box(box_left, box_right);
     }
     </code></pre>
     <h3 id="the-critical-traversal-algorithm">The Critical Traversal Algorithm</h3>
     <p>Once built, the BVH traversal is where the speedup happens. The algorithm is simple:</p>
-    <pre><code class="lang-cpp">bool hit(const Ray&amp; ray, <span class="hljs-built_in">double</span> t_min, <span class="hljs-built_in">double</span> t_max, HitRecord&amp; <span class="hljs-built_in">record</span>) const override {
-        <span class="hljs-keyword">if</span> (!box.hit(ray, t_min, t_max))
-            <span class="hljs-keyword">return</span> false;
+    <pre><code>bool hit(const Ray&amp; ray, double t_min, double t_max, HitRecord&amp; record) const override {
+        if (!box.hit(ray, t_min, t_max))
+            return false;
 
-        bool hit_left = <span class="hljs-built_in">left</span>-&gt;hit(ray, t_min, t_max, <span class="hljs-built_in">record</span>);
-        bool hit_right = <span class="hljs-built_in">right</span>-&gt;hit(ray, t_min, hit_left? <span class="hljs-built_in">record</span>.t:t_max, <span class="hljs-built_in">record</span>);
+        bool hit_left = left-&gt;hit(ray, t_min, t_max, record);
+        bool hit_right = right-&gt;hit(ray, t_min, hit_left? record.t:t_max, record);
 
-        <span class="hljs-keyword">return</span> hit_left |<span class="hljs-type">| hit_right</span>;
+        return hit_left || hit_right;
     }
     </code></pre>
     <p>If the left child hits at distance <code>t</code>, we don&#39;t care about right child hits beyond that distance. By passing <code>record.t</code> as the new <code>t_max</code>, we aggressively cull geometry that&#39;s occluded.</p>
     <h3 id="why-aabb-intersection-is-cheap">Why AABB Intersection is Cheap</h3>
     <p>The axis-aligned bounding box test is the workhorse of the BVH. It needs to be fast because we&#39;re calling it at every tree node:</p>
-    <pre><code class="lang-cpp">bool hit(const Ray&amp; r, <span class="hljs-keyword">double</span> t_min, <span class="hljs-keyword">double</span> t_max) const {
-        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> a = <span class="hljs-number">0</span>; a &lt; <span class="hljs-number">3</span>; ++a) {
-            <span class="hljs-keyword">double</span> origin_component = (a==<span class="hljs-number">0</span>)? r.origin.x : (a==<span class="hljs-number">1</span>)? r.origin.y : r.origin.z;
-            <span class="hljs-keyword">double</span> direction_component = (a==<span class="hljs-number">0</span>)? r.direction.x : (a==<span class="hljs-number">1</span>)? r.direction.y : r.direction.z;
-            <span class="hljs-keyword">double</span> min_component = (a==<span class="hljs-number">0</span>)? minimum.x : (a==<span class="hljs-number">1</span>)? minimum.y : minimum.z;
-            <span class="hljs-keyword">double</span> max_component = (a==<span class="hljs-number">0</span>)? maximum.x : (a==<span class="hljs-number">1</span>)? maximum.y : maximum.z;
+    <pre><code>bool hit(const Ray&amp; r, double t_min, double t_max) const {
+        for(int a = 0; a &lt; 3; ++a) {
+            double origin_component = (a==0)? r.origin.x : (a==1)? r.origin.y : r.origin.z;
+            double direction_component = (a==0)? r.direction.x : (a==1)? r.direction.y : r.direction.z;
+            double min_component = (a==0)? minimum.x : (a==1)? minimum.y : minimum.z;
+            double max_component = (a==0)? maximum.x : (a==1)? maximum.y : maximum.z;
 
-            <span class="hljs-keyword">double</span> invD = <span class="hljs-number">1.0</span> / direction_component;
-            <span class="hljs-keyword">double</span> t0 = (min_component - origin_component) * invD;
-            <span class="hljs-keyword">double</span> t1 = (max_component - origin_component) * invD;
-            <span class="hljs-keyword">if</span> (invD &lt; <span class="hljs-number">0.0</span>) <span class="hljs-string">std:</span>:swap(t0, t1);
+            double invD = 1.0 / direction_component;
+            double t0 = (min_component - origin_component) * invD;
+            double t1 = (max_component - origin_component) * invD;
+            if (invD &lt; 0.0) std::swap(t0, t1);
             t_min = t0 &gt; t_min ? t0 : t_min;
             t_max = t1 &lt; t_max ? t1 : t_max;
-            <span class="hljs-keyword">if</span> (t_max &lt;= t_min)
-                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            if (t_max &lt;= t_min)
+                return false;
         }
-        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+        return true;
     }
     </code></pre>
     <p>This slab test uses the ray-plane intersection formula. For each axis, we compute where the ray intersects the near and far planes of the box. The ray hits the box only if these intervals overlap on all three axes.</p>

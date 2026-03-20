@@ -20,7 +20,7 @@
     <div class="nav-links">
         <a href="../../index.html">home</a> | <a href="https://github.com/datavorous">github</a> | <a href="https://x.com/datavorous_">twitter</a>
     </div>
-<h1 id="building-a-vector-search-library-from-scratch-part-2-ivf-inverted-file-index">Building a Vector Search Library from Scratch: Part 2 - IVF (Inverted File Index)</h1>
+<h2 id="building-a-vector-search-library-from-scratch-part-2-ivf-inverted-file-index">Building a Vector Search Library from Scratch: Part 2 - IVF (Inverted File Index)</h2>
 <div class="publish-date">February 10, 2026</div>
 <h2 id="the-wall-we-hit">The Wall We Hit</h2>
 <p>Previously in <a href="part1.html">Part 1</a>, we built a working vector search engine. It was correct, small, but completely impractical. Our <code>FlatIndex</code> compared every single vector in the database.
@@ -260,7 +260,7 @@ class Engine:
 </code></pre>
 <p>This is our reference point. Latency scales linearly with dataset size, which was expected. For a single user clicking around that would feel almost instant, BUT if we try to handle 100 concurrent users, we would struggle to serve.</p>
 <h3 id="ivf-the-first-configuration">IVF: The First Configuration</h3>
-<h4 id="n_lists50-5000-vectors">n_lists=50 (5000 vectors)</h4>
+<h3 id="n_lists50-5000-vectors">n_lists=50 (5000 vectors)</h3>
 <p>Training builds 50 k-means centroids. After that we vary the <code>n_probe</code>:</p>
 <pre><code>n_probe=1  | recall 55.0% | latency 0.128 ms | 7806 QPS | 28.5x speedup
 n_probe=2  | recall 72.0% | latency 0.211 ms | 4728 QPS | 17.3x speedup
@@ -272,7 +272,7 @@ n_probe=16 | recall 100%  | latency 1.316 ms |  760 QPS |  2.8x speedup
 <p>At <code>n_probe=1</code>, IVF is extremely aggressive: nearly 30x faster, but recall collapses to 55%. That's rarely acceptable.</p>
 <p>At <code>n_probe=4</code>, we hit a practical balance: 87.5% recall with a 10x speedup, cutting latency from 3.65 ms to 0.36 ms.</p>
 <p>By <code>n_probe=8</code>, recall is effectively exact (98.5%) while still being almost 6x faster than brute force!</p>
-<h4 id="n_lists100-10000-vectors">n_lists=100 (10,000 vectors)</h4>
+<h3 id="n_lists100-10000-vectors">n_lists=100 (10,000 vectors)</h3>
 <p>Now we double both the dataset size and cluster count.</p>
 <pre><code>n_probe=1  | recall 67.5% | latency 0.168 ms | 5952 QPS | 44.3x speedup
 n_probe=2  | recall 82.5% | latency 0.249 ms | 4015 QPS | 29.9x speedup

@@ -4,16 +4,21 @@
     <title>garbage collector</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <link rel="stylesheet" href="../extra/index.css">
+    <link rel="stylesheet" href="../index.css">
+    <style>
+        main {
+            max-width: 60rem;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
 
-<a href="../index.html" class="back-btn"><- back to home</a>
+<main>
 
-<h2>Garbage Collector</h2>
+<p><a href="../index.html">home</a> / <a href="https://github.com/datavorous/garbage-collector-py">repo</a></p>
+
+<h3>exploring garbage collector and how it works</h3>
 
 <p>
     On a boring saturday night, right after my midterm exams ended, I sat down with a strange urge to build a garbage collector from scratch. We all benefit from it, but most of us never question <i>how</i>. This is the summary of what I found, and what I understood.
@@ -65,7 +70,7 @@
 
 Before any collection happens, we need something in memory to work with. Using the GC’s <code>alloc()</code> function, we can create objects on the heap:
 
-<pre><code class="language-python">gc = MarkSweepGC()
+<pre><code>gc = MarkSweepGC()
 
 obj_a = gc.alloc("Node A")
 obj_b = gc.alloc("Node B")
@@ -74,7 +79,7 @@ obj_d = gc.alloc("Node D")
 
 print(gc.heap_snapshot())</code></pre>
 
-<pre><code class="language-bash">HEAP size=4, ROOTS=[]
+<pre><code>HEAP size=4, ROOTS=[]
 _Obj #1 (val='Node A', marked=False, freed=False, fields=[])
 _Obj #2 (val='Node B', marked=False, freed=False, fields=[])
 _Obj #3 (val='Node C', marked=False, freed=False, fields=[])
@@ -86,13 +91,13 @@ _Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
 
 <img src="../media/gc/2.png" alt="graph structure">
 
-<pre><code class="language-python">gc.set_field(obj_a, "left", obj_b)
+<pre><code>gc.set_field(obj_a, "left", obj_b)
 gc.set_field(obj_a, "right", obj_d)
 gc.set_field(obj_b, "child", obj_c)
 
 print(gc.heap_snapshot())</code></pre>
 
-<pre><code class="language-bash">HEAP size=4, ROOTS=[]
+<pre><code>HEAP size=4, ROOTS=[]
 _Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2, right -> #4])
 _Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
 _Obj #3 (val='Node C', marked=False, freed=False, fields=[])
@@ -104,20 +109,20 @@ _Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
 
 <img src="../media/gc/3.png" alt="marking root">
 
-<pre><code class="language-python">gc.add_root(obj_a)
+<pre><code>gc.add_root(obj_a)
 print(gc.heap_snapshot())</code></pre>
 
-<pre><code class="language-bash">HEAP size=4, ROOTS=[1]
+<pre><code>HEAP size=4, ROOTS=[1]
 ... rest remain same ...</code></pre>
 
 <p>Now object #1 (A) is a root. It's like saying "this is a global variable, don't delete it".</p>
 
 <h3>First Garbage Collection</h3>
 
-<pre><code class="language-python">gc.gc()
+<pre><code>gc.gc()
 print(gc.heap_snapshot())</code></pre>
 
-<pre><code class="language-bash">HEAP size=4, ROOTS=[1]
+<pre><code>HEAP size=4, ROOTS=[1]
 _Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2, right -> #4])
 _Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
 _Obj #3 (val='Node C', marked=False, freed=False, fields=[])
@@ -137,20 +142,20 @@ _Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
 
 <p>We create an orphan that's NOT connected to any root. We remove the connection A -> D:</p>
 
-<pre><code class="language-python">gc.set_field(obj_a, "right", None)
+<pre><code>gc.set_field(obj_a, "right", None)
 print(gc.heap_snapshot())</code></pre>
 
-<pre><code class="language-bash">_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2])
+<pre><code>_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2])
 _Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
 _Obj #3 (val='Node C', marked=False, freed=False, fields=[])
 _Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
 
 <p>Now we do garbage collection again:</p>
 
-<pre><code class="language-python">gc.gc()
+<pre><code>gc.gc()
 print(gc.heap_snapshot())</code></pre>
 
-<pre><code class="language-bash">HEAP size=3, ROOTS=[1]
+<pre><code>HEAP size=3, ROOTS=[1]
 _Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2])
 _Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
 _Obj #3 (val='Node C', marked=False, freed=False, fields=[])</code></pre>
@@ -166,7 +171,7 @@ _Obj #3 (val='Node C', marked=False, freed=False, fields=[])</code></pre>
 
 <p>Let's build a cycle:</p>
 
-<pre><code class="language-python">node_a = gc.alloc("A")
+<pre><code>node_a = gc.alloc("A")
 node_b = gc.alloc("B")
 node_c = gc.alloc("C")
 gc.add_root(node_a)
@@ -178,7 +183,7 @@ print(gc.heap_snapshot())</code></pre>
 
 <p>This cycle constitutes of the root (A(1)):</p>
 
-<pre><code class="language-bash">HEAP size=3, ROOTS=[1]
+<pre><code>HEAP size=3, ROOTS=[1]
 _Obj #1 (val='A', marked=False, freed=False, fields=[next -> #2])
 _Obj #2 (val='B', marked=False, freed=False, fields=[next -> #3])
 _Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])</code></pre>
@@ -189,7 +194,7 @@ _Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])</code></pre>
 
 <p>Let's make an unreachable cycle, which will be collected:</p>
 
-<pre><code class="language-python">orphan_x = gc.alloc("X")
+<pre><code>orphan_x = gc.alloc("X")
 orphan_y = gc.alloc("Y")
 orphan_z = gc.alloc("Z")
 
@@ -198,7 +203,7 @@ gc.set_field(orphan_y, "next", orphan_z)
 gc.set_field(orphan_z, "next", orphan_x)
 print(gc.heap_snapshot())</code></pre>
 
-<pre><code class="language-bash">HEAP size=6, ROOTS=[1]
+<pre><code>HEAP size=6, ROOTS=[1]
 _Obj #1 (val='A', marked=False, freed=False, fields=[next -> #2])
 _Obj #2 (val='B', marked=False, freed=False, fields=[next -> #3])
 _Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])
@@ -208,12 +213,12 @@ _Obj #6 (val='Z', marked=False, freed=False, fields=[next -> #4])</code></pre>
 
 <p>Well, now if we run GC:</p>
 
-<pre><code class="language-python">gc.gc()
+<pre><code>gc.gc()
 print(gc.heap_snapshot())</code></pre>
 
 <p>The unreachable cycle gets removed:</p>
 
-<pre><code class="language-bash">HEAP size=3, ROOTS=[1]
+<pre><code>HEAP size=3, ROOTS=[1]
 _Obj #1 (val='A', marked=False, freed=False, fields=[next -> #2])
 _Obj #2 (val='B', marked=False, freed=False, fields=[next -> #3])
 _Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])</code></pre>
@@ -226,6 +231,8 @@ _Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])</code></pre>
 <p>That's it.<br>
     This toy implementation is intentionally simple. It runs in one thread, pauses the world, doesn’t handle fragmentation, and skips real-world optimizations like generations, compaction, or tri-color marking.<br>The next steps on this journey could be implementing a copying collector, adding generations, or experimenting with incremental "stop-less" GC, etc.<br><br>Maybe, someday...
 </p>
+
+</main>
 
 </body>
 </html>
