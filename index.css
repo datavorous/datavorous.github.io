@@ -398,7 +398,7 @@ article img:not(.fav):not(.exp-logo) {
 
 /* ── mobile ── */
 
-@media (max-width: 540px) {
+@media (max-width: 680px) {
   body {
     font-size: 16px;
   }
