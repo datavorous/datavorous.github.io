@@ -1,15 +1,15 @@
 /* ── tokens ── */
 
 :root {
-  --bg-from:     #fffcf7;
-  --bg-to:       #fef4e2;
-  --text:        #1c1610;
-  --muted:       #9a8f80;
-  --border:      #ecddc8;
-  --select-bg:   #ffd166;
-  --select-fg:   #1c1610;
-  --avatar-ring: #e8d5b4;
-  --code-bg:     #f5ede0;
+  --bg-from:     #fff5f7;
+  --bg-to:       #fce4ed;
+  --text:        #1a0f14;
+  --muted:       #9e8490;
+  --border:      #f0cad8;
+  --select-bg:   #ff9eb5;
+  --select-fg:   #1a0f14;
+  --avatar-ring: #f0cad8;
+  --code-bg:     #fdf0f4;
 }
 
 
