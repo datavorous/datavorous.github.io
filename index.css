@@ -100,9 +100,8 @@ a:hover {
 
 header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 1.2rem;
   margin-bottom: 2.8rem;
 }
 
@@ -412,14 +411,9 @@ article img:not(.fav):not(.exp-logo) {
     display: none;
   }
 
-  header {
-    flex-direction: column-reverse;
-    gap: 1rem;
-  }
-
   .avatar {
-    width: 60px;
-    height: 60px;
+    width: 52px;
+    height: 52px;
   }
 
   .webring {
