@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+Disallow: /old/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+Sitemap: https://datavorous.github.io/sitemap.xml

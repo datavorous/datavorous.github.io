@@ -1,0 +1,32 @@
+# datavorous
+
+> sagnik bhattacharjee — cs student (class of 2029) building fast, small, and slightly cursed things.
+
+## about
+
+sagnik is a first-year cs student currently working as a research intern at the Language Technology Research Centre, IIIT Hyderabad (analyzing computation graphs & hardware delegation for npu performance using the qualcomm npu sdk), and as an sde intern at an undisclosed startup (distillation pipeline for an analog circuit optimizer for micron technologies). previously built a risk moderation engine at an undisclosed startup for buymeacoffee (yc w19).
+
+handle: datavorous
+email: datavorous.work@gmail.com
+github: https://github.com/datavorous
+twitter: https://x.com/datavorous_
+hn: https://news.ycombinator.com/user?id=datavorous_
+
+## projects
+
+- [sameshi](https://github.com/datavorous/sameshi): ~1200 elo chess engine squeezed into 2kb of c. hit the hn frontpage and was liked by andrej karpathy.
+- [spheni](https://github.com/datavorous/spheni): vector search built from scratch with product quantization and residual encoding. well received on r/developersIndia.
+- [dunefetch](https://github.com/datavorous/dunefetch): neofetch but the ascii art is a live falling sand simulation. loved on r/unixporn.
+- also built: path tracers, inference runtimes, quantization libraries, syscall tracers, gemm kernels, distraction blockers, pixel editors. the most used by strangers is yars, a reddit scraper.
+- all repos: https://github.com/datavorous?tab=repositories
+
+## writeups
+
+- [side quests](https://datavorous.notion.site/Side-Quests-35be1be246b480d4bf4cf87eb60bf28c): running notes and experiments
+- [npus: what and where they break](https://datavorous.notion.site/NPUs-what-and-where-they-break-367e1be246b480f6ba57cc3730eca4bd): deep dive into npu internals
+- [building my own curriculum as a freshman](https://www.reddit.com/r/developersIndia/comments/1s0kgu7/comment/obu62vg/): ask good questions
+- [staying calibrated as a generalist in fast-paced environments](https://x.com/i/status/2048856882400698609): speed learning thread
+
+## playlist
+
+- [spotify playlist](https://open.spotify.com/playlist/4YjtneVqstKIVbrOOBgVzW): well curated
