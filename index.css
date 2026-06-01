@@ -416,6 +416,10 @@ article img:not(.fav):not(.exp-logo) {
     height: 52px;
   }
 
+  .alias {
+    display: none;
+  }
+
   .webring {
     flex-direction: column;
     align-items: flex-start;
