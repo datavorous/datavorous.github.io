@@ -22,8 +22,9 @@ hn: https://news.ycombinator.com/user?id=datavorous_
 
 ## writeups
 
+- [what i learned trying to break a single gpu with mixed traffic](https://datavorous.github.io/writing/lm-inference/): vllm inference optimization study across workload profiles — prefix caching, chunked prefill, awq, mixed traffic
+- [npus: what, and where they break](https://datavorous.github.io/writing/npu/): how npus actually execute models — compile-time graph partitioning, systolic arrays, quantization constraints, and why fragmentation kills performance on qualcomm hexagon
 - [side quests](https://datavorous.notion.site/Side-Quests-35be1be246b480d4bf4cf87eb60bf28c): running notes and experiments
-- [npus: what and where they break](https://datavorous.notion.site/NPUs-what-and-where-they-break-367e1be246b480f6ba57cc3730eca4bd): deep dive into npu internals
 - [building my own curriculum as a freshman](https://www.reddit.com/r/developersIndia/comments/1s0kgu7/comment/obu62vg/): ask good questions
 - [staying calibrated as a generalist in fast-paced environments](https://x.com/i/status/2048856882400698609): speed learning thread
 
