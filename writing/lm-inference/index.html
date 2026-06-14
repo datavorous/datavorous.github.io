@@ -1,24 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>vLLM inference optimization across mixed traffic shapes - datavorous</title>
+<title>what i learned trying to break a single gpu with mixed traffic - datavorous</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="prefix caching, chunked prefill, AWQ quantization, and admission control tested against four traffic shapes (SISO, SILO, LISO, LILO) on a single RTX 6000 Ada running vLLM with Qwen2.5-14B. not every optimization helps every workload.">
-<meta name="keywords" content="vllm, llm inference, prefix caching, chunked prefill, AWQ quantization, inference optimization, Qwen2.5, RTX 6000 Ada, goodput, KV cache, TTFT, ITL">
+<meta name="description" content="most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. i want to go the other way. the actual job is not picking the optimization but figuring out what's slow and why, before reaching for the toolbox.">
+<meta name="keywords" content="vllm, llm inference, prefix caching, chunked prefill, awq quantization, inference optimization, qwen2.5, rtx 6000 ada, goodput, kv cache, ttft, itl, mixed traffic">
 <meta name="author" content="datavorous">
-<meta property="og:title" content="vLLM inference optimization across mixed traffic shapes - datavorous">
-<meta property="og:description" content="prefix caching, chunked prefill, AWQ quantization, and admission control tested against four traffic shapes on a single GPU. the diagnosis is the work — the config change is one flag.">
+<meta property="og:title" content="what i learned trying to break a single gpu with mixed traffic">
+<meta property="og:description" content="most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. i want to go the other way. the actual job is not picking the optimization but figuring out what's slow and why.">
 <meta property="og:url" content="https://datavorous.github.io/writing/lm-inference/">
 <meta property="og:type" content="article">
-<meta property="og:image" content="https://datavorous.github.io/writing/lm-inference/img/prefix_surprise.png">
 <meta property="article:author" content="https://datavorous.github.io/">
-<meta property="article:published_time" content="2026-06-01T00:00:00Z">
-<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-06-14T00:00:00Z">
+<meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@datavorous_">
-<meta name="twitter:title" content="vLLM inference optimization across mixed traffic shapes">
-<meta name="twitter:description" content="prefix caching, chunked prefill, AWQ, and admission control tested against SISO/SILO/LISO/LILO traffic on one GPU. the diagnosis is the work.">
-<meta name="twitter:image" content="https://datavorous.github.io/writing/lm-inference/img/prefix_surprise.png">
+<meta name="twitter:title" content="what i learned trying to break a single gpu with mixed traffic">
+<meta name="twitter:description" content="most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. i want to go the other way. the actual job is figuring out what's slow and why.">
 <link rel="canonical" href="https://datavorous.github.io/writing/lm-inference/">
 <link rel="icon" type="image/x-icon" href="/media/favicon/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/media/favicon/favicon-32x32.png">
@@ -26,6 +24,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/media/favicon/apple-touch-icon.png">
 <link rel="manifest" href="/media/favicon/site.webmanifest">
 <meta name="theme-color" content="#fff5f7">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
@@ -77,7 +76,7 @@
     color: var(--muted);
   }
   .cell-hi {
-    background: rgba(255, 158, 181, 0.18);
+    background: rgba(220, 80, 110, 0.18);
   }
   .post-body blockquote {
     border-left: 2px solid var(--border);
@@ -165,7 +164,7 @@
 
 <p>i use a <code>config.yaml</code> file to carry out my experiments. the default <code>run:</code> block is overridden under the <code>experiments:</code> block. in this case, the baseline is just the defaults plus a few key overrides (poisson at 32 rps, 128 concurrent). sweep mode exists in the harness but the baseline doesn't touch it.</p>
 
-<p>this whole setup is a proxy. real production traffic is unavailable and would be unrepeatable anyway. the shape of the curves and the relative effect of each optimization will transfer to a similarly configured production environment - just the deltas.</p>
+<p>this whole setup is a proxy. real production traffic is unavailable and would be unrepeatable anyway. the shape of the curves and the relative effect of each optimization will transfer to a similarly configured production environment, it'd be just the deltas.</p>
 
 <h2>the eyes they never lie, except when they do.</h2>
 
@@ -179,16 +178,16 @@
 
 <img src="img/image 2.png" alt="completed vs failed requests by input token length">
 
-<p>roughly four out of every five requests offered to this server did not come back. and the failure percentage points all hover around 78 to 81%. uniformity - what can that mean?</p>
+<p>roughly four out of every five requests offered to this server did not come back. and the failure percentage points all hover around 78 to 81%. uniformity...what can that mean?</p>
 
-<p>one hypothesis is that, if the server were doing anything intelligent under pressure (say fair share scheduling, biased toward cheap requests) - i.e. anything intelligent under pressure which <em>could have</em> prioritized one shape over another - then things could have looked different.</p>
+<p>one hypothesis is that, if the server were doing anything intelligent under pressure (say fair share scheduling, biased toward cheap requests) i.e. anything intelligent under pressure which <em>could have</em> prioritized one shape over another then things could have looked different.</p>
 
 <p>things are flat because the scheduler, when it runs out of room, is not choosing. requests arrive faster than the server can finish them, so they pile up in vllm's waiting queue. the scheduler tried to admit as many as fit in kv memory, the kv fills, the scheduler has to preempt already-running sequences to make room for new ones, the preempted sequences go back to the queue to be recomputed later, and the loop continues until the client times out. as nothing is being chosen against, the damage falls on everything.</p>
 
 <div class="callout">
   <span class="callout-icon">♻️</span>
   <div class="callout-body">
-    <p>the vllm scheduler does ship a priority-based policy that would preempt the lowest-priority running request instead of just popping whatever sits at the back of the queue, but it requires clients to pass a non-standard <code>priority</code> field on every request, and no off-the-shelf openai-compatible client does that. what you get is the fcfs behaviour i just described.</p>
+    <p>the vllm scheduler does ship a priority based policy that would preempt the <i>lowest</i> priority running request instead of just popping whatever sits at the back of the queue, but it requires clients to pass a non standard <code>priority</code> field on every request, and no off the shelf openai compatible client does that. what you get is the fcfs behaviour i just described.</p>
     <img src="img/image 3.png" alt="vllm scheduler fcfs behavior diagram">
   </div>
 </div>
@@ -197,7 +196,7 @@
 
 <p>siso loses most of its requests despite each one being trivially small to serve, which means the bottleneck for short traffic is the queue. silo loses most of its requests with the longest output bins dying most, which means the bottleneck there is decode throughput per stream. liso loses most of its requests with the longest input bins dying most, which means the bottleneck is prefill cost. lilo loses most of its requests for both reasons at once.</p>
 
-<p>these are the four hypotheses which i will be testing, but before that we need to define what counts as "good". we need to know what this hardware should be capable of because an honest optimization story needs to know how close we are to them.</p>
+<p>these are the four hypotheses which i will be testing, but before that we need to define what counts as "good". we need to know what this hardware should be capable of because an honest optimization story needs to know <b>how close we are</b> to them.</p>
 
 <h2>what counts as good</h2>
 
@@ -219,7 +218,7 @@
 
 <div class="callout">
   <div class="callout-body">
-    <p>a later audit found two bugs i.e. latency is measured from actual send time, not the intended poisson arrival time, and per-profile percentiles skip the stable-window trim. both make the absolute numbers in this post optimistic. the relative ordering of optimizations is unaffected. fix is in the followup.</p>
+    <p>a later audit found two bugs: latency is measured from actual send time, not the intended poisson arrival time, and per profile %iles skip the stable window trim. both make the absolute numbers in this post optimistic. the relative ordering of optimizations is unaffected. fix is in the followup.</p>
   </div>
 </div>
 
@@ -237,13 +236,13 @@
 
 <img src="img/image 7.png" alt="kv cache memory layout and sizing">
 
-<p>coming back to kv cache, every active sequence holds a key value tensor of roughly 196kb per token. after vllm loads ~28 gb of bf16 weights and reserves overhead, ~15-17gb of the 48gb is left - around 80k to 90k kv tokens in flight.</p>
+<p>coming back to kv cache, every active sequence holds a key value tensor of roughly 196kb per token. after vllm loads ~28 gb of bf16 weights and reserves overhead, ~15-17gb of the 48gb is left. that's around 80k to 90k kv tokens in flight.</p>
 
-<p>now an average lilo holds around 3,000 kv tokens at steady state, meaning just 25 concurrent requests would completely use up our ~80k token budget. this is why our physical memory caps our effective concurrency at ~28 before pinning kv at 100%. that's why the baseline collapsed - the card simply lacks the memory depth to hold this many long context requests at once. vllm's actual kv budget after framework overhead lands closer to 57k tokens, which is what shows up in the experiments below.</p>
+<p>now an average lilo holds around 3,000 kv tokens at steady state, meaning just 25 concurrent requests would completely use up our ~80k token budget. this is why our physical memory caps our effective concurrency at ~28 before pinning kv at 100%. that's why the baseline collapsed! the card simply lacks the memory depth to hold this many long context requests at once. vllm's actual kv budget after framework overhead lands closer to 57k tokens, which is what shows up in the experiments below.</p>
 
 <h2>predictions before measuring</h2>
 
-<p>[note] some of them failed after i ran the experiments on real hardware.</p>
+<p class="dim">some of them failed after i ran the experiments on real hardware.</p>
 
 <ol>
   <li>if we use prefix caching then the cache would be storing kv blocks for token sequences it has seen and would reuse them on subsequent requests that start the same way, skipping the prefill gemm for the shared portions. lilo and liso should have their ttft drop substantially (as long prompts overlap due to their code file corpus), and siso and silo would barely move.</li>
@@ -271,11 +270,11 @@
 <div class="callout">
   <span class="callout-icon"></span>
   <div class="callout-body">
-    <p>throughput increased 4.6x - i would like to be very careful with this claim. prefix caching skips prefill work for tokens it has seen before. more requests fit through, so aggregate output goes up. no individual stream is generating tokens faster. the 4.6x is the system breathing again, not a decode speedup (<a href="https://github.com/vllm-project/vllm/blob/469f3dcf/benchmarks/benchmark_prefix_caching.py#L4"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">benchmark</a>, <a href="https://github.com/vllm-project/vllm/blob/469f3dcf/docs/design/prefix_caching.md?plain=1#L1"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">design doc</a>).</p>
+    <p>throughput increased 4.6x - i would like to be very careful with this claim. prefix caching skips prefill work for tokens it has seen before. more requests fit through, so aggregate output goes up. no individual stream is generating tokens faster. the 4.6x is the <i>system breathing again</i>, not a decode speedup (<a href="https://github.com/vllm-project/vllm/blob/469f3dcf/benchmarks/benchmark_prefix_caching.py#L4"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">benchmark</a>, <a href="https://github.com/vllm-project/vllm/blob/469f3dcf/docs/design/prefix_caching.md?plain=1#L1"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">design doc</a>).</p>
   </div>
 </div>
 
-<p>what the cache is actually catching is the file bodies in the liso and lilo corpus, being reused across requests after the model sees each file once. with five source files in the corpus and a few hundred requests drawing from them, every file ends up cached after a few sightings, and the rest of the requests effectively skip the expensive prefill entirely - which is exactly the workload that prefix caching is designed for: document qa, code review, rag-style workloads where the same content reoccurs across many user queries.</p>
+<p>what the cache is actually catching is the file bodies in the liso and lilo corpus, being reused across requests after the model sees each file once. with five source files in the corpus and a few hundred requests drawing from them, every file ends up cached after a few sightings, and the rest of the requests effectively skip the expensive prefill entirely - which is exactly the workload that prefix caching is designed for: document qa, code review, rag style workloads where the same content reoccurs across many user queries.</p>
 
 <table>
   <thead><tr><th>metric</th><th>baseline (s)</th><th>cache on (s)</th><th>speedup</th></tr></thead>
@@ -287,15 +286,15 @@
   </tbody>
 </table>
 
-<p>the surprise was in the per-profile breakdown though. i predicted that liso and lilo would benefit most, since they were the profiles with the long shared prefixes, and they did benefit, but siso benefited <em>more</em>.</p>
+<p>the surprise was in the profile breakdown though. i predicted that liso and lilo would benefit most, since they were the profiles with the long shared prefixes, and they did benefit, but siso benefited <em>more</em>.</p>
 
 <img src="img/prefix_surprise.png" alt="per-profile ttft speedup with prefix caching">
 
-<p>which made no sense if you assume the cache is only helping the profiles whose prompts it can actually reuse. it took me a minute to see the most plausible explanation. the timing is consistent with siso sitting in vllm's waiting queue behind liso and lilo requests whose long prefills were monopolizing the gpu: in the baseline, siso's ttft p50 is 56.6s despite a median prompt of 83 tokens, while liso's ttft p50 is 21.9s with a median prompt of 1440 tokens — a 17x shorter request waiting 2.6x longer for first token is hard to explain without queue contention. turning on the cache made liso and lilo prefills largely disappear (73.7% cache hit rate), and siso ttft dropped to 4.67s. the bottleneck for the cheap profiles was most likely the expensive profiles' prefill cost. per-profile queue time (vllm's <code>vllm:request_queue_time_seconds</code> split by request tag) would confirm this directly; future runs will log it.</p>
+<p>which made no sense if you assume the cache is only helping the profiles whose prompts it can actually reuse. it took me a minute to see the most plausible (causal?) explanation. the timing is consistent with siso sitting in vllm's waiting queue behind liso and lilo requests whose long prefills were monopolizing the gpu: in the baseline, siso's ttft p50 is 56.6s despite a median prompt of 83 tokens, while liso's ttft p50 is 21.9s with a median prompt of 1440 tokens. from there we can see that a 17x shorter request waiting 2.6x longer for first token is hard to explain without queue contention. turning on the cache made liso and lilo prefills largely disappear (73.7% cache hit rate), and siso ttft dropped to 4.67s. the bottleneck for the cheap profiles was most likely the expensive profiles' prefill cost. the per profile queue time (vllm's <code>vllm:request_queue_time_seconds</code> split by request tag) would confirm this directly.</p>
 
 <h2>chunked prefill</h2>
 
-<p>as we saw earlier, a long prefill monopolizes the gpu until it's done, during which every other request's decode is frozen. chunked prefill breaks the prefill into pieces (in this case i tried it with 2048 tokens at a time) and interleaves them with decode steps for in-flight requests. that makes a 4000 token prefill become two chunks with decode work happening in between.</p>
+<p>as we saw earlier, a long prefill monopolizes the gpu until it's done, during which every other request's decode is frozen. chunked prefill breaks the prefill into pieces (in this case i tried it with 2048 tokens at a time) and interleaves them with decode steps for in flight requests. that makes a 4000 token prefill become two chunks with decode work happening in between.</p>
 
 <p>i expected this to improve liso/lilo ttft (their prefills no longer block others), improve siso indirectly (it stops queuing behind those prefills), and mildly hurt silo itl (its decode now shares the gpu with prefill chunks of other requests).</p>
 
@@ -313,17 +312,17 @@
 
 <p>the metric i predicted it would show up in was wrong, though the mechanism i predicted was partially right.</p>
 
-<p>chunked prefill spreads each prefill across multiple scheduler iterations, which keeps decode progressing instead of freezing it. but it also means any individual request's prefill takes longer wall-clock time to complete, because it's now competing with decode for slots. ttft got worse because the cost of slicing appears to have exceeded the benefit of unblocking at this arrival rate. chunked prefill is designed to let new requests start sooner instead of waiting behind a monolithic prefill, but at sustained overload, every request pays the slicing tax and only some of them benefit from the unblocking. itl improved because no single prefill can monopolize the gpu anymore, so decode steps come out more regularly.</p>
+<p>chunked prefill spreads each prefill across multiple scheduler iterations, which keeps decode progressing instead of freezing it. but it also means any individual request's prefill takes longer wall clock time to complete, because it's now competing with decode for slots. ttft got worse because the cost of slicing appears to have exceeded the benefit of unblocking at this arrival rate. chunked prefill is designed to let new requests start sooner instead of waiting behind a monolithic prefill, but at sustained overload, every request pays the slicing tax and only some of them benefit from the unblocking. itl improved because no single prefill can monopolize the gpu anymore, so decode steps come out more regularly.</p>
 
 <p>the throughput number counts both prefill and decode tokens. chunked prefill spreads prefill work across more iterations, so per-iteration token counts go up while per-request wall-clock latency goes up too. the aggregate metric and the per-user metric are measuring different things.</p>
 
 <p>if i only looked at ttft, i would probably call this a regression. if i only looked at aggregate throughput, i would probably call it an improvement. preemptions also rose from 262 to 412 because chunked prefill keeps more prefills concurrently in flight instead of serializing them, which raises sustained kv pressure and triggers more preemptions.</p>
 
-<p>kv usage still sits at 100%. chunked prefill, like caching before it, isn't fixing the memory budget problem - it's changing how the scheduler spends that budget.</p>
+<p>kv usage still sits at 100%. chunked prefill, like caching before it, is now changing how the scheduler spends that budget.</p>
 
 <h2>quantization, with a surprise</h2>
 
-<p>decode is memory-bandwidth-bound, so if weights go from bf16 to 4-bit (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct-AWQ"><img class="fav" src="https://www.google.com/s2/favicons?domain=huggingface.co&sz=16" alt="">qwen2.5-14b-instruct-awq</a>), each decode step should have to pull roughly a quarter of the bytes from hbm. you don't quite get a 4x speedup because dequantization still exists, but nearly 2x improvement in single stream decode didn't seem unreasonable. the other thing i expected was that the smaller weights would leave a lot more vram available for kv. on this setup, that should have been almost comically helpful because the workload is visibly kv bound. in practice, the in-flight kv budget jumps from around 57k tokens to 171k tokens.</p>
+<p>decode is memory-bandwidth-bound, so if weights go from bf16 to 4 bit (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct-AWQ"><img class="fav" src="https://www.google.com/s2/favicons?domain=huggingface.co&sz=16" alt="">qwen2.5-14b-instruct-awq</a>), each decode step should have to pull roughly a quarter of the bytes from hbm. you don't quite get a 4x speedup because dequantization still exists, but nearly 2x improvement in single stream decode didn't seem unreasonable. the other thing i expected was that the smaller weights would leave a lot more vram available for kv. on this setup, that should have been almost comically helpful because the workload is visibly kv bound. in practice, the in flight kv budget jumps from around 57k tokens to 171k tokens.</p>
 
 <p>the freed vram did get handed back to the kv pool, the budget really did triple, and preemptions dropped from 262 to 132 because the scheduler could now afford to keep more sequences resident instead of constantly evicting and re-admitting them.</p>
 
@@ -340,15 +339,18 @@
   </tbody>
 </table>
 
-<p>but the decode got slower. siso itl is roughly 3x worse and lilo degraded by almost 50% - though lilo degraded less than siso likely because lilo runs at effectively higher per-step batch (more concurrent decode tokens), which is closer to the regime where awq kernels amortize dequantization cost. throughput did get better, but only from 144 tok/s to 189 tok/s. the extra throughput wasn't coming from any individual request decoding faster (baseline per-request p50: 2.09 tok/s, awq: 0.94 tok/s) - the larger kv budget was just allowing more requests to coexist.</p>
+<p>but the decode got slower. siso itl is roughly 3x worse and lilo degraded by almost 50%.
+<br>  
+though lilo degraded less than siso likely because lilo runs at effectively higher per step batch (more concurrent decode tokens), which is closer to the regime where awq kernels amortize dequantization cost. <br>
+throughput did get better, but only from 144 tok/s to 189 tok/s, probably because the larger kv budget was just allowing more requests to coexist. hence the extra throughput wasn't coming from any individual request with faster decoding.</p>
 
 <img src="img/divergence.png" alt="throughput vs itl divergence under awq">
 
 <p>the server is doing more work overall, but each stream is progressing more slowly. from a user's perspective, every token arrives later even though the dashboard says throughput went up.</p>
 
-<p>the regression had to be somewhere higher in the stack, and once i looked at what awq kernels actually do, it was obvious. awq is a w4a16 storage scheme: weights are stored as int4 with fp16 scaling factors, but every matmul dequantizes them back to fp16 and runs the gemm in fp16 (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">vllm source</a>). at high batch sizes the dequantization overhead disappears into the pipeline. at the m=1 gemv shape that decode uses, the dequantization cost sits on the critical path without being amortized across a batch dimension. this is documented behavior - vllm's awq path was designed for prefill-heavy throughput, not interactive decode (<a href="https://github.com/vllm-project/vllm/pull/2566"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">pr #2566</a>, <a href="https://github.com/vllm-project/vllm/issues/2268"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">issue #2268</a>).</p>
+<p>the regression had to be somewhere higher in the stack, and once i looked at what awq kernels actually do, it was obvious. awq is a w4a16 storage scheme, where weights are stored as int4 with fp16 scaling factors, but every matmul dequantizes them back to fp16 and runs the gemm in fp16 (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">vllm source</a>). at high batch sizes the dequantization overhead disappears into the pipeline. at the m=1 gemv shape that decode uses, the dequantization cost sits on the critical path without being amortized across a batch dimension. (this is a documented behavior btw <a href="https://github.com/vllm-project/vllm/pull/2566"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">pr #2566</a>, <a href="https://github.com/vllm-project/vllm/issues/2268"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">issue #2268</a>) vllm's awq path was designed for prefill-heavy throughput, not interactive decode .</p>
 
-<p>so two things happen simultaneously: the system-level scheduler becomes happier because memory pressure drops, while the individual decode path becomes slower because each token now carries extra work that the hardware shape can't hide.</p>
+<p>the system level scheduler becomes happier because memory pressure drops, while the individual decode path becomes slower because each token now carries extra work that the hardware shape can't hide. these are the two things happen simultaneously.</p>
 
 <h2>awq + chunked prefill</h2>
 
@@ -356,7 +358,7 @@
 
 <p>intuitively, they seemed complementary. awq gives me a much larger kv pool, chunked prefill gives decode more opportunities to run, and maybe the ugly itl numbers disappear. so i turned both on and reran everything.</p>
 
-<p>"yes" and "not really."</p>
+<p>the answer? <i>yes.</i><br>and, <i>uh..not really</i></p>
 
 <table>
   <thead><tr><th></th><th>baseline</th><th>awq</th><th>stack</th></tr></thead>
@@ -369,17 +371,17 @@
   </tbody>
 </table>
 
-<p>chunked prefill does pull awq's itl back in the right direction. siso drops from 557ms to 367ms, which is still substantially worse than baseline but no longer catastrophic. e2e latency also falls to 91 seconds, which actually ends up being the best e2e number in this entire post. so if the thing you care about is getting long jobs finished sooner, the stack genuinely works.</p>
+<p>chunked prefill does pull awq's itl back in the right direction. siso drops from 557ms to 367ms, which is still substantially worse than baseline but no longer catastrophic. e2e latency also falls to 91 seconds, which actually ends up being the <i>best e2e number in this entire post</i>. so if the thing you care about is getting long jobs finished sooner, the stack genuinely works.</p>
 
-<p>the part i didn't expect was what happened to preemptions. awq by itself had cut them almost in half because the scheduler suddenly had three times more kv headroom. after enabling chunked prefill, they climbed back to roughly the original disaster baseline level (~260). the kv budget never changed - it's still 171k tokens. but chunked prefill admits more concurrent in-flight prefills instead of serializing them, which is consistent with what consumed the additional headroom awq provided. not a hidden interaction - the documented behavior of both knobs composed.</p>
+<p>the part i didn't expect was what happened to preemptions. awq by itself had cut them almost in half because the scheduler suddenly had three times more kv headroom. after enabling chunked prefill, they climbed back to roughly the original disaster baseline level (~260). the kv budget is still at 171k tokens. but chunked prefill admits more concurrent in flight prefills instead of serializing them, which is consistent with what consumed the additional headroom which awq prevoiously provided.</p>
 
-<p>so the two optimizations both operate on the same resource from different directions. stacking them doesn't preserve both benefits.</p>
+<p>so the two optimizations both operate on the same resource from different directions. stacking them doesn't preserve both benefits.</p><p>:(</p>
 
-<p>this also ended up being one of the most deceptive results in the entire experiment. when i looked at per profile slo compliance, it was among the worst configurations: 1% on siso, 1% on silo, 9% on liso, and 15% on lilo. the stack really is getting more work done. it's just getting more work done by fitting more requests into the same period of time, not by making any individual request feel faster. the server is happier. the users won't be.</p>
+<p>this also ended up being one of the most deceptive results in the entire experiment. when i looked at per profile slo compliance, it was among the <b>worst</b> configurations: 1% on siso, 1% on silo, 9% on liso, and 15% on lilo. the stack really is getting more work done. it's just getting more work done by fitting more requests into the same period of time, not by making any individual request feel faster. the server is happier. the users definitely won't be.</p>
 
 <h2>the tradeoff matrix</h2>
 
-<p>here's the table everything else was building toward. two additional configurations appear that weren't covered in their own sections. admission control caps the number of concurrently running requests (i used vllm's <code>--max-num-seqs</code>) to keep kv from filling and triggering cascading preemptions - headline result: helps long-output profiles, does nothing for siso. prefix + chunked stacks automatic prefix caching with chunked prefill - headline result: statistically identical to prefix caching alone, at higher preemption cost.</p>
+<p>this is my entire post summarised. two additional configurations appear that weren't covered in their own sections. admission control caps the number of concurrently running requests (i used vllm's <code>--max-num-seqs</code>) to keep kv from filling and triggering cascading preemptions, it helped with long output profiles, but does nothing for siso. similarly prefix + chunked stacks automatic prefix caching with chunked prefill was pretty much identical to prefix caching alone, at higher preemption cost.</p>
 
 <table>
   <thead><tr><th></th><th>baseline</th><th>prefix</th><th>chunked</th><th>awq</th><th>stack</th><th>admit</th><th>prefix+chunk</th></tr></thead>
@@ -393,37 +395,35 @@
 
 <p class="dim"><em>slo compliance: fraction of offered requests that met the per-profile latency budget. siso/liso: ttft &lt;5s. silo/lilo: itl p95 &lt;250ms. bold = above 40%.</em></p>
 
-<p>look at the awq column. 189 tok/s throughput, sounds fine, but zero siso compliance, zero silo compliance, 2% lilo. nobody is getting a usable response. that's the gap between throughput and goodput.</p>
+<p>look at the awq column. 189 tok/s throughput, sounds fine, but zero siso compliance, zero silo compliance, 2% lilo. nobody is getting a usable response. and that's <i>THE GAP</i> between throughput and goodput.</p>
 
-<p>the prefix caching column is the only one that doesn't look broken. every profile above 40%, four out of four. everything else either flatlines on siso or has at least one profile in crisis. automatic prefix caching is enabled by default in vllm v1 (<a href="https://docs.vllm.ai/en/latest/design/v1/prefix_caching.html"><img class="fav" src="https://www.google.com/s2/favicons?domain=docs.vllm.ai&sz=16" alt="">docs</a>), which has been the default engine since 0.8.1. if you're on a recent vllm, this is already on. if you're on an older version, it's the one flag that matters most.</p>
+<p>the prefix caching column is the only one that doesn't look broken. every profile above 40%, 4/4. everything else either flatlines on siso or has at least one profile in crisis. automatic prefix caching is enabled by default in vllm v1 (<a href="https://docs.vllm.ai/en/latest/design/v1/prefix_caching.html"><img class="fav" src="https://www.google.com/s2/favicons?domain=docs.vllm.ai&sz=16" alt="">docs</a>), which has been the default engine since 0.8.1. if you're on a recent vllm, this is already on. if you're on an older version, then turn it on, perhaps?</p>
 
-<p>two things in the matrix surprised me.</p>
+<p>two things in the matrix are unintuitive in my opinion.</p>
 
-<p>admission control helped silo and lilo (52%, 41%) but did nothing for siso slo compliance - stayed at 0% even though completion rate hit 44%. lower in-flight concurrency does help the queue drain faster, but at 32 rps the http queue still grows unboundedly, and siso's ttft budget is too tight to survive any meaningful wait. admission control fixes the running-requests queue. siso's problem is the arrival queue. the fix there is rate limiting at ingress, not concurrency limiting at admission.</p>
+<p>admission control helped silo and lilo (52%, 41%) but did nothing for siso slo compliance, it stayed at 0% even though completion rate hit 44%. <br>lower in flight concurrency does help the queue drain faster, but at 32 rps the http queue still grows unboundedly, and siso's ttft budget is too tight to survive any meaningful wait.</p>
 
-<p>prefix caching plus chunked prefill is statistically identical to prefix caching alone - completion rate, throughput, and all four slo rates within 1 point of each other. the reason is that prefix caching skipped 73.7% of the prefill work, which means there's almost nothing left for chunked prefill to chunk. it doesn't conflict; it just has nothing to do, and then it charges you 405 preemptions (up from 334) for the privilege of doing nothing. sometimes one optimization is so dominant that stacking another on top of it is just overhead.</p>
+<p>prefix caching plus chunked prefill is statistically identical to prefix caching alone. the reason is that prefix caching skipped 73.7% of the prefill work, which means there's almost nothing left for chunked prefill to chunk. it doesn't conflict - it just has nothing to do! and then it charges you 405 preemptions (up from 334) for the privilege of doing nothing.</p>
 
-<p>the matrix reads differently depending on which axis you care about. by row: turn on prefix caching and you're mostly fine across all four profiles - if your workload has content overlap. by column: chunked prefill alone is a worse production config than baseline for any siso-heavy product (1% slo compliance vs 0% is not a win), awq is dangerous on interactive workloads because its kernel path dequantizes weights to fp16 before the matmul (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">vllm source</a>), and that overhead sits on the critical path at the m=1 decode shape - the bandwidth savings only materialize at prefill-sized batches, and the stack is the clearest example in this post of an optimization that improves every aggregate metric while making the per-user experience worse.</p>
+<p>if you turn on prefix caching, you're mostly fine across all four profiles, given your workload has content overlap. whereas chunked prefill alone is a worse production config than baseline for any siso heavy product (1% slo compliance vs 0% is not a win !!), awq is dangerous on interactive workloads because its kernel path dequantizes weights to fp16 before the matmul (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">vllm source</a>), and that overhead sits on the critical path (the bandwidth savings will show up in prefill sized batches) and therefore the stack is the clearest example in this post of an optimization that improves every aggregate metric while making the per user experience terribly worse.</p>
 
-<p>the actionable summary is short. if your workload has prefix sharing - rag, system prompts, document qa, code review over a known codebase - turn on prefix caching. it's one flag, and it's the difference between a working system and the mess in the baseline column. if it doesn't, the next best option depends on your dominant profile: admission control for long-output traffic, operational separation (separate clusters) for short-output traffic, because no vllm flag fixes the waiting-in-line problem for siso at 32 rps.</p>
+<p>hence, if your workload has prefix sharing, things like rag, system prompts, document qa, code review over a known codebase - turn on prefix caching. free lunch (even the docs call it that).
 
-<p>everything else in the matrix earns its place by losing. the optimization wasn't where the work was. the diagnosis was.</p>
+  the next best option depends on your dominant profile would be admission control for long output traffic, separate clusters for short output traffic, because no vllm flag fixes the waiting-in-line problem for siso at 32 rps.</p>
+
+<p>essentially, everything else in the matrix earns its place by losing. the diagnosis of the entire thing was the fun part.</p>
 
 <h2>so what</h2>
 
-<p>i spent a weekend simulating a busy monday morning on one gpu. the result is a 21% completion rate and a kv cache pegged at 100%. most of the requests never came back. that's what you get when you take a 14b model, point mixed traffic at it, and don't think about what the traffic actually looks like.</p>
+<p>inference optimization is a diagnosis problem, much like a sherlock holmes' story line, except you just play with flags and kernels. <br>every now and then someone comes up with a new optimization, and shows the exact benchmark where it outperforms others. but what happens when others are stacked together? what happens when my workload is totally different from theirs? why should i care for long conversations when my entire work is to handle 10 words at a time?</p>
 
-<p>inference optimization isn't a knobs problem. it's a diagnosis problem. everyone ships a new technique and shows you the benchmark where it wins. nobody shows you the benchmark where it loses, because they didn't run that benchmark, because running that benchmark requires knowing what your workload actually is. the diagnosis work is the majority of the work - the config change at the end is one flag.</p>
+<p>we also saw that awq and the stacked config are examples of the same failure mode because the aggregate metrics improve while per user experience degraded badly. despite the throughput going up, the goodput goes to zero.</p>
 
-<p>prefix caching is the one that worked across everything. it removes prefill cost on content that recurs, and on almost every real production workload something recurs - the system prompt, the retrieved documents, the source file being reviewed. when that cost disappears, the whole queue moves faster and the profiles that were dying in line suddenly get served.</p>
+<p>the matrix is actully the whole post in one table. no column is uniformly green. no row is served well by everything. the right configuration is the one that matches the traffic shape, and most deployments don't know their traffic shape because they never measured it (or do they?)</p>
 
-<p>awq and the stack are examples of the same failure mode: aggregate metrics improve while per-user experience degrades. awq triples the kv budget and slows per-token decode. the stack improves e2e latency and produces the worst slo compliance in the post. the server gets happier. the users don't. throughput going up while goodput goes to zero is the benchmark nobody runs.</p>
+<p>i think that's the actual job - not picking the optimization but figuring out what's slow and why, before reaching for the toolbox.</p>
 
-<p>the matrix is the whole post in one table. no column is uniformly green. no row is served well by everything. the right configuration is the one that matches the traffic shape, and most deployments don't know their traffic shape because they never measured it.</p>
-
-<p>that's the actual job. not picking the optimization. figuring out what's slow and why, before reaching for the toolbox. the rest is just running the right flag.</p>
-
-<p class="section-note">code is at <a href="https://github.com/datavorous/to-fa"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">datavorous/to-fa</a>. if this is the kind of systems work you need done - <a href="mailto:datavorous.work@gmail.com"><img class="fav" src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="">get in touch</a>.</p>
+<p class="section-note">code is at <a href="https://github.com/datavorous/to-fa"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=16" alt="">datavorous/to-fa</a>. if this is the kind of systems work you need done - <a href="mailto:datavorous.work@gmail.com"><img class="fav" src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="">get in touch</a> (i am looking for an internship)</p>
 
 <div class="refs">
   <h3>references</h3>
