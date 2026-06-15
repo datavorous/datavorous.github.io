@@ -79,6 +79,20 @@ nav button.on { color: var(--accent); border-bottom-color: var(--accent); font-w
 }
 .tab { display: none; }
 .tab.on { display: block; }
+.filters {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+.filters select, .filters input[type=number] {
+  padding: 0.3rem 0.55rem;
+  font-family: inherit; font-size: 0.76rem;
+  border: 1px solid var(--border); border-radius: 4px;
+  background: var(--card); color: var(--text);
+  outline: none; cursor: pointer;
+}
+.filters select:focus, .filters input[type=number]:focus { border-color: var(--accent); }
+.filters input[type=number] { width: 100px; }
+.filters label { font-size: 0.72rem; color: var(--muted); align-self: center; }
 .note {
   background: var(--card);
   border-left: 2.5px solid var(--accent);
@@ -168,12 +182,47 @@ input[type=search]::placeholder { color: var(--muted); }
 
 <div id="single" class="tab on">
   <div class="note">single-source tenders skip competitive bidding entirely. high emd requirements price out smaller vendors. these are the highest-stakes no-contest awards in the dataset.</div>
+  <div class="filters">
+    <label>min emd</label>
+    <select id="sf-emd" onchange="applyFilters('single')">
+      <option value="0">any</option>
+      <option value="1e5">1L+</option>
+      <option value="1e6">10L+</option>
+      <option value="1e7">1Cr+</option>
+      <option value="1e8">10Cr+</option>
+    </select>
+    <label>location</label>
+    <select id="sf-loc" onchange="applyFilters('single')"><option value="">any</option></select>
+  </div>
   <div class="cnt" id="sc"></div>
   <div id="st"></div>
 </div>
 
 <div id="rush" class="tab">
   <div class="note">bid windows under 7 days leave no time for outsiders to prepare. short windows on high-value open tenders strongly suggest a pre-selected vendor with advance notice.</div>
+  <div class="filters">
+    <label>max window</label>
+    <select id="rf-days" onchange="applyFilters('rush')">
+      <option value="7">7d or less</option>
+      <option value="3">3d or less</option>
+      <option value="2">2d or less</option>
+      <option value="1">1 day</option>
+    </select>
+    <label>min emd</label>
+    <select id="rf-emd" onchange="applyFilters('rush')">
+      <option value="0">any</option>
+      <option value="1e5">1L+</option>
+      <option value="1e6">10L+</option>
+      <option value="1e7">1Cr+</option>
+    </select>
+    <label>type</label>
+    <select id="rf-type" onchange="applyFilters('rush')">
+      <option value="">any</option>
+      <option value="Open/Advertised">open</option>
+      <option value="Limited">limited</option>
+      <option value="Single">single</option>
+    </select>
+  </div>
   <div class="cnt" id="rc"></div>
   <div id="rt"></div>
 </div>
@@ -243,6 +292,7 @@ const TABS = ['single','rush','orgs','sectors','charts','search'];
 const done = {};
 const sortst = {};
 let searchData = null, searchTimer = null;
+const rawData = {};
 
 function go(name, btn) {
   TABS.forEach(t => document.getElementById(t).classList.toggle('on', t === name));
@@ -331,10 +381,38 @@ function cellHtml(id, r, i) {
   return '';
 }
 
+function applyFilters(name) {
+  if (name === 'single') {
+    const minEmd = parseFloat(document.getElementById('sf-emd').value);
+    const loc = document.getElementById('sf-loc').value;
+    const d = rawData['single'].filter(r =>
+      r.emd >= minEmd && (!loc || (r.location||'').toLowerCase() === loc)
+    );
+    document.getElementById('sc').textContent = d.length + ' tenders';
+    renderTable('st', 'single', ['org','title','emd','type','days','location'],
+      ['org','title','emd','ttype','days','location'], d);
+  } else if (name === 'rush') {
+    const maxDays = parseInt(document.getElementById('rf-days').value);
+    const minEmd = parseFloat(document.getElementById('rf-emd').value);
+    const type = document.getElementById('rf-type').value;
+    const d = rawData['rush'].filter(r =>
+      r.days <= maxDays && r.emd >= minEmd && (!type || r.ttype === type)
+    );
+    document.getElementById('rc').textContent = d.length + ' tenders';
+    renderTable('rt', 'rush', ['org','title','emd','window','published','type'],
+      ['org','title','emd','days','pub_date','ttype'], d);
+  }
+}
+
 async function loadTab(name) {
   try {
     if (name === 'single') {
       const d = await jfetch('./data_single.json');
+      rawData['single'] = d;
+      // populate location filter
+      const locs = [...new Set(d.map(r => (r.location||'').toLowerCase()).filter(Boolean))].sort();
+      const sel = document.getElementById('sf-loc');
+      locs.forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; sel.appendChild(o); });
       document.getElementById('sc').textContent = d.length + ' single-source tenders, sorted by emd desc';
       sortst['single'] = { c: 2, asc: false };
       renderTable('st', 'single', ['org','title','emd','type','days','location'],
@@ -342,6 +420,7 @@ async function loadTab(name) {
     }
     else if (name === 'rush') {
       const d = await jfetch('./data_rush.json');
+      rawData['rush'] = d;
       document.getElementById('rc').textContent = d.length + ' rush tenders (bid window <= 7 days), sorted by emd desc';
       sortst['rush'] = { c: 2, asc: false };
       renderTable('rt', 'rush', ['org','title','emd','window','published','type'],
