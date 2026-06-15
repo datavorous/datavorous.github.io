@@ -9,3 +9,4 @@ wheels/
 .env
 cache/tender/*.db
 data/*.db
+*.zip
