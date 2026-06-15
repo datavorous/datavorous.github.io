@@ -120,6 +120,28 @@ td {
 }
 tr:nth-child(even) td { background: var(--row-alt); }
 tr:hover td { background: #fce4ed; cursor: pointer; }
+.hide-sm { }
+@media (max-width: 540px) {
+  table, thead, tbody, th, td, tr { display: block; }
+  thead { display: none; }
+  tr {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    background: var(--card);
+    padding: 0.5rem 0.6rem;
+    cursor: pointer;
+  }
+  tr:nth-child(even) { background: var(--card); }
+  tr:hover { background: #fce4ed; }
+  td {
+    border: none; padding: 0.1rem 0;
+    font-size: 0.8rem; line-height: 1.4;
+  }
+  td:first-child { font-size: 0.74rem; color: var(--muted); }
+  td:nth-child(2) { font-weight: 500; font-size: 0.84rem; margin-bottom: 0.2rem; }
+  .hide-sm { display: none; }
+}
 .mono { font-family: monospace; font-size: 0.75rem; }
 .hi { color: var(--accent); font-weight: 500; }
 .dim { color: var(--muted); font-size: 0.72rem; }
@@ -366,17 +388,17 @@ function cellHtml(id, r, i) {
     `<span style="font-size:.74rem">${(r.org||'-').toLowerCase()}</span>`,
     `<span style="font-size:.74rem">${(r.title||'-').toLowerCase()}</span>`,
     `<span class="hi mono">&#8377;${fmtemd(r.emd)}</span>`,
-    `<span class="dim">${(r.ttype||'-').toLowerCase()}</span>`,
-    `<span class="mono dim">${r.days != null ? r.days + 'd' : '-'}</span>`,
-    `<span class="dim">${(r.location||'-').toLowerCase()}</span>`
+    `<span class="dim hide-sm">${(r.ttype||'-').toLowerCase()}</span>`,
+    `<span class="mono dim hide-sm">${r.days != null ? r.days + 'd' : '-'}</span>`,
+    `<span class="dim hide-sm">${(r.location||'-').toLowerCase()}</span>`
   ][i];
   if (id === 'rush') return [
     `<span style="font-size:.74rem">${(r.org||'-').toLowerCase()}</span>`,
     `<span style="font-size:.74rem">${(r.title||'-').toLowerCase()}</span>`,
     `<span class="hi mono">&#8377;${fmtemd(r.emd)}</span>`,
     `<span class="${r.days <= 2 ? 'red' : 'dim'} mono">${r.days}d</span>`,
-    `<span class="dim">${r.pub_date||'-'}</span>`,
-    `<span class="dim">${(r.ttype||'-').toLowerCase()}</span>`
+    `<span class="dim hide-sm">${r.pub_date||'-'}</span>`,
+    `<span class="dim hide-sm">${(r.ttype||'-').toLowerCase()}</span>`
   ][i];
   return '';
 }
