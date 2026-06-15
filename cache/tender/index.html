@@ -58,6 +58,25 @@ nav button {
 }
 nav button:hover { color: var(--text); }
 nav button.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+.nav-select {
+  display: none;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font-family: inherit; font-size: 0.88rem;
+  border: 1.5px solid var(--border); border-radius: 5px;
+  background: var(--card); color: var(--text);
+  margin-bottom: 1.2rem; outline: none;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e8490' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.2rem;
+}
+.nav-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px #ff9eb540; }
+@media (max-width: 540px) {
+  nav { display: none; }
+  .nav-select { display: block; }
+}
 .tab { display: none; }
 .tab.on { display: block; }
 .note {
@@ -130,6 +149,14 @@ input[type=search]::placeholder { color: var(--muted); }
 <p class="sub">2.8m indian government tenders, navigated</p>
 <div class="stats" id="stats">loading...</div>
 
+<select class="nav-select" id="nav-select" onchange="goSelect(this.value)">
+  <option value="single">single-source</option>
+  <option value="rush">rush jobs</option>
+  <option value="orgs">orgs</option>
+  <option value="sectors">sectors</option>
+  <option value="charts">charts</option>
+  <option value="search">search</option>
+</select>
 <nav>
   <button class="on" onclick="go('single',this)">single-source</button>
   <button onclick="go('rush',this)">rush jobs</button>
@@ -220,7 +247,13 @@ let searchData = null, searchTimer = null;
 function go(name, btn) {
   TABS.forEach(t => document.getElementById(t).classList.toggle('on', t === name));
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b === btn));
+  document.getElementById('nav-select').value = name;
   if (!done[name]) { done[name] = 1; loadTab(name); }
+}
+
+function goSelect(name) {
+  const btn = document.querySelectorAll('nav button')[TABS.indexOf(name)];
+  go(name, btn);
 }
 
 async function jfetch(path) {

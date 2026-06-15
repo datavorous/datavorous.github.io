@@ -7,4 +7,5 @@ wheels/
 
 .venv
 .env
+cache/tender/*.db
 data/*.db
