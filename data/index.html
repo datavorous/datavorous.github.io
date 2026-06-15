@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tender lens</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-from: #fff5f7;
+  --bg-to:   #fce4ed;
+  --text:    #1a0f14;
+  --muted:   #9e8490;
+  --border:  #f0cad8;
+  --sel-bg:  #ff9eb5;
+  --sel-fg:  #1a0f14;
+  --code-bg: #fdf0f4;
+  --accent:  #c2185b;
+  --red:     #b71c1c;
+  --row-alt: #fdf0f4;
+  --card:    #fff8fa;
+}
+html {
+  background: linear-gradient(150deg, var(--bg-from) 0%, var(--bg-to) 100%) fixed;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  font-family: "DM Sans", ui-rounded, system-ui, sans-serif;
+  font-size: 19px;
+  color: var(--text);
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+::selection { background: var(--sel-bg); color: var(--sel-fg); }
+h1 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.15rem; }
+.sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.8rem; }
+.stats {
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  font-size: 0.76rem; color: var(--muted);
+  margin-bottom: 1.6rem; font-family: monospace;
+}
+.stats strong { color: var(--accent); }
+nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.4rem;
+  overflow-x: auto;
+}
+nav button {
+  background: none; border: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 0.45rem 0.9rem;
+  font-family: inherit; font-size: 0.8rem; color: var(--muted);
+  cursor: pointer; white-space: nowrap; transition: color 0.12s;
+}
+nav button:hover { color: var(--text); }
+nav button.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+.tab { display: none; }
+.tab.on { display: block; }
+.note {
+  background: var(--card);
+  border-left: 2.5px solid var(--accent);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.8rem; color: var(--muted);
+  margin-bottom: 0.9rem; line-height: 1.55;
+}
+.cnt { font-size: 0.74rem; color: var(--muted); margin-bottom: 0.5rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.77rem; }
+th {
+  text-align: left; padding: 0.35rem 0.4rem;
+  font-size: 0.7rem; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none;
+  white-space: nowrap; font-weight: 500;
+}
+th:hover { color: var(--text); }
+th.s { color: var(--accent); }
+th.s::after { content: ' v'; font-size: 0.58rem; }
+th.s.asc::after { content: ' ^'; font-size: 0.58rem; }
+td {
+  padding: 0.32rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top; line-height: 1.3;
+}
+tr:nth-child(even) td { background: var(--row-alt); }
+tr:hover td { background: #fce4ed; cursor: pointer; }
+.mono { font-family: monospace; font-size: 0.75rem; }
+.hi { color: var(--accent); font-weight: 500; }
+.dim { color: var(--muted); font-size: 0.72rem; }
+.red { color: var(--red); font-weight: 600; }
+.bars { list-style: none; margin-top: 0.3rem; }
+.bar {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.26rem 0; border-bottom: 1px solid var(--border);
+  font-size: 0.77rem;
+}
+.bar:hover { background: #fce4ed; }
+.bl { width: 180px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.75rem; }
+.bt { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; min-width: 0; }
+.bf { height: 100%; background: var(--accent); opacity: 0.6; border-radius: 3px; display: block; }
+.bn { font-family: monospace; font-size: 0.7rem; color: var(--muted); width: 60px; text-align: right; flex-shrink: 0; }
+input[type=search] {
+  width: 100%; padding: 0.5rem 0.75rem;
+  font-family: inherit; font-size: 0.88rem;
+  border: 1.5px solid var(--border); border-radius: 5px;
+  background: var(--card); color: var(--text);
+  margin-bottom: 0.75rem; outline: none;
+}
+input[type=search]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px #ff9eb540; }
+input[type=search]::placeholder { color: var(--muted); }
+.card {
+  border: 1px solid var(--border); border-radius: 5px;
+  padding: 0.6rem 0.75rem; margin-bottom: 0.5rem;
+  background: var(--card); cursor: pointer;
+}
+.card:hover { border-color: var(--accent); background: #fce4ed; }
+.ct { font-size: 0.86rem; font-weight: 500; margin-bottom: 0.18rem; line-height: 1.3; }
+.cm { display: flex; gap: 0.8rem; font-size: 0.71rem; color: var(--muted); flex-wrap: wrap; }
+.chart-block { margin-bottom: 2rem; }
+.chart-cap { font-size: 0.78rem; color: var(--muted); line-height: 1.55; margin-bottom: 0.45rem; }
+.chart-img { width: 100%; border-radius: 5px; border: 1px solid var(--border); display: block; }
+</style>
+</head>
+<body>
+
+<h1>tender lens</h1>
+<p class="sub">2.8m indian government tenders, navigated</p>
+<div class="stats" id="stats">loading...</div>
+
+<nav>
+  <button class="on" onclick="go('single',this)">single-source</button>
+  <button onclick="go('rush',this)">rush jobs</button>
+  <button onclick="go('orgs',this)">orgs</button>
+  <button onclick="go('sectors',this)">sectors</button>
+  <button onclick="go('charts',this)">charts</button>
+  <button onclick="go('search',this)">search</button>
+</nav>
+
+<div id="single" class="tab on">
+  <div class="note">single-source tenders skip competitive bidding entirely. high emd requirements price out smaller vendors. these are the highest-stakes no-contest awards in the dataset.</div>
+  <div class="cnt" id="sc"></div>
+  <div id="st"></div>
+</div>
+
+<div id="rush" class="tab">
+  <div class="note">bid windows under 7 days leave no time for outsiders to prepare. short windows on high-value open tenders strongly suggest a pre-selected vendor with advance notice.</div>
+  <div class="cnt" id="rc"></div>
+  <div id="rt"></div>
+</div>
+
+<div id="orgs" class="tab">
+  <div class="cnt">top 50 organisations by tender volume (all 2.8m records)</div>
+  <ul class="bars" id="ob"></ul>
+</div>
+
+<div id="sectors" class="tab">
+  <div class="cnt">product category breakdown (from 30k scraped records)</div>
+  <ul class="bars" id="sb"></ul>
+</div>
+
+<div id="charts" class="tab">
+  <div class="cnt" style="margin-bottom:1.2rem">8 charts across 30k detailed records + 2.8m macro dataset</div>
+
+  <div class="chart-block">
+    <p class="chart-cap">bid window distribution - the spike at exactly 7 days (1,266 tenders) is not random. orgs have learned the minimum. anything in red gave vendors under a week.</p>
+    <img src="./plot_bid_window.png" class="chart-img" alt="bid window distribution">
+  </div>
+
+  <div class="chart-block">
+    <p class="chart-cap">tender type breakdown - 465 single-source tenders in this dataset. small percentage, highest scrutiny warranted.</p>
+    <img src="./plot_tender_types.png" class="chart-img" alt="tender types">
+  </div>
+
+  <div class="chart-block">
+    <p class="chart-cap">single-source by org - ministry of railways issues 118, more than double bhel (46) and ongc (38). three of the top five are defence or energy.</p>
+    <img src="./plot_single_source_orgs.png" class="chart-img" alt="single source by org">
+  </div>
+
+  <div class="chart-block">
+    <p class="chart-cap">emd vs bid window scatter - each dot is a tender. red = single-source, orange = rush (&lt;=7d). the cluster of high-emd short-window tenders is the investigative sweet spot.</p>
+    <img src="./plot_emd_vs_window.png" class="chart-img" alt="emd vs bid window">
+  </div>
+
+  <div class="chart-block">
+    <p class="chart-cap">total emd at stake by sector - civil works and power projects have the most money locked in security deposits, not railways (which dominates by count but not value).</p>
+    <img src="./plot_sector_emd.png" class="chart-img" alt="sector emd totals">
+  </div>
+
+  <div class="chart-block">
+    <p class="chart-cap">zero-emd rate by org type - over half of all tenders carry no security deposit. autonomous bodies are the worst offenders. no emd means no financial accountability if a vendor ghosts.</p>
+    <img src="./plot_zero_emd_by_orgtype.png" class="chart-img" alt="zero emd by org type">
+  </div>
+
+  <div class="chart-block">
+    <p class="chart-cap">rush tenders by emd bracket - most rush tenders have zero emd. but 200+ have emd &gt;1cr, meaning crore-scale contracts were rushed through with no time for outside bidders.</p>
+    <img src="./plot_rush_emd_buckets.png" class="chart-img" alt="rush tenders emd buckets">
+  </div>
+
+  <div class="chart-block">
+    <p class="chart-cap">active vs archived - orgs ranked by active tender count. municipal corporation of delhi and delhi development authority dominate current live procurement.</p>
+    <img src="./plot_active_vs_archived.png" class="chart-img" alt="active vs archived tenders">
+  </div>
+</div>
+
+<div id="search" class="tab">
+  <input type="search" id="qi" placeholder="search title or org..." autocomplete="off">
+  <div class="cnt">searching across 5,000 recently scraped tenders</div>
+  <div id="qr"></div>
+</div>
+
+<script>
+const TABS = ['single','rush','orgs','sectors','charts','search'];
+const done = {};
+const sortst = {};
+let searchData = null, searchTimer = null;
+
+function go(name, btn) {
+  TABS.forEach(t => document.getElementById(t).classList.toggle('on', t === name));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b === btn));
+  if (!done[name]) { done[name] = 1; loadTab(name); }
+}
+
+async function jfetch(path) {
+  const r = await fetch(path);
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+function epurl(tid) {
+  if (!tid) return '#';
+  return 'https://eprocure.gov.in/eprocure/app?page=FrontEndTenderDetailNewFormat&service=page&id=' + tid;
+}
+
+function fmtemd(v) {
+  if (!v || v === 0) return '0';
+  const cr = v / 1e7;
+  if (cr >= 1) return cr.toFixed(2) + 'cr';
+  const lac = v / 1e5;
+  if (lac >= 1) return lac.toFixed(1) + 'L';
+  return v.toLocaleString();
+}
+
+function renderTable(contId, id, cols, keys, data) {
+  const st = sortst[id] || { c: 0, asc: false };
+  const sorted = [...data].sort((a, b) => {
+    let av = a[keys[st.c]], bv = b[keys[st.c]];
+    if (av == null) av = ''; if (bv == null) bv = '';
+    if (typeof av === 'number' && typeof bv === 'number') return st.asc ? av - bv : bv - av;
+    return st.asc ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+  });
+  let h = '<table><thead><tr>';
+  cols.forEach((c, i) => {
+    const cls = i === st.c ? (st.asc ? 's asc' : 's') : '';
+    h += `<th class="${cls}" data-i="${i}">${c}</th>`;
+  });
+  h += '</tr></thead><tbody>';
+  sorted.forEach((r, ri) => {
+    h += `<tr data-ri="${ri}">`;
+    cols.forEach((_, i) => { h += `<td>${cellHtml(id, r, i)}</td>`; });
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  const cont = document.getElementById(contId);
+  cont.innerHTML = h;
+  cont.querySelectorAll('th').forEach(th => {
+    th.onclick = () => {
+      const i = parseInt(th.dataset.i);
+      const cur = sortst[id] || { c: 0, asc: false };
+      sortst[id] = { c: i, asc: cur.c === i ? !cur.asc : false };
+      renderTable(contId, id, cols, keys, data);
+    };
+  });
+  cont.querySelectorAll('tr[data-ri]').forEach((tr, i) => {
+    tr.onclick = () => window.open(epurl(sorted[i].tender_id), '_blank');
+  });
+}
+
+function cellHtml(id, r, i) {
+  if (id === 'single') return [
+    `<span style="font-size:.74rem">${(r.org||'-').toLowerCase()}</span>`,
+    `<span style="font-size:.74rem">${(r.title||'-').toLowerCase()}</span>`,
+    `<span class="hi mono">&#8377;${fmtemd(r.emd)}</span>`,
+    `<span class="dim">${(r.ttype||'-').toLowerCase()}</span>`,
+    `<span class="mono dim">${r.days != null ? r.days + 'd' : '-'}</span>`,
+    `<span class="dim">${(r.location||'-').toLowerCase()}</span>`
+  ][i];
+  if (id === 'rush') return [
+    `<span style="font-size:.74rem">${(r.org||'-').toLowerCase()}</span>`,
+    `<span style="font-size:.74rem">${(r.title||'-').toLowerCase()}</span>`,
+    `<span class="hi mono">&#8377;${fmtemd(r.emd)}</span>`,
+    `<span class="${r.days <= 2 ? 'red' : 'dim'} mono">${r.days}d</span>`,
+    `<span class="dim">${r.pub_date||'-'}</span>`,
+    `<span class="dim">${(r.ttype||'-').toLowerCase()}</span>`
+  ][i];
+  return '';
+}
+
+async function loadTab(name) {
+  try {
+    if (name === 'single') {
+      const d = await jfetch('./data_single.json');
+      document.getElementById('sc').textContent = d.length + ' single-source tenders, sorted by emd desc';
+      sortst['single'] = { c: 2, asc: false };
+      renderTable('st', 'single', ['org','title','emd','type','days','location'],
+        ['org','title','emd','ttype','days','location'], d);
+    }
+    else if (name === 'rush') {
+      const d = await jfetch('./data_rush.json');
+      document.getElementById('rc').textContent = d.length + ' rush tenders (bid window <= 7 days), sorted by emd desc';
+      sortst['rush'] = { c: 2, asc: false };
+      renderTable('rt', 'rush', ['org','title','emd','window','published','type'],
+        ['org','title','emd','days','pub_date','ttype'], d);
+    }
+    else if (name === 'orgs') {
+      const d = await jfetch('./data_orgs.json');
+      const max = d[0].total;
+      document.getElementById('ob').innerHTML = d.map(r => `
+        <li class="bar">
+          <span class="bl" title="${r.org}">${(r.org||'').toLowerCase()}</span>
+          <span class="bt"><span class="bf" style="width:${(r.total/max*100).toFixed(1)}%"></span></span>
+          <span class="bn">${r.total.toLocaleString()}</span>
+        </li>`).join('');
+    }
+    else if (name === 'sectors') {
+      const d = await jfetch('./data_sectors.json');
+      const max = d[0].count;
+      document.getElementById('sb').innerHTML = d.map(r => `
+        <li class="bar">
+          <span class="bl" title="${r.category}">${(r.category||'').toLowerCase()}</span>
+          <span class="bt"><span class="bf" style="width:${(r.count/max*100).toFixed(1)}%"></span></span>
+          <span class="bn">${r.count.toLocaleString()}</span>
+        </li>`).join('');
+    }
+    else if (name === 'search') {
+      searchData = await jfetch('./data_search.json');
+      const qi = document.getElementById('qi');
+      qi.oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(doSearch, 180); };
+    }
+  } catch(e) {
+    const errMap = { single:'st', rush:'rt', orgs:'ob', sectors:'sb', search:'qr' };
+    const el = document.getElementById(errMap[name]);
+    if (el) el.innerHTML = `<span class="dim">failed to load: ${e.message}</span>`;
+  }
+}
+
+function doSearch() {
+  const q = document.getElementById('qi').value.trim().toLowerCase();
+  const out = document.getElementById('qr');
+  if (!q || q.length < 2) { out.innerHTML = ''; return; }
+  if (!searchData) { out.innerHTML = '<span class="dim">still loading...</span>'; return; }
+  const terms = q.split(/\s+/);
+  const matches = searchData.filter(r => {
+    const hay = ((r.title||'') + ' ' + (r.org||'')).toLowerCase();
+    return terms.every(t => hay.includes(t));
+  }).slice(0, 40);
+  if (!matches.length) { out.innerHTML = '<span class="dim">no results.</span>'; return; }
+  out.innerHTML = matches.map(r => `
+    <div class="card" onclick="window.open('${epurl(r.tender_id)}','_blank')">
+      <div class="ct">${(r.title||'-').toLowerCase()}</div>
+      <div class="cm">
+        <span>${(r.org||'-').toLowerCase()}</span>
+        ${r.emd ? `<span class="hi">&#8377;${fmtemd(r.emd)} emd</span>` : ''}
+        ${r.category ? `<span>${r.category.toLowerCase()}</span>` : ''}
+        ${r.location ? `<span>${r.location.toLowerCase()}</span>` : ''}
+        ${r.bid_end ? `<span>closes ${r.bid_end}</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+jfetch('./data_stats.json').then(d => {
+  document.getElementById('stats').innerHTML = `
+    <span><strong>${(d.total_macro/1e6).toFixed(1)}m</strong> total</span>
+    <span><strong>${d.active_count.toLocaleString()}</strong> active</span>
+    <span><strong>${d.total_details.toLocaleString()}</strong> with details</span>
+    <span><strong>${(d.top_category||'').toLowerCase()}</strong> top sector</span>`;
+}).catch(() => { document.getElementById('stats').textContent = ''; });
+
+done['single'] = 1;
+loadTab('single');
+</script>
+</body>
+</html>

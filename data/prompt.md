@@ -1,0 +1,4 @@
+the tender details has the 30k stage 2 details of tenders: /home/datavorous/lab/coding/web/datavorous.github.io/data/tender_details.db
+the macrotender has basic metadata of 2.5 million tenders: /home/datavorous/lab/coding/web/datavorous.github.io/data/macrotender.db
+aim: figure out the schema, what they contain, align yourself to that of an investigative journalist to navigate the space, to find discrepancies or patterns in it, build a hyper minimal frontend navigator for all that, take help from /home/datavorous/lab/coding/web/datavorous.github.io/agent.md for design choices, keep everything inside the /home/datavorous/lab/coding/web/datavorous.github.io/data folder. 
+proceed.
