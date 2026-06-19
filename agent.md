@@ -29,8 +29,9 @@ old/                — old content, disallowed from indexing, do not link to
 
 ## voice and writing style
 
-- **all lowercase** everywhere. no exceptions — not for names, acronyms, brands, sentence starts. this is intentional and deliberate.
-- **no em dashes** (`—`). use a regular hyphen (`-`) instead.
+- **proper capitalization** in all visible text. sentence case for prose (capitalize sentence starts, the pronoun "i" -> "I", and proper nouns), acronyms uppercase (npu -> NPU, vtcm -> VTCM, gpu -> GPU, llm -> LLM, etc.), brands/orgs in their real casing (Qualcomm, GitHub, Micron, BuyMeACoffee). headings use sentence case, not title case. job titles use title case (Research Intern, SDE Intern). this REPLACED the old all-lowercase aesthetic (changed jun 2026 at the user's request) — do not revert to all-lowercase.
+- **stays lowercase**: the handle `datavorous`, the email/urls, and lowercase-branded repo names (sameshi, spheni, dunefetch, yars). these are proper names that are styled lowercase.
+- **no em dashes** (`—`) in visible site text. use a regular hyphen (`-`) instead. (llms.txt is machine-facing and keeps its existing em dashes.)
 - **terse**. say less. if a sentence can be shorter, make it shorter.
 - **narrative over lists** where possible. the writeups and project descriptions are prose, not bullets.
 - **no over-explanation**. don't justify choices or add context that isn't needed.
@@ -66,6 +67,8 @@ a wrapping list of friends' sites, each with their favicon. currently 17 members
 ## css conventions
 
 - font: `DM Sans`, 19px, light warm feel
+- inline `code` uses `--code-inline` (a darker rose than `--code-bg`) so it stands out; `pre` blocks keep `--code-bg`
+- `h2`/`h3` no longer force `text-transform: lowercase`, and `.webring-label` is no longer uppercase — capitalization comes from the html now
 - max-width: `680px` on `main`, centered with `margin: 0 auto`
 - background: warm cream gradient on `html` (`#fffcf7 → #fef4e2`), fixed
 - selection color: `#ffd166` (yellow)
@@ -105,7 +108,8 @@ if content changes significantly, update `llms.txt` to match. it is the primary 
 
 - add dark mode (removed deliberately)
 - use em dashes in visible text
-- capitalize anything in visible text (all lowercase is the aesthetic)
+- revert visible text to all-lowercase (the site now uses proper capitalization)
+- force `text-transform: lowercase/uppercase` on headings or labels
 - add javascript
 - link to anything inside `/old/`
 - add verbose descriptions or over-explain anything

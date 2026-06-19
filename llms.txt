@@ -1,10 +1,10 @@
 # datavorous
 
-> sagnik bhattacharjee — cs student (class of 2029) building fast, small, and slightly cursed things.
+> Sagnik Bhattacharjee — CS student (class of 2029) building fast, small, and slightly cursed things.
 
 ## about
 
-sagnik is a first-year cs student currently working as a research intern at the Language Technology Research Centre, IIIT Hyderabad (analyzing computation graphs & hardware delegation for npu performance using the qualcomm npu sdk), and as an sde intern at an undisclosed startup (distillation pipeline for an analog circuit optimizer for micron technologies). previously built a risk moderation engine at an undisclosed startup for buymeacoffee (yc w19).
+Sagnik is a first-year CS student currently working as a Research Intern at the Language Technology Research Centre, IIIT Hyderabad (analyzing computation graphs & hardware delegation for NPU performance using the Qualcomm NPU SDK), and as an SDE Intern at an undisclosed startup (distillation pipeline for an analog circuit optimizer for Micron Technologies). Previously built a risk moderation engine at an undisclosed startup for BuyMeACoffee (YC W19).
 
 handle: datavorous
 email: datavorous.work@gmail.com
@@ -14,20 +14,21 @@ hn: https://news.ycombinator.com/user?id=datavorous_
 
 ## projects
 
-- [sameshi](https://github.com/datavorous/sameshi): ~1200 elo chess engine squeezed into 2kb of c. hit the hn frontpage and was liked by andrej karpathy.
-- [spheni](https://github.com/datavorous/spheni): vector search built from scratch with product quantization and residual encoding. well received on r/developersIndia.
-- [dunefetch](https://github.com/datavorous/dunefetch): neofetch but the ascii art is a live falling sand simulation. loved on r/unixporn.
-- also built: path tracers, inference runtimes, quantization libraries, syscall tracers, gemm kernels, distraction blockers, pixel editors. the most used by strangers is yars, a reddit scraper.
-- all repos: https://github.com/datavorous?tab=repositories
+- [sameshi](https://github.com/datavorous/sameshi): ~1200 ELO chess engine squeezed into 2KB of C. Hit the HN frontpage and was liked by Andrej Karpathy.
+- [spheni](https://github.com/datavorous/spheni): Vector search built from scratch with product quantization and residual encoding. Well received on r/developersIndia.
+- [dunefetch](https://github.com/datavorous/dunefetch): Neofetch but the ASCII art is a live falling sand simulation. Loved on r/unixporn.
+- Also built: path tracers, inference runtimes, quantization libraries, syscall tracers, GEMM kernels, distraction blockers, pixel editors. The most used by strangers is yars, a Reddit scraper.
+- All repos: https://github.com/datavorous?tab=repositories
 
 ## writeups
 
-- [what i learned trying to break a single gpu with mixed traffic](https://datavorous.github.io/writing/lm-inference/): vllm inference optimization study across workload profiles — prefix caching, chunked prefill, awq, mixed traffic
-- [npus: what, and where they break](https://datavorous.github.io/writing/npu/): how npus actually execute models — compile-time graph partitioning, systolic arrays, quantization constraints, and why fragmentation kills performance on qualcomm hexagon
-- [side quests](https://datavorous.notion.site/Side-Quests-35be1be246b480d4bf4cf87eb60bf28c): running notes and experiments
+- [What I learned trying to break a single GPU with mixed traffic](https://datavorous.github.io/writing/lm-inference/): vLLM inference optimization study across workload profiles — prefix caching, chunked prefill, AWQ, mixed traffic
+- [NPUs: what, and where they break](https://datavorous.github.io/writing/npu/): how NPUs actually execute models — compile-time graph partitioning, systolic arrays, quantization constraints, and why fragmentation kills performance on Qualcomm Hexagon
+- [Reverse engineering the Qualcomm NPU compiler](https://datavorous.github.io/writing/qairt/): reverse engineering QAIRT's HTP from the stripped libHtpPrepare.so — VTCM placement as an MILP solved with HiGHS, the Priority BFS scheduler, silent precision rewrites, and the hidden Hextimate simulator
+- [Side Quests](https://datavorous.notion.site/Side-Quests-35be1be246b480d4bf4cf87eb60bf28c): running notes and experiments
 - [building my own curriculum as a freshman](https://www.reddit.com/r/developersIndia/comments/1s0kgu7/comment/obu62vg/): ask good questions
 - [staying calibrated as a generalist in fast-paced environments](https://x.com/i/status/2048856882400698609): speed learning thread
 
 ## playlist
 
-- [spotify playlist](https://open.spotify.com/playlist/4YjtneVqstKIVbrOOBgVzW): well curated
+- [Spotify playlist](https://open.spotify.com/playlist/4YjtneVqstKIVbrOOBgVzW): well curated
