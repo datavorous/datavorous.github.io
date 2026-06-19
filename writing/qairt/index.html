@@ -248,7 +248,7 @@ time = bytes/bandwidth</code></pre>
 <ol>
   <li>Integer and floating point compute are priced separately (trivial)</li>
   <li>Writing one piece of data to many places at once (multicast) is priced apart from writing it one at a time (also trivial)</li>
-  <li>KV cache tensors and weights get their own "fast DDR" factor. Inferred from these symbols <code>sim_fast_ddr_for_</code><code>InputSliceForKVcache_factor</code> and <code>sim_fast_ddr_for_wgt</code></code>_bias_factor</code>, so the model assumes the two tensor types that dominate large language models sit on a cheaper memory path than everything else. ("fast DDR" is the plain reading of <code>fast_ddr</code>)</li>
+  <li>KV cache tensors and weights get their own "fast DDR" factor.</li>
 </ol>
 
 <p>It also carries dedicated detectors that recognizes FlashAttention, MoEs, KVCache, rotary embeddings etc.</p>
