@@ -361,6 +361,7 @@ code {
   background: var(--code-inline);
   padding: 0.1em 0.38em;
   border-radius: 4px;
+  overflow-wrap: anywhere;
 }
 
 pre {
@@ -376,6 +377,7 @@ pre code {
   background: none;
   padding: 0;
   font-size: 0.84rem;
+  overflow-wrap: normal;
 }
 
 hr {

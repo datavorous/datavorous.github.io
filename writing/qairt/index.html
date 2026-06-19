@@ -4,11 +4,11 @@
 <title>Reverse engineering the Qualcomm NPU compiler - datavorous</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Qualcomm won't say how their NPU compiler decides what fits on chip. So I took a stripped binary apart and found a real solver, precision it rewrites behind your back, and a simulator nobody mentions.">
+<meta name="description" content="I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.">
 <meta name="keywords" content="QAIRT, Qualcomm Hexagon, HTP, NPU compiler, VTCM, spillFillBufferSize, HiGHS, MILP, Hextimate, roofline model, edge inference, reverse engineering, Ghidra, libHtpPrepare, on-device AI, tensor placement, relaxed_precision_cast, SM8350, SM8650, Priority BFS, im2col">
 <meta name="author" content="Sagnik Bhattacharjee">
 <meta property="og:title" content="Reverse Engineering the Qualcomm NPU Compiler">
-<meta property="og:description" content="Qualcomm ships no docs on how their NPU compiler fits tensors on-chip, so I reverse engineered the binary. There's a real solver in there, quiet precision rewrites, and a secret simulator.">
+<meta property="og:description" content="I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.">
 <meta property="og:url" content="https://datavorous.github.io/writing/qairt/">
 <meta property="og:type" content="article">
 <meta property="og:image" content="https://datavorous.github.io/media/me.jpg">
@@ -21,7 +21,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@datavorous_">
 <meta name="twitter:title" content="Reverse Engineering the Qualcomm NPU Compiler">
-<meta name="twitter:description" content="What I found taking Qualcomm's NPU compiler apart: a real optimization solver, precision it rewrites behind your back, and a simulator nobody talks about.">
+<meta name="twitter:description" content="I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.">
 <meta name="twitter:image" content="https://datavorous.github.io/media/me.jpg">
 <link rel="canonical" href="https://datavorous.github.io/writing/qairt/">
 <script type="application/ld+json">
@@ -29,7 +29,7 @@
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "headline": "Reverse Engineering the Qualcomm NPU Compiler",
-  "description": "Qualcomm doesn't document how its NPU compiler decides what fits in on chip memory, so I reverse engineered a stripped QAIRT binary. It turns out to solve tensor placement with a real optimization solver, quietly rewrite model precision to save space, and price its own decisions with a hidden analytical simulator.",
+  "description": "I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.",
   "author": {
     "@type": "Person",
     "name": "Sagnik Bhattacharjee",
@@ -169,12 +169,12 @@
 
 <p>For none of the SoC's did Qualcomm publish the memory capacity of VTCMs. How am I supposed to understand whether my tensors were spilling all over? Or whether quantisation is really needed? Add to that my curiousty to know how they simulate the working of a model even before it runs on the actual hardware, and which optimization algorithms are involved.</p>
 
-<p>I (equipped with Claude Code) doubled down on the <code>*.so</code> files of QNPU SDK (v2.46.0.260424), and banked on the unmangled names that survived stripping, the raw machine code decompiled with Ghidra, and some empirical parameter sweeping on my Linux.</p>
+<p>I (equipped with <a href="https://claude.com/product/claude-code"><img class="fav" src="https://www.google.com/s2/favicons?domain=claude.com&sz=32" alt="">Claude Code</a>) doubled down on the <code>*.so</code> files of <a href="https://www.qualcomm.com/developer/software/neural-processing-sdk-for-ai"><img class="fav" src="https://www.google.com/s2/favicons?domain=qualcomm.com&sz=32" alt="">QNPU SDK</a> (v2.46.0.260424), and banked on the unmangled names that survived stripping, the raw machine code decompiled with <a href="https://github.com/NationalSecurityAgency/ghidra"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">Ghidra</a>, and some empirical parameter sweeping on my Linux.</p>
 
 <p>Some of the novel findings are (no one has the attention span to read the entire writeup anyway):</p>
 
 <ol>
-  <li>HTP solves VTCM placement as an MILP and solves it using HiGHS (optimization solver rather than heuristics) which was completely unknown publicly</li>
+  <li>HTP solves VTCM placement as an MILP and solves it using <a href="https://highs.dev/"><img class="fav" src="https://www.google.com/s2/favicons?domain=highs.dev&sz=32" alt="">HiGHS</a> (optimization solver rather than heuristics) which was completely unknown publicly</li>
   <li>VTCM placement uses a recursive backtracking allocator operating in a 3D coordinate space</li>
   <li>The compiler can automatically alter weight precision (without you knowing) during placement to relieve memory pressure</li>
   <li>The effective fit/spill boundary depends on the target architecture even when different SoCs report the same <code>vtcmSize</code></li>
@@ -205,7 +205,7 @@
 
 <p>It does this with something called "Priority BFS". It walks the graph, and measures the peak VTCM that order would require, and then <code>peak_tcm &lt;= tcm_capacity</code>-s it. It returns SMALL/LARGE after this, indicating no spill/spill respectively. The fill/spill decision is therefore the outcome of whether the best order it found keeps the peak working set under capacity. Then the ordering metric underneath is an op's position in a depth first topological sort of the graph, which has a nice property of keeping a value's producer and consumer as close together in time as possible. When two ops are tied, that tie is broken with a stack of heuristics, some of them being graph distance between an op's inputs and outputs, depth within a branch, scheduling the heaviest branch first etc.</p>
 
-<p>Once the order is fixed, the compiler has to physically place each tensor on the VTCM. It sorts tensors with the longest lived one first, and eventually the short lived ones next, to cut down fragmentation. The placement is not a simple 1D address by the way, the code assigns each block a three dimensional coordinate <code>(d0, d1, d2)</code> in the tile space, and the packer (which is recursive) backtracks. The exact retry condition lived in a few kilobytes of inlined SIMD which I didn't try to decode, yet.</p>
+<p>Once the order is fixed, the compiler has to physically place each tensor on the VTCM. It sorts tensors with the longest lived one first, and eventually the short lived ones next, to cut down fragmentation. The placement is not a simple 1D address by the way, the code assigns each block a <a href="https://stackoverflow.com/questions/2192087/3-dimensional-bin-packing-algorithms"><img class="fav" src="https://www.google.com/s2/favicons?domain=stackoverflow.com&sz=32" alt="">three dimensional coordinate</a> <code>(d0, d1, d2)</code> in the tile space, and the packer (which is recursive) backtracks. The exact retry condition lived in a few kilobytes of inlined SIMD which I didn't try to decode, yet.</p>
 
 <p>That backtracking packer is the fallback path. When the compiler runs its full optimizer instead, placement takes a more striking form, which is a formal optimization problem I had seen before elsewhere.</p>
 
@@ -267,7 +267,7 @@ time = bytes/bandwidth</code></pre>
   <li><code>spillFillBufferSize</code> can be used a static fit/spill oracle</li>
 </ol>
 
-<p>Whether it direclty helps anyone, or simply quenches aynone's curiosity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - I'd like that.</p>
+<p>Whether it direclty helps anyone, or simply quenches aynone's curiosity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - <a href="mailto:datavorous.work@gmail.com"><img class="fav" src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="">I'd like that</a>.</p>
 
 <h2>Notes</h2>
 
