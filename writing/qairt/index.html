@@ -65,6 +65,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../index.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
 <style>
   .post-subtitle {
     font-size: 1rem;
@@ -276,7 +277,7 @@ time = bytes/bandwidth</code></pre>
 <ol>
   <li>The only finds which I could not place anywhere in NPU related literature are the ones stated at the very beginning of this writeup. "Not publicly documented in this SDK version" is a claim I can stand behind.</li>
   <li>This is one SDK version of one binary. The numbers (the 33x DDR jump, the 5.46/33.9 MB spill/fill, the <code>spillFillBufferSize</code> verdicts) are reproducible on my box with Qualcomm's own tools as the oracle, but a different QAIRT release could reshuffle any of it.</li>
-  <li>The binary is littered with names like <code>dp_tcm_threshold_selector</code>, <code>TCM_THRESH_75_predictor</code>, <code>special_mlp_features</code>, it really looks like as if there's a trained model in there choosing when to spill. There isn't, at least not in this binary. I could not find any weight matrix, no forward-pass, nothing that smells like inference. <code>special_mlp_features</code> turned out to be a function that exports features to Python i.e. training data going out. The cost path is a plain CSV lookup table. So the learned part, if it exists, lives upstream at Qualcomm's training time and ships as a table. I could not prove a weight bearing model runs at compile time, and I'd bet against it</li>
+  <li>The binary is littered with names like <code>dp_tcm_threshold_selector</code>, <code>TCM_THRESH_75_predictor</code>, <code>special_mlp_features</code>, it really looks like as if there's a trained model in there choosing when to spill. There isn't, at least not in this binary. I could not find any weight matrix, no forward pass, nothing that smells like inference. <code>special_mlp_features</code> turned out to be a function that exports features to Python i.e. training data going out. The cost path is a plain CSV lookup table. So the learned part, if it exists, lives upstream at Qualcomm's training time and ships as a table. I could not prove a weight bearing model runs at compile time, and I'd bet against it</li>
 </ol>
 
 </article>
