@@ -1,0 +1,377 @@
+running notes of sagnik (datavorous) 
+x--x---x---x---x---x---x---x---x--x
+x--x---x---x---x---x---x---x---x--x
+
+I will keep on updating this doc as a living memoir of what I was, where I was, and where I might be heading. 
+
+x--x---x---x---x---x---x---x---x--x
+x--x---x---x---x---x---x---x---x--x
+
+== June 22, 16:28 ==
+
+This one year has been a wild ride for me. I took some calculated risks and almost all of them yielded asymmetrical results. At this stage I am convinced that my brain operates at an entirely different frequency than that of any of my peers. It's not raw intelligence but something totally different, something resembling a cocktail of machine-like stubborness and curiosity of a first principles thinker, sprinkled with a hint of AuDHD.
+
+This summer felt like an inflection point in my life. I went from a naive-nobody from an unknown place in North Bengal to someone who has VCs, CTOs and Engineers from all over the world willing to take me under their wing.
+
+Intelligence is like a windblower, you can point It towards anything, and things will start to move. 
+
+As for me, my favourite tool in my skillbox is asking questions. It's a 4 layered process.
+
+1. first layer is the inventory layer 
+- "what is even happening here?"
+- list down every possible axis the problem space depends on
+- you are not going to jump directly into finding a solution, you will just map the problem space 
+
+2. second layer is to find the levers
+- "what are the things affecting our problem?"
+- list them down, keep "formulation" as a premium lever
+
+3. third layer is to prioritize
+- "which of these is a whale?" 
+- find a way to rank analytically when you cant have them measured 
+
+4. fourth layer is to find constraints
+- "what am i not allowed to do?"
+- "what does moving my current lever cause to other factors?"
+
+Measure, repeat until you find the right combination of the levers.
+
+This is the combinatorial and exploratory method of finding a solution for something. Reformulaion is not - that's transformational. Questioning the framing of the problem itself, looking at it through a new lens. The first two can let one learn something totally new in a very short period of time, and be moderately competitive within pressure. 
+
+Recently, I managed to learn enough kernel programming in 16 hours to get 10x the performance of PyTorch for QR decomposition (GPU MODE contest). It was a trial imposed upon me by a few folks who happened to be in OpenAI earlier.
+
+Next thing I would like to talk about is curiosity and presentation. The former acts as the fuel of the engine, and the latter makes sure we can output an artifact which would act as a tangible result for others to evalute and utilize.
+
+I was told to work with LiteRT as part of a project for my internship in IIIT H. I was curious about how NPUs work, as they are not something which are talked about frequently on the internet. I ended up reverse engineering the Qualcomm NPU compiler, and figured out a few of their internal mechanisms. I spent quite some time writing an article on it, and how it would help Edge ML practitioners. It was very well received on Reddit, Twitter and some Chinese forums. I received an email from a senior director of Qualcomm Netherlands -- my article has been shared internally in their team, and they intend to use it as a reference for NPU related tools/docs which they would need to work on next.
+
+We talked about questioning the right things, curiosity and presentation, all of which contribute directly towards increasing the surface area of one's luck. Then there's the beautiful effect of compounding. It's magical. I have felt it first hand. 
+
+I will append the month by month breakdown of the things I did in the last 12 months at the end of this document (please scroll down).
+
+-- note for my future self (just in case i forget what i was like) --
+
+- i stayed humble and curious 
+- never apologised for coming up with new plausible ideas
+- worked fast and was proactive (TPOT term: "agency") 
+- yes, i have always been high agency.
+- i could see through different fields, and interconnect ideas
+- the analogy machine
+- always had the ability to explain things to anyone
+- a bit of quiet confidence and IDGAF attitude about social conventions
+- good risk apetite with taste
+- hyperfocus for which i can sleep in the lab, and work for extended hours 
+    without the need for food, water or rest. hyponitezed.
+
+peope notice this easily, they feel attracted to the velocity of how i move things whilst maintaining quality and uniqueness. 
+
+everyone sees a story unfold, and humans always want to be a part of them.
+
+-- something else that i should share -- 
+
+I get 3-4 offers from VC backed startups everytime I post something new on SM. I have 3 interviews stacked up. I already attended one 3 days back (I hate attenting them at 2 am in the morning). All of these come with a cost. I work on thingds which don't have many guide on the internet, whatever I do becomes a resource for people to read. I need to keep things as correct as possible, answer to rebuttals and confusion etc. 
+
+I often lose touch from reality, my friends and family don't understand what I do, my world has drifted far apart from theirs. People who approach me, want something from the "engine" inside me, they are not here for the "me" me. I feel a strange mixture of lonliness and adrenaline. I don't know what will fix it, but time can heal every wound.
+
+Here are some of the posts/comments/tweets I made over the last few months which are very informative in my opinion:
+
+1. Reverse engineering the NPU Compiler: https://x.com/datavorous_/status/2067961873195229671?s=20 (helpful to see how to narrate something complex)
+
+2. Speedrunning QR_2 GPU MODE Contest: https://x.com/datavorous_/status/2068696750228173229?s=20 (speedlearning technique : read the writeup on Github)
+
+3. Oh 'taste', what dost thou hide? https://x.com/datavorous_/status/2054541796437582011?s=20 (my opinion on 'taste' - knowing when not to keep something)
+
+4. AI induced anxiety and Shu-Ha-Ri: https://www.reddit.com/r/Btechtards/comments/1rkkt8x/i_have_the_cure_for_your_ai_anxiety_read_this_post/
+
+5. If someone wants to start with CS, what should they do? https://www.reddit.com/r/Btechtards/comments/1ttqwmc/comment/op50nxh/ (the point is, computers are to CS as telescopes are to astronomy)
+
+6. Statistically improbable != impossible: https://www.reddit.com/r/Btechtards/comments/1ttqwmc/comment/op9ugfq/ (we optimise for safety, some of us dont, our time on earth is limited) 
+
+7. goals i had in each semester: https://www.reddit.com/r/Btechtards/comments/1ttqwmc/comment/op9grme/ 
+
+8. i had a terrible and unhealthy obsession with work: https://www.reddit.com/r/Btechtards/comments/1r2z28k/comment/o5i0314/
+
+9. how i got out of vibe coding: https://www.reddit.com/r/developersIndia/comments/1s0kgu7/comment/obu62vg/
+
+
+========= timeline breakdown =========
+== a few edits were made on june 22 == 
+======================================
+
+== June 3, 2026 ==
+
+hii, if you're reading this, you probably know about me.
+
+in short, im a misfit who escalated from a nobody, to someone who is
+- pretty well known in the indian tech (+twitter) sphere
+- in contact with multiple deep tech startup founders
+- works as a researcher (ml-systems) at LTRC, IIIT H and a software intern in a UAE based startup. (edit: i left that startup, i have 5 more offers from hand, mostly SF based ones)
+
+all that in first year of college.
+
+before you guess anything,
+- im pretty dumb
+- come from a remote town in north bengal
+- parents are far from being techsavvy
+
+hence you can safely rule out elite schooling or parental influence for what i did in one academic year.
+
+at the time of writing this, im travelling towards hyd to finally work onsite (+ will be attending bangerlore v5 this weekend in blr!)
+
+im proud of what i did in 12 months, and simultaneously scared of what's coming next.
+
+BUT, i have no publications yet + no shipped product with real users.
+
+no proof yet that any of this compounds into something meaningful.
+
+what looked impressive to you probably just means your bar was low, or mine was the only story you found.
+
+hence, read what i did as a starting point, not a destination.
+im still in the middle.
+i might not make it.
+
+here is my timeline:
+
+june 2025
+1. read fluent python end to end, and wrote and ran all the code manually alongside
+2. did dsa problems from neetcode150 (upto graphs)
+3. wanted to learn c++, didn't understand pointers and references; asked claude to give me practise problems, and real life uses and patterns. wrote them down:
+
+4. referred to winterdev's articles and pre historic code commits of matter.js to learn how to make a physics engine.
+understood how to write basic c++ by following learncpp, and learnxinyminutes.com.
+
+5. felt tired doing leetcode all day, felt that i need to rejuvenate my love for programming - opened up daniel shiffman's playlist, and started building:
+- fractals
+- cellular automata
+- boid simulation
+- shaders
+- perceptrons
+
+https://github.com/datavorous/explanations
+
+july 2025
+
+6. participated in an online hackathon after a friend forced me to take part, speed ran my way into learning fastMCP and how to work with nginx. won a prize in the first round.
+
+https://github.com/datavorous/puch-mcp-hackathon
+
+7. worked on making a mini browser renderer after being trolled by a hater on twitter
+
+https://github.com/datavorous/toy-browser
+
+8. built a reddit monitoring tool for marketing but got ghosted
+
+aug 2025
+
+9. built a hybrid falling sand simulator + neofetch
+
+https://github.com/datavorous/dunefetch
+
+september 2025
+
+10. saw sebastian lague's videos, and thought to make a ray tracer - read RTIOW book and started making one in python
+
+https://github.com/datavorous/tinytracer
+
+october 2025
+
+11. wrote a garbage collector in python
+
+https://github.com/datavorous/garbage-collector-py
+
+12. started doing codeforces seriously
+- daily USACO problems
+- implementation/greedy/math/construction tagged problems on CF
+- leetcode revisions from neetcode, and  hellointerview
+- practised problems from tle eliminators
+- gave all the contests, upsolved every problem after that
+- wrote code on paper while being in class and not listening to the lecture
+
+13. took part in hackathons and learnt javascript (react) at a rudimentary level - didn't understand anything deeply - lost in the hackathon
+
+14. kept doing cf till mid november
+
+november 225
+
+15. made a chess engine backend in python after reading chess programming wiki
+
+https://github.com/datavorous/touchgrass
+
+16. built a tinder for my college (don't ask why) - learnt about new algos and how tinder/binge work internally - got interested into machine learning and optimizations - learnt how auth works
+
+december 2025
+
+17. college coding club's open source event: took part in it, and worked on a quantization library - implemented all the easy algos in python after understanding it from pytorch's documentation
+
+18. started rewriting my ray tracer in c++, aim was to make it faster and render more complex scenes
+
+ended up studying about high performance computing - why problems are generally memory bound and how to structure a program to extract max performance out of it
+
+19. dec 27, collected all the projects I made in a year, and made a year wrap - posted on twitter, reddit and x.
+
+post got removed from r/developersindia after 30 mins.
+
+someone saw it, and dmed me:
+
+"Hey Sagnik, great projects! Want to take it to the next level?"
+
+I didn't understand what he meant, said yes sure, and he told me to book a call on calendly. I picked jan 9 - the last one.
+
+jan 2026 (new year!)
+
+20. wrote down what i want to do this year:
+
+1. land a serious internship (startup or research adjacent)
+2. maintain two flagship projects
+3. learn about memory models, cache behavior, allocators, profiling tools, and parallelism
+4. reading and implementing from papers without crying
+5. eat 3 times a day (lmao yes?)
+6. post write ups about my failed experiments on X/HN/Reddit
+7. meet/network with cool people
+8. i don't want to poison my checklist by mentioning anything about uni - but i got to take things a little bit seriously
+
+and wrote a blog on how I optimized my ray tracer
+
+21. got on the before mentioned call, he was a cto of startup who work on risk moderation for buymeacoffee. i said sure. got an assignment to make one at small scale.
+
+- learnt basic regex
+- learnt how to make APIs, use postman
+- figured out fuzzysearch, caching, routing prompts to heavy and lighter LMs etc.
+- fault tolerance and logging
+- tested on actual profiles
+
+he was impressed, got an internship.
+low pay as per my current standards, but I was happy ^ - ^
+
+22. worked on the codebase - I can't reveal much but I worked on a lot of scrapers (read blogs from Exa, and similar stuff for information retrieval), and classifiers.
+
+understood how to deal with Jira tickets (lol), handle merge conflicts and attend meetings
+
+23. couldn't get over the high i got from optimizing my ray tracer - my python version was slow af, numpy could make it faster
+
+then I thought, let me try to make numpy from scratch
+
+opened the codebase got fucking scared and went to chatgpt to suggest me - something with vectors as the main data format
+
+24. started working on spheni - my biggest project of first year
+
+- read 3-4 research papers, utilized gemini to help me understand them
+- learnt to implement papers, make modifications and measure modifications
+- read cpumemory.pdf, and jason turner, got introduced to hpc
+- faced difficulty with build systems
+
+Feb 2026
+
+- implemented flat and ivf search after lots of struggle and google searched and claude prompts to help me visualse memory layouts (voronoi cells)
+- used copilot to add a python extension
+- built a lib, pushed to pypi
+
+made a beautiful demo (dynamic image search) and posted on reddit, x, hn and linkedin.
+
+- gained 100k impression on linkedin, 300k on reddit, 150k on X.
+
+- got 2 inbounds - h2loop.ai's CTO and one another
+
+25. got bored with all these, made a small chess engine in 8 hours and posted everywhere again - viral again + front page of hackernews.
+
+- 1.2k followers in a week on X
+- didn't get offers, but requests to work with fellow programmers on their chess related projects
+-
+
+26. h2loop was looking for an intern to do IR and inference - I chose inference as it sounded cool. Speed ran my way into learning about GPUs and what exactly prefill/decode, kv cache, spec dec were.
+Didn't qualify in their technical assignment.
+
+Other offer didn't suit me, felt too generic.
+
+27. Was enraged that I couldn't qualify, I followed karpathy's llama2.c, and built a simpler version in C.
+
+28. Added PQ to my vector search lib. Around that time, saw a tweet that they are looking for interns to work at LTRC on edge ai, information retrieval, language models etc. i applied under the post for information retrieval.
+
+that guy told me to send my resume. impressed - he told mail the prof after adding his name.
+
+3 weeks silence.
+
+29. prof got on call, asked me if im really in first year - i said yes, then we directly went to discuss what i would like to do. I said ml sys (cause I was angry at me for not qualifying my last technical assignment)
+
+30. got bored with my current internship, resigned.
+
+march 2026
+
+31. read beej's guide to c, modern c, build systems, relied on man pages, re built linux tools without any help
+
+32. networked with people by going through their work and asking them questions
+
+33. polished older projects, cold emailed at 3 startups. 1 soft rejected, 1 didn't reply, another scheduled an interview.
+
+34. on screen interview on c + memory + dsa, technical assignment with harness enginnering. qualified. got on a call with the ceo - projects felt too much of higher abstraction - i declined. pay was more than last time.
+
+april 2026
+
+35. got accepted for summer research officially.
+
+36. studied about Inference, gpu programming, how LMs work at a surface level
+
+37. got a new offer to work on hw/sw codesign - analog circuits (accepted it). model distillation, harness engineering yada yada. i was contacted by the startup.
+
+may 2026
+
+38. studied about gpu programming, gpu arch - did initial work for gpu cluster setup for the lab.
+
+39. prof told me to work for a different project alongside the distributed training one - edge ai. snapdragon npus.  gemma4, LiteRT. Spent a lot of time analysis how LiteRT works, NPUs and how SoCs work. Wrote articles and published on X. niche work. made good connections.
+
+40. worked on building a retrieval layer for PDK files, improved the distillation pipeline by implementing papers, built static analysers.
+
+41. built a tool to analyse computational graphs and figure out what causes fragmentation.
+
+june 2026
+
+42. onsite work time. waiting at the station. dms drop: "hey! would love to talk sometime!"
+
+fair enough. I had shared a tweet a few hours back with a massive list of links for my "side quests".
+
+after a 2 hour talk on my internet in DL x proteins. i got invited to lagrange point and bangerlore. very cool!
+
+got introduced to the ceos of popvax and altcarbon - then they invited me to their labs, and said that they'd introduce me to more people.
+
+currently im in a train. work stats tomorrow.
+
+june 8
+- on a flight back to hyderabad from bengaluru
+
+so what happened in hyd:
+- got assigned to work
+- everyone is chill
+- DPPNet x Diffusion
+- LiteRT work with AR2 chips for vision/speech tasks
+- RL for PCB layout design
+- (TBD) ML Compiler optimization
+
+came to BLR on the morning of June 6 (sat)
+- really thankful to arnav bansal (UoToronto dropout, replit (2020-24), who came back to india - now funds young talent and deep tech startups for civic good)
+
+- went to Point L2 in Indiranagar
+- met Rahul C.
+incredible guy - got inspired so badly by him (rcx86.me)
+apparently, he was my unofficial guide who showed me around blr XD
+
+I met these people:
+Let me lay down:
+
+1. ex openai + a16z investor guy (edit: we have a call tonight (June 22))
+2. founder of HumanArchive
+3. founder of (FO) alt carbon (edit: i liked sparsh very much)
+4. FO of popvax (edit: i visited their lab next week)
+5. RL engineer at Sarvam
+6. 2021-2022 world's best CTF team's founder
+7. Guys working in Microsoft research
+8. Entirety of LocalHostHQ
+9. Conscious Engine CEO
+10. Guy from sarvam ai / an arc agi guy (mithil is GOATed)
+11. folks in Nous Research
+12. folks in smallest.ai
+13. some venture capitalists from EV, osv, YC, antler etc.
+
+Might work in Sarvam AI, or continue the side quest with the ex openai guy + the arc agi guy - my suddenly got better. (edit: my internal prediction seems to be very fine tuned ;p)
+
+At this stage, i am at an inflection point. I showed competence, and agency by drawing out an entire prototype design of the {thing} the openai, sarvam and arc agi guys were discussing. i might be in. game knows game.
+
+I need to focus, time to prune relationships, capitalism ftw.
