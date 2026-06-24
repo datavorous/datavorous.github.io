@@ -7,6 +7,26 @@ I will keep on updating this doc as a living memoir of what I was, where I was, 
 x--x---x---x---x---x---x---x---x--x
 x--x---x---x---x---x---x---x---x--x
 
+== June 24, 9:58 ==
+
+quick notes:
+- got the offer, (india) FAANG level stipend 
+    - i have many restrictions:
+        - cant take the name of my company (frontier ai lab)
+        - the people i work with, their names and credentials (think top ai companies)
+        - and what i work on.
+    - i cant put it on my resume 
+    - i cant post on reddit or tweet about it
+    - HUGE BET; best case, i become a millionare, and a well known name everywhere
+    - worst case, the bank on the network of the cofounders, and get myself poached to the US 
+- professor impressed with my work on QR decomposition, and the RE part XD
+- he asked me to leave the lab, and get sleep and food from now on.
+- and also reply back to the qualcomm netherlands guy asking for AR2 chips.
+
+[+] i think i will need therapy very soon. i have had always been on survival mode till now. my adreanline levels have always been so high that my survival instincts get numbed. 
+
+[+] datavorous v3.0 coming soon. we are winning this.
+
 == June 22, 16:28 ==
 
 This one year has been a wild ride for me. I took some calculated risks and almost all of them yielded asymmetrical results. At this stage I am convinced that my brain operates at an entirely different frequency than that of any of my peers. It's not raw intelligence but something totally different, something resembling a cocktail of machine-like stubborness and curiosity of a first principles thinker, sprinkled with a hint of AuDHD.
