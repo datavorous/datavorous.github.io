@@ -84,6 +84,7 @@ c. right structure -> enforced by seeded groups.
 ==========================
 
 model inspirations:
+0. https://www.pointblank.club/
 0. hackerfabiitb.github.io
 1. blog.sravjti.in
 2. homebrew.hsp-ec.xyz/tags/summer
