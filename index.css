@@ -386,6 +386,27 @@ article img:not(.fav):not(.exp-logo) {
   nav {
     gap: 0.8rem;
   }
+
+  article a {
+    text-underline-offset: 0.14em;
+  }
+
+  .psa {
+    margin: 1.4rem 0 1rem;
+    padding: 0.8rem 0.9rem 0.8rem 1rem;
+  }
+
+  .psa-label {
+    display: block;
+    width: fit-content;
+    margin: 0 0 0.5em;
+  }
+
+  .q-link {
+    font-size: 0.85rem;
+    padding: 0.15em 0.3em;
+    opacity: 0.75;
+  }
 }
 
 nav.top {
