@@ -464,10 +464,58 @@ article p {
 
 article a {
   color: var(--text);
-  text-decoration: none;
-  border-bottom: 1px solid var(--muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+  text-decoration-color: var(--border);
+  transition: text-decoration-color 0.12s ease;
 }
 
 article a:hover {
-  border-bottom-color: var(--text);
+  text-decoration-color: var(--text);
+}
+
+.psa {
+  position: relative;
+  margin: 1.6rem 0 1.1rem;
+  padding: 0.9rem 1.1rem 0.9rem 1.2rem;
+  background: color-mix(in srgb, var(--select-bg) 10%, transparent);
+  border-left: 3px solid var(--select-bg);
+  border-radius: 0 4px 4px 0;
+}
+
+.q-link {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: none;
+  opacity: 0.6;
+  transition: opacity 0.12s ease, color 0.12s ease;
+}
+
+.q-link:hover {
+  opacity: 1;
+  color: var(--text);
+  border-bottom: none;
+}
+
+.q-link.copied::after {
+  content: "copied";
+  margin-left: 0.4em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.psa-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--select-fg);
+  background: var(--select-bg);
+  padding: 0.1em 0.5em;
+  border-radius: 999px;
+  margin-right: 0.5em;
+  vertical-align: 1px;
 }
