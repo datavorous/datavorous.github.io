@@ -24,7 +24,8 @@ body{
   color:var(--text);
   background:var(--bg);
 }
-a{color:var(--link)}
+a{color:var(--link);text-underline-offset:2px;text-decoration-thickness:1px;text-decoration-color:#e9bdcb}
+a:hover{text-decoration-color:var(--link)}
 p{margin:0 0 1em}
 h1,h2{font-weight:normal}
 h1{
@@ -83,6 +84,29 @@ h2{
 .date{
   white-space:nowrap;
 }
+.writing-list{
+  list-style:none;
+  margin:.6em 0 1.4em;
+  padding:0;
+}
+.writing-list li{
+  margin:.85em 0;
+}
+.writing-list a{
+  color:var(--text);
+  text-decoration-color:#ead6dc;
+}
+.writing-list a:hover{
+  text-decoration-color:var(--link);
+}
+.writing-list .date{
+  display:block;
+  margin-top:.05em;
+  font-size:.9em;
+}
+.aside-note{
+  margin-top:1.8em;
+}
 @media(max-width:640px){
   body{
     padding:2.25em 1.15em 5em;
@@ -132,7 +156,7 @@ h2{
 <body>
 <div class="layout">
 <aside class="profile">
-<canvas class="avatar" data-organic role="img" aria-label="moving organic Lorenz attractor"></canvas>
+<img class="avatar" src="../media/me.jpg" alt="Sagnik Bhattacharjee">
 <h1>Sagnik Bhattacharjee</h1>
 <p class="handle">datavorous</p>
 <nav class="links" aria-label="Profile links">
@@ -151,21 +175,15 @@ h2{
 <p>Shoot me an <a href="mailto:datavorous.work@gmail.com">email</a>, and I will reply with a cat meme.</p>
 
 <h2 id="writeups">Writeups</h2>
-<ul class="index">
+<ul class="writing-list">
 <li><a href="/writing/qairt/">Reverse Engineering the Qualcomm NPU compiler</a> <span class="date">June 19, 2026</span></li>
 <li><a href="/writing/lm-inference/">What I learned trying to break a single GPU with mixed traffic</a> <span class="date">June 14, 2026</span></li>
 <li><a href="/writing/npu/">NPUs: what, and where they break</a> <span class="date">May 21, 2026</span></li>
 </ul>
 
 <h2 id="essays">Essays</h2>
-<ul class="index">
-<li><a href="/essays/year1.html">A Very Opinionated Take on Year 1</a> <span class="date">July 16, 2026</span></li>
-<li><a href="/essays/symptoms.html">Symptom Driven Learning</a> <span class="date">July 12, 2026</span></li>
-<li><a href="/essays/edge-in-the-node.html">An Edge In The Node</a> <span class="date">June 26, 2026</span></li>
-<li><a href="/essays/nothing-was-asked.html">Nothing Was Asked</a> <span class="date">June 23, 2026</span></li>
-</ul>
+<p class="aside-note">I write <a href="/essays/">mini essays</a> on non technical topics.</p>
 </main>
 </div>
-<script src="../media/organic.js"></script>
 </body>
 </html>
