@@ -59,131 +59,28 @@
 <link rel="manifest" href="/media/favicon/site.webmanifest">
 <meta name="theme-color" content="#fff5f7">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../index.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
-<style>
-  .post-subtitle {
-    font-size: 1rem;
-    color: var(--muted);
-    margin: 0.25rem 0 0.5rem;
-    font-weight: 400;
-  }
-  .post-meta {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin: 0 0 2.5rem;
-  }
-  .post-body h2 {
-    margin-top: 2.2rem;
-  }
-  .post-body p {
-    font-size: 0.93rem;
-    line-height: 1.85;
-  }
-  .post-body li {
-    font-size: 0.93rem;
-    line-height: 1.75;
-    margin: 0.3rem 0;
-  }
-  .post-body ol {
-    padding-left: 1.4em;
-    margin: 0.8rem 0;
-  }
-  .post-body table {
-    border-collapse: collapse;
-    font-size: 0.82rem;
-    margin: 1.5rem auto;
-    overflow-x: auto;
-    display: block;
-  }
-  .post-body th, .post-body td {
-    border: 1px solid var(--border);
-    padding: 0.35em 0.7em;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .post-body th {
-    background: var(--code-bg);
-    font-weight: 500;
-    color: var(--muted);
-  }
-  .cell-hi {
-    background: rgba(220, 80, 110, 0.18);
-  }
-  .post-body blockquote {
-    border-left: 2px solid var(--border);
-    margin: 1.2rem 0;
-    padding: 0.5rem 1rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-  .callout {
-    border-left: 3px solid var(--border);
-    padding: 0.7rem 1.1rem;
-    margin: 1.5rem 0;
-    font-size: 0.88rem;
-    color: var(--muted);
-  }
-  .callout-icon {
-    display: none;
-  }
-  .callout-body p {
-    margin: 0.3rem 0;
-  }
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3em;
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 2.8rem;
-    transition: color 0.12s ease, border-color 0.12s ease;
-  }
-  .back-link:hover {
-    color: var(--text);
-    border-color: var(--text);
-  }
-  .post-title {
-    font-size: 1.35rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.3;
-    margin: 0 0 0.5rem;
-  }
-  article img:not(.fav) {
-    border-radius: 12px;
-  }
-  .refs {
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-  }
-  .refs p {
-    font-size: 0.82rem;
-    word-break: break-all;
-    margin: 0.25rem 0;
-  }
-</style>
 </head>
 <body>
 <main>
 
-<a class="back-link" href="/"><img class="fav" src="https://www.google.com/s2/favicons?domain=datavorous.github.io&sz=32" alt="">datavorous</a>
+<nav class="top">
+<a href="/">Home</a>
+<a href="/#writeups">Writeups</a>
+<a href="/essays/">Essays</a>
+<a href="mailto:datavorous.work@gmail.com">Email</a>
+</nav>
 
 <h1 class="post-title">What I learned trying to break a single GPU with mixed traffic</h1>
 <p class="post-subtitle">Not all inference optimizations are worth your bucks</p>
-<p class="post-meta">Jun 2026 · datavorous</p>
+<p class="post-meta">Jun 2026 - datavorous</p>
 
 <article class="post-body">
 
 <p>Most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. I want to go the other way.</p>
 
-<p>Last weekend, while talking with <a href="https://x.com/anand_404"><img class="fav" src="https://www.google.com/s2/favicons?domain=x.com&sz=32" alt="">Tanay</a> from Sarvam AI, I first came across this phrase: "token factory". Now, sitting in a lab full of idle GPUs, I got this idea to simulate different workload profiles for different "token factories".</p>
+<p>Last weekend, while talking with <a href="https://x.com/anand_404">Tanay</a> from Sarvam AI, I first came across this phrase: "token factory". Now, sitting in a lab full of idle GPUs, I got this idea to simulate different workload profiles for different "token factories".</p>
 
 <p>Not every optimization helps every workload. For a company which deals only with RAG and summarisation, I would not bother with speculative decoding. Similarly for something like Character AI, with short conversations as the main goal, I would focus heavily on optimizing the decode stage.</p>
 
@@ -191,7 +88,7 @@
 
 <h2>The setup</h2>
 
-<p>A single RTX 6000 Ada for now, running vLLM. We will be serving <a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct"><img class="fav" src="https://www.google.com/s2/favicons?domain=huggingface.co&sz=32" alt="">Qwen2.5-14B-Instruct</a> with an 8k context window and at 90% GPU memory utilization. I created a small harness using Claude Code to make it easier to iterate between configurations, launch experiments, and collect metrics, along with a workload generator that produces four request classes: SISO (short input, short output), SILO (short input, long output), LISO (long input, short output), and LILO (long input, long output).</p>
+<p>A single RTX 6000 Ada for now, running vLLM. We will be serving <a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct">Qwen2.5-14B-Instruct</a> with an 8k context window and at 90% GPU memory utilization. I created a small harness using Claude Code to make it easier to iterate between configurations, launch experiments, and collect metrics, along with a workload generator that produces four request classes: SISO (short input, short output), SILO (short input, long output), LISO (long input, short output), and LILO (long input, long output).</p>
 
 <p>For the baseline, I wanted something resembling a busy Monday morning. Requests arrive according to a Poisson process at 32 requests/sec, with up to 128 concurrent requests in flight. The workload is intentionally mixed - hundreds of short chat style requests, long form summarization jobs, code generation heavy prompts, and long context generation tasks all competing for the same GPU. Now we can observe which bottlenecks emerge naturally under realistic pressure.</p>
 
@@ -220,7 +117,6 @@
 <p>Things are flat because the scheduler, when it runs out of room, is not choosing. Requests arrive faster than the server can finish them, so they pile up in vLLM's waiting queue. The scheduler tried to admit as many as fit in KV memory, the KV fills, the scheduler has to preempt already-running sequences to make room for new ones, the preempted sequences go back to the queue to be recomputed later, and the loop continues until the client times out. As nothing is being chosen against, the damage falls on everything.</p>
 
 <div class="callout">
-  <span class="callout-icon">♻️</span>
   <div class="callout-body">
     <p>The vLLM scheduler does ship a priority based policy that would preempt the <i>lowest</i> priority running request instead of just popping whatever sits at the back of the queue, but it requires clients to pass a non standard <code>priority</code> field on every request, and no off the shelf OpenAI compatible client does that. What you get is the FCFS behaviour I just described.</p>
     <img src="img/image 3.png" alt="vllm scheduler fcfs behavior diagram">
@@ -235,7 +131,7 @@
 
 <h2>What counts as good</h2>
 
-<p>Throughput is the number which every inference benchmark reports, and (if I understand correctly) is the easiest to lie with. Instead, the honest metric is goodput. <a href="https://bentoml.com/llm/llm-inference-basics/llm-inference-metrics#goodput"><img class="fav" src="https://www.google.com/s2/favicons?domain=bentoml.com&sz=32" alt="">BentoML</a> explains it aptly:</p>
+<p>Throughput is the number which every inference benchmark reports, and (if I understand correctly) is the easiest to lie with. Instead, the honest metric is goodput. <a href="https://bentoml.com/llm/llm-inference-basics/llm-inference-metrics#goodput">BentoML</a> explains it aptly:</p>
 
 <img src="img/image 4.png" alt="goodput definition from bentoml">
 
@@ -243,7 +139,7 @@
 
 <p>SISO: TTFT &lt;5s. SILO: ITL P95 &lt;250ms. LISO: TTFT &lt;5s. LILO: ITL P95 &lt;250ms.</p>
 
-<p>The disaster baseline's goodput against these SLOs is close to 0. Moreover, I came across Gil Tene's presentation on coordinated omission (slides <a href="https://www.slideshare.net/slideshow/how-not-to-measure-latency-london-oct-2013/27088981"><img class="fav" src="https://www.google.com/s2/favicons?domain=slideshare.net&sz=32" alt="">here</a>) during my research and I think they are worth mentioning here.</p>
+<p>The disaster baseline's goodput against these SLOs is close to 0. Moreover, I came across Gil Tene's presentation on coordinated omission (slides <a href="https://www.slideshare.net/slideshow/how-not-to-measure-latency-london-oct-2013/27088981">here</a>) during my research and I think they are worth mentioning here.</p>
 
 <p>In simple words, under overload, even the load generator can fall behind schedule. Measuring latency from when a request actually left the client hides the time the user was already waiting, so we measure from when the request was <em>supposed</em> to be sent.</p>
 
@@ -259,15 +155,15 @@
 
 <h2>What this hardware should actually do</h2>
 
-<p>All references were taken from Nvidia's <a href="https://images.nvidia.com/aem-dam/en-zz/Solutions/technologies/NVIDIA-ADA-GPU-PROVIZ-Architecture-Whitepaper_1.1.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=nvidia.com&sz=32" alt="">Ada architecture whitepaper</a> (pages 28-30 are relevant).</p>
+<p>All references were taken from Nvidia's <a href="https://images.nvidia.com/aem-dam/en-zz/Solutions/technologies/NVIDIA-ADA-GPU-PROVIZ-Architecture-Whitepaper_1.1.pdf">Ada architecture whitepaper</a> (pages 28-30 are relevant).</p>
 
 <img src="img/image 6.png" alt="nvidia rtx 6000 ada specs table">
 
 <p>We get a BF16 dense tensor compute of 364.2 TFLOPS, memory bandwidth of 960 GB/s, and 48GB of VRAM.</p>
 
-<p>There is the prefill phase, and there's the decode one. Prefill is compute bound, and most of the computations are in the form of GEMMs. With our model (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct"><img class="fav" src="https://www.google.com/s2/favicons?domain=huggingface.co&sz=32" alt="">Qwen2.5-14B</a>), we would need roughly 28 GFLOPs per prompt token (2 * params * tokens). That gives us the theoretical prefill ceiling of around 13k toks/s <em>before</em> overhead.</p>
+<p>There is the prefill phase, and there's the decode one. Prefill is compute bound, and most of the computations are in the form of GEMMs. With our model (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct">Qwen2.5-14B</a>), we would need roughly 28 GFLOPs per prompt token (2 * params * tokens). That gives us the theoretical prefill ceiling of around 13k toks/s <em>before</em> overhead.</p>
 
-<p>Decode is memory bound. It's just a matrix-vector op (GEMV) with nearly zero arithmetic intensity. The bottleneck is entirely consumed by streaming ~28 GB of weights across the bus for every single token. Dividing 960 GB/s by 28 GB caps a single stream at ~34 tokens/sec (<a href="https://images.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=nvidia.com&sz=32" alt="">Nvidia Ada whitepaper</a>), which is the upper bound before KV reads, attention compute, and kernel launch overhead are accounted for. The only way to save throughput here is batching.</p>
+<p>Decode is memory bound. It's just a matrix-vector op (GEMV) with nearly zero arithmetic intensity. The bottleneck is entirely consumed by streaming ~28 GB of weights across the bus for every single token. Dividing 960 GB/s by 28 GB caps a single stream at ~34 tokens/sec (<a href="https://images.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf">Nvidia Ada whitepaper</a>), which is the upper bound before KV reads, attention compute, and kernel launch overhead are accounted for. The only way to save throughput here is batching.</p>
 
 <img src="img/image 7.png" alt="kv cache memory layout and sizing">
 
@@ -303,9 +199,8 @@
 </table>
 
 <div class="callout">
-  <span class="callout-icon"></span>
   <div class="callout-body">
-    <p>Throughput increased 4.6x - I would like to be very careful with this claim. Prefix caching skips prefill work for tokens it has seen before. More requests fit through, so aggregate output goes up. No individual stream is generating tokens faster. The 4.6x is the <i>system breathing again</i>, not a decode speedup (<a href="https://github.com/vllm-project/vllm/blob/469f3dcf/benchmarks/benchmark_prefix_caching.py#L4"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">benchmark</a>, <a href="https://github.com/vllm-project/vllm/blob/469f3dcf/docs/design/prefix_caching.md?plain=1#L1"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">design doc</a>).</p>
+    <p>Throughput increased 4.6x - I would like to be very careful with this claim. Prefix caching skips prefill work for tokens it has seen before. More requests fit through, so aggregate output goes up. No individual stream is generating tokens faster. The 4.6x is the <i>system breathing again</i>, not a decode speedup (<a href="https://github.com/vllm-project/vllm/blob/469f3dcf/benchmarks/benchmark_prefix_caching.py#L4">benchmark</a>, <a href="https://github.com/vllm-project/vllm/blob/469f3dcf/docs/design/prefix_caching.md?plain=1#L1">design doc</a>).</p>
   </div>
 </div>
 
@@ -357,7 +252,7 @@
 
 <h2>Quantization, with a surprise</h2>
 
-<p>Decode is memory-bandwidth-bound, so if weights go from BF16 to 4 bit (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct-AWQ"><img class="fav" src="https://www.google.com/s2/favicons?domain=huggingface.co&sz=32" alt="">Qwen2.5-14B-Instruct-AWQ</a>), each decode step should have to pull roughly a quarter of the bytes from HBM. You don't quite get a 4x speedup because dequantization still exists, but nearly 2x improvement in single stream decode didn't seem unreasonable. The other thing I expected was that the smaller weights would leave a lot more VRAM available for KV. On this setup, that should have been almost comically helpful because the workload is visibly KV bound. In practice, the in flight KV budget jumps from around 57k tokens to 171k tokens.</p>
+<p>Decode is memory-bandwidth-bound, so if weights go from BF16 to 4 bit (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct-AWQ">Qwen2.5-14B-Instruct-AWQ</a>), each decode step should have to pull roughly a quarter of the bytes from HBM. You don't quite get a 4x speedup because dequantization still exists, but nearly 2x improvement in single stream decode didn't seem unreasonable. The other thing I expected was that the smaller weights would leave a lot more VRAM available for KV. On this setup, that should have been almost comically helpful because the workload is visibly KV bound. In practice, the in flight KV budget jumps from around 57k tokens to 171k tokens.</p>
 
 <p>The freed VRAM did get handed back to the KV pool, the budget really did triple, and preemptions dropped from 262 to 132 because the scheduler could now afford to keep more sequences resident instead of constantly evicting and re-admitting them.</p>
 
@@ -383,7 +278,7 @@ Throughput did get better, but only from 144 tok/s to 189 tok/s, probably becaus
 
 <p>The server is doing more work overall, but each stream is progressing more slowly. From a user's perspective, every token arrives later even though the dashboard says throughput went up.</p>
 
-<p>The regression had to be somewhere higher in the stack, and once I looked at what AWQ kernels actually do, it was obvious. AWQ is a W4A16 storage scheme, where weights are stored as INT4 with FP16 scaling factors, but every matmul dequantizes them back to FP16 and runs the GEMM in FP16 (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">vLLM source</a>). At high batch sizes the dequantization overhead disappears into the pipeline. At the m=1 GEMV shape that decode uses, the dequantization cost sits on the critical path without being amortized across a batch dimension. (This is a documented behavior btw <a href="https://github.com/vllm-project/vllm/pull/2566"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">PR #2566</a>, <a href="https://github.com/vllm-project/vllm/issues/2268"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">issue #2268</a>) vLLM's AWQ path was designed for prefill-heavy throughput, not interactive decode .</p>
+<p>The regression had to be somewhere higher in the stack, and once I looked at what AWQ kernels actually do, it was obvious. AWQ is a W4A16 storage scheme, where weights are stored as INT4 with FP16 scaling factors, but every matmul dequantizes them back to FP16 and runs the GEMM in FP16 (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu">vLLM source</a>). At high batch sizes the dequantization overhead disappears into the pipeline. At the m=1 GEMV shape that decode uses, the dequantization cost sits on the critical path without being amortized across a batch dimension. (This is a documented behavior btw <a href="https://github.com/vllm-project/vllm/pull/2566">PR #2566</a>, <a href="https://github.com/vllm-project/vllm/issues/2268">issue #2268</a>) vLLM's AWQ path was designed for prefill-heavy throughput, not interactive decode .</p>
 
 <p>The system level scheduler becomes happier because memory pressure drops, while the individual decode path becomes slower because each token now carries extra work that the hardware shape can't hide. These are the two things happen simultaneously.</p>
 
@@ -432,7 +327,7 @@ Throughput did get better, but only from 144 tok/s to 189 tok/s, probably becaus
 
 <p>Look at the AWQ column. 189 tok/s throughput, sounds fine, but zero SISO compliance, zero SILO compliance, 2% LILO. Nobody is getting a usable response. And that's <i>THE GAP</i> between throughput and goodput.</p>
 
-<p>The prefix caching column is the only one that doesn't look broken. Every profile above 40%, 4/4. Everything else either flatlines on SISO or has at least one profile in crisis. Automatic prefix caching is enabled by default in vLLM v1 (<a href="https://docs.vllm.ai/en/latest/design/v1/prefix_caching.html"><img class="fav" src="https://www.google.com/s2/favicons?domain=docs.vllm.ai&sz=32" alt="">docs</a>), which has been the default engine since 0.8.1. If you're on a recent vLLM, this is already on. If you're on an older version, then turn it on, perhaps?</p>
+<p>The prefix caching column is the only one that doesn't look broken. Every profile above 40%, 4/4. Everything else either flatlines on SISO or has at least one profile in crisis. Automatic prefix caching is enabled by default in vLLM v1 (<a href="https://docs.vllm.ai/en/latest/design/v1/prefix_caching.html">docs</a>), which has been the default engine since 0.8.1. If you're on a recent vLLM, this is already on. If you're on an older version, then turn it on, perhaps?</p>
 
 <p>Two things in the matrix are unintuitive in my opinion.</p>
 
@@ -440,7 +335,7 @@ Throughput did get better, but only from 144 tok/s to 189 tok/s, probably becaus
 
 <p>Prefix caching plus chunked prefill is statistically identical to prefix caching alone. The reason is that prefix caching skipped 73.7% of the prefill work, which means there's almost nothing left for chunked prefill to chunk. It doesn't conflict - it just has nothing to do! And then it charges you 405 preemptions (up from 334) for the privilege of doing nothing.</p>
 
-<p>If you turn on prefix caching, you're mostly fine across all four profiles, given your workload has content overlap. Whereas chunked prefill alone is a worse production config than baseline for any SISO heavy product (1% SLO compliance vs 0% is not a win !!), AWQ is dangerous on interactive workloads because its kernel path dequantizes weights to FP16 before the matmul (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">vLLM source</a>), and that overhead sits on the critical path (the bandwidth savings will show up in prefill sized batches) and therefore the stack is the clearest example in this post of an optimization that improves every aggregate metric while making the per user experience terribly worse.</p>
+<p>If you turn on prefix caching, you're mostly fine across all four profiles, given your workload has content overlap. Whereas chunked prefill alone is a worse production config than baseline for any SISO heavy product (1% SLO compliance vs 0% is not a win !!), AWQ is dangerous on interactive workloads because its kernel path dequantizes weights to FP16 before the matmul (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu">vLLM source</a>), and that overhead sits on the critical path (the bandwidth savings will show up in prefill sized batches) and therefore the stack is the clearest example in this post of an optimization that improves every aggregate metric while making the per user experience terribly worse.</p>
 
 <p>Hence, if your workload has prefix sharing, things like RAG, system prompts, document QA, code review over a known codebase - turn on prefix caching. Free lunch (even the docs call it that).
 
@@ -458,28 +353,27 @@ Throughput did get better, but only from 144 tok/s to 189 tok/s, probably becaus
 
 <p>I think that's the actual job - not picking the optimization but figuring out what's slow and why, before reaching for the toolbox.</p>
 
-<p class="section-note">Code is at <a href="https://github.com/datavorous/to-fa"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">datavorous/to-fa</a>. If this is the kind of systems work you need done - <a href="mailto:datavorous.work@gmail.com"><img class="fav" src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="">get in touch</a> (I am looking for an internship)</p>
+<p class="section-note">Code is at <a href="https://github.com/datavorous/to-fa">datavorous/to-fa</a>. If this is the kind of systems work you need done - <a href="mailto:datavorous.work@gmail.com">get in touch</a> (I am looking for an internship)</p>
 
 <div class="refs">
   <h3>References</h3>
-  <p><a href="https://www.slideshare.net/slideshow/how-not-to-measure-latency-london-oct-2013/27088981"><img class="fav" src="https://www.google.com/s2/favicons?domain=slideshare.net&sz=32" alt="">Gil Tene - how not to measure latency</a></p>
-  <p><a href="https://bentoml.com/llm/llm-inference-basics/llm-inference-metrics#goodput"><img class="fav" src="https://www.google.com/s2/favicons?domain=bentoml.com&sz=32" alt="">BentoML - LLM inference metrics / goodput</a></p>
-  <p><a href="https://images.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=nvidia.com&sz=32" alt="">Nvidia Ada GPU architecture whitepaper</a></p>
-  <p><a href="https://en.wikipedia.org/wiki/Roofline_model"><img class="fav" src="https://www.google.com/s2/favicons?domain=wikipedia.org&sz=32" alt="">Roofline model</a></p>
+  <p><a href="https://www.slideshare.net/slideshow/how-not-to-measure-latency-london-oct-2013/27088981">Gil Tene - how not to measure latency</a></p>
+  <p><a href="https://bentoml.com/llm/llm-inference-basics/llm-inference-metrics#goodput">BentoML - LLM inference metrics / goodput</a></p>
+  <p><a href="https://images.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf">Nvidia Ada GPU architecture whitepaper</a></p>
+  <p><a href="https://en.wikipedia.org/wiki/Roofline_model">Roofline model</a></p>
 </div>
 
 <div class="refs">
   <h3>Acknowledgements</h3>
-  <p>I built my own benchmarking harness for this, which was fine, but I later found out <a href="https://youtu.be/eJBjgakTulg?si=MhUwG0gBq6k7suna"><img class="fav" src="https://www.google.com/s2/favicons?domain=youtube.com&sz=32" alt="">GuideLLM</a> (RedHat) already does most of what I wrote. Legare Kerrison's Devoxx UK talk covers it well - would have saved me a weekend. Thanks for putting that out.</p>
+  <p>I built my own benchmarking harness for this, which was fine, but I later found out <a href="https://youtu.be/eJBjgakTulg?si=MhUwG0gBq6k7suna">GuideLLM</a> (RedHat) already does most of what I wrote. Legare Kerrison's Devoxx UK talk covers it well - would have saved me a weekend. Thanks for putting that out.</p>
   <img src="img/screenshots/guideLLM_should_have_used.png" alt="guidellm benchmark tool by redhat">
-  <p>The SISO/SILO/LISO/LILO framing came from Mark Moyou's <a href="https://youtu.be/z2M8gKGYws4?si=5VgJBR47nREuAYsl"><img class="fav" src="https://www.google.com/s2/favicons?domain=youtube.com&sz=32" alt="">PyTorch talk</a> (Nvidia). Before watching it I hadn't thought to treat traffic shapes as distinct objects with different hardware bottlenecks. That framing is the whole premise of this post.</p>
+  <p>The SISO/SILO/LISO/LILO framing came from Mark Moyou's <a href="https://youtu.be/z2M8gKGYws4?si=5VgJBR47nREuAYsl">PyTorch talk</a> (Nvidia). Before watching it I hadn't thought to treat traffic shapes as distinct objects with different hardware bottlenecks. That framing is the whole premise of this post.</p>
   <img src="img/screenshots/pytorch_talk_prompt_size.png" alt="mark moyou's pytorch talk - prompt size traffic shape breakdown">
 </div>
 
 </article>
 
 <footer style="margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--border)">
-  <p class="meta"><a href="/"><- Back to datavorous.github.io</a></p>
 </footer>
 
 </main>

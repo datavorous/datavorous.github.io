@@ -60,117 +60,22 @@
 <link rel="manifest" href="/media/favicon/site.webmanifest">
 <meta name="theme-color" content="#fff5f7">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../index.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
-<style>
-  .post-subtitle {
-    font-size: 1rem;
-    color: var(--muted);
-    margin: 0.25rem 0 0.5rem;
-    font-weight: 400;
-  }
-  .post-meta {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin: 0 0 2.5rem;
-  }
-  .post-body h2 {
-    margin-top: 2.2rem;
-  }
-  .post-body h3 {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-    margin: 1.8rem 0 0.4rem;
-  }
-  .post-body p {
-    font-size: 0.93rem;
-    line-height: 1.85;
-  }
-  .post-body li {
-    font-size: 0.93rem;
-    line-height: 1.75;
-    margin: 0.3rem 0;
-  }
-  .post-body ol {
-    padding-left: 1.4em;
-    margin: 0.8rem 0;
-  }
-  .post-body blockquote {
-    border-left: 2px solid var(--border);
-    margin: 1.2rem 0;
-    padding: 0.5rem 1rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-  .callout {
-    border-left: 3px solid var(--border);
-    padding: 0.7rem 1.1rem;
-    margin: 1.5rem 0;
-    font-size: 0.88rem;
-    color: var(--muted);
-  }
-  .callout-body p {
-    margin: 0.3rem 0;
-  }
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3em;
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 2.8rem;
-    transition: color 0.12s ease, border-color 0.12s ease;
-  }
-  .back-link:hover {
-    color: var(--text);
-    border-color: var(--text);
-  }
-  .post-title {
-    font-size: 1.35rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.3;
-    margin: 0 0 0.5rem;
-  }
-  article img:not(.fav) {
-    border-radius: 12px;
-  }
-  .refs {
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-  }
-  .refs p {
-    font-size: 0.82rem;
-    word-break: break-all;
-    margin: 0.25rem 0;
-  }
-  figcaption {
-    font-size: 0.78rem;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 0.4rem;
-  }
-  figure {
-    margin: 1.5rem 0;
-  }
-</style>
 </head>
 <body>
 <main>
 
-<a class="back-link" href="/"><img class="fav" src="https://www.google.com/s2/favicons?domain=datavorous.github.io&sz=32" alt="">datavorous</a>
+<nav class="top">
+<a href="/">Home</a>
+<a href="/#writeups">Writeups</a>
+<a href="/essays/">Essays</a>
+<a href="mailto:datavorous.work@gmail.com">Email</a>
+</nav>
 
 <h1 class="post-title">NPUs: what, and where they break</h1>
 <p class="post-subtitle">A middle ground between research papers and marketing fluff</p>
-<p class="post-meta">Jun 2026 · datavorous</p>
+<p class="post-meta">Jun 2026 - datavorous</p>
 
 <article class="post-body">
 
@@ -223,15 +128,15 @@
 
 <p>Next the DMA engines start moving the first weight tiles from DDR into the on-chip scratchpad, on the schedule the compiler baked into the configuration. The scalar core kicks these off and then goes back to idling. After this, the matrix unit starts consuming weight and activation tiles from the scratchpad. On the Hexagon HMX, this is a 32x32 systolic array (a grid of multiply accumulate cells where data flows from cell to cell in a regular rhythm. The partial sums accumulate diagonally, and the whole grid advances one step per clock).</p>
 
-<p>A great visualization tool to simulate 4 MACs working together: <a href="https://williampan-personalwebsite.vercel.app/blog/systolic-array"><img class="fav" src="https://www.google.com/s2/favicons?domain=williampan-personalwebsite.vercel.app&sz=32" alt="">Williampan systolic array demo</a></p>
+<p>A great visualization tool to simulate 4 MACs working together: <a href="https://williampan-personalwebsite.vercel.app/blog/systolic-array">Williampan systolic array demo</a></p>
 
-<p>A diagram from <a href="https://www.eecs.harvard.edu/htk/static/files/1978-cmu-cs-report-kung-leiserson.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=eecs.harvard.edu&sz=32" alt="">Systolic arrays for (VLSI)</a> by HT Kung and Charles E. Leiserson, which clearly shows working of the <code>AB + C</code> op:</p>
+<p>A diagram from <a href="https://www.eecs.harvard.edu/htk/static/files/1978-cmu-cs-report-kung-leiserson.pdf">Systolic arrays for (VLSI)</a> by HT Kung and Charles E. Leiserson, which clearly shows working of the <code>AB + C</code> op:</p>
 
 <figure>
   <img src="img/image 3.png" alt="systolic array AB+C operation diagram - kung and leiserson">
 </figure>
 
-<p>Additionally the <a href="https://docs.qualcomm.com/doc/80-N2040-62/80-N2040-62_REV_AA_Qualcomm_Hexagon_V81_HMX_Programmers_Reference_Manual.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=qualcomm.com&sz=32" alt="">Qualcomm Hexagon V81 HMX programmer's reference manual</a> has a section dedicated to explain the inner working of the HMX:</p>
+<p>Additionally the <a href="https://docs.qualcomm.com/doc/80-N2040-62/80-N2040-62_REV_AA_Qualcomm_Hexagon_V81_HMX_Programmers_Reference_Manual.pdf">Qualcomm Hexagon V81 HMX programmer's reference manual</a> has a section dedicated to explain the inner working of the HMX:</p>
 
 <figure>
   <img src="img/image 4.png" alt="qualcomm hexagon v81 hmx inner working diagram">
@@ -316,17 +221,16 @@
 
 <div class="refs">
   <h3>References</h3>
-  <p><a href="https://docs.qualcomm.com/doc/80-N2040-62/80-N2040-62_REV_AA_Qualcomm_Hexagon_V81_HMX_Programmers_Reference_Manual.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=qualcomm.com&sz=32" alt="">Programmer's reference manual - Qualcomm Hexagon V81 HMX</a></p>
-  <p><a href="https://www.qualcomm.com/developer/blog/2026/03/bringing-xnnpack-hexagon-npu"><img class="fav" src="https://www.google.com/s2/favicons?domain=qualcomm.com&sz=32" alt="">Bringing XNNPACK to Hexagon NPU - Qualcomm developer blog</a></p>
-  <p><a href="https://www.eecs.harvard.edu/htk/static/files/1978-cmu-cs-report-kung-leiserson.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=eecs.harvard.edu&sz=32" alt="">Systolic arrays for VLSI - Kung and Leiserson</a></p>
-  <p><a href="https://arxiv.org/pdf/2509.23324v1"><img class="fav" src="https://www.google.com/s2/favicons?domain=arxiv.org&sz=32" alt="">Scaling LLM Test-Time Compute with Mobile NPU on Smartphones - Hao et al., EuroSys '26</a></p>
-  <p><a href="https://www.opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=opencompute.org&sz=32" alt="">OCP microscaling formats (MX v1.0)</a></p>
+  <p><a href="https://docs.qualcomm.com/doc/80-N2040-62/80-N2040-62_REV_AA_Qualcomm_Hexagon_V81_HMX_Programmers_Reference_Manual.pdf">Programmer's reference manual - Qualcomm Hexagon V81 HMX</a></p>
+  <p><a href="https://www.qualcomm.com/developer/blog/2026/03/bringing-xnnpack-hexagon-npu">Bringing XNNPACK to Hexagon NPU - Qualcomm developer blog</a></p>
+  <p><a href="https://www.eecs.harvard.edu/htk/static/files/1978-cmu-cs-report-kung-leiserson.pdf">Systolic arrays for VLSI - Kung and Leiserson</a></p>
+  <p><a href="https://arxiv.org/pdf/2509.23324v1">Scaling LLM Test-Time Compute with Mobile NPU on Smartphones - Hao et al., EuroSys '26</a></p>
+  <p><a href="https://www.opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf">OCP microscaling formats (MX v1.0)</a></p>
 </div>
 
 </article>
 
 <footer style="margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--border)">
-  <p class="meta"><a href="/"><- back to datavorous.github.io</a></p>
 </footer>
 
 </main>

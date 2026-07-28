@@ -60,121 +60,35 @@
 <link rel="manifest" href="/media/favicon/site.webmanifest">
 <meta name="theme-color" content="#fff5f7">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../index.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
-<style>
-  .post-subtitle {
-    font-size: 1rem;
-    color: var(--muted);
-    margin: 0.25rem 0 0.5rem;
-    font-weight: 400;
-  }
-  .post-meta {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin: 0 0 2.5rem;
-  }
-  .post-body h2 {
-    margin-top: 2.2rem;
-  }
-  .post-body h3 {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-    margin: 1.8rem 0 0.4rem;
-  }
-  .post-body p {
-    font-size: 0.93rem;
-    line-height: 1.85;
-  }
-  .post-body li {
-    font-size: 0.93rem;
-    line-height: 1.75;
-    margin: 0.3rem 0;
-  }
-  .post-body ol {
-    padding-left: 1.4em;
-    margin: 0.8rem 0;
-  }
-  .post-body blockquote {
-    border-left: 2px solid var(--border);
-    margin: 1.2rem 0;
-    padding: 0.5rem 1rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-  .callout {
-    border-left: 3px solid var(--border);
-    padding: 0.7rem 1.1rem;
-    margin: 1.5rem 0;
-    font-size: 0.88rem;
-    color: var(--muted);
-  }
-  .callout-body p {
-    margin: 0.3rem 0;
-  }
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3em;
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 2.8rem;
-    transition: color 0.12s ease, border-color 0.12s ease;
-  }
-  .back-link:hover {
-    color: var(--text);
-    border-color: var(--text);
-  }
-  .post-title {
-    font-size: 1.35rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.3;
-    margin: 0 0 0.5rem;
-  }
-  article img:not(.fav) {
-    border-radius: 12px;
-  }
-  .refs {
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-  }
-  .refs p {
-    font-size: 0.82rem;
-    word-break: break-all;
-    margin: 0.25rem 0;
-  }
-</style>
 </head>
 <body>
 <main>
 
-<a class="back-link" href="/"><img class="fav" src="https://www.google.com/s2/favicons?domain=datavorous.github.io&sz=32" alt="">datavorous</a>
+<nav class="top">
+<a href="/">Home</a>
+<a href="/#writeups">Writeups</a>
+<a href="/essays/">Essays</a>
+<a href="mailto:datavorous.work@gmail.com">Email</a>
+</nav>
 
 <h1 class="post-title">Reverse engineering the Qualcomm NPU compiler</h1>
 <p class="post-subtitle">What I pulled out of a stripped QAIRT binary</p>
-<p class="post-meta">Jun 2026 · datavorous</p>
+<p class="post-meta">Jun 2026 - datavorous</p>
 
 <article class="post-body">
 
-<p>My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. But NPU documentation on the web is basically nonexistent, and the little that's out there was so disappointing that at one point I thought of quitting - so I reverse engineered the compiler instead. I previously wrote a small primer on <a href="https://datavorous.github.io/writing/npu/"><img class="fav" src="https://www.google.com/s2/favicons?domain=datavorous.github.io&sz=32" alt="">NPUs: what, and where they break</a>, it should be enough to understand for what's coming next.</p>
+<p>My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. But NPU documentation on the web is basically nonexistent, and the little that's out there was so disappointing that at one point I thought of quitting - so I reverse engineered the compiler instead. I previously wrote a small primer on <a href="https://datavorous.github.io/writing/npu/">NPUs: what, and where they break</a>, it should be enough to understand for what's coming next.</p>
 
 <p>For none of the SoC's did Qualcomm publish the memory capacity of VTCMs. How am I supposed to understand whether my tensors were spilling all over? Or whether quantisation is really needed? Add to that my curiousty to know how they simulate the working of a model even before it runs on the actual hardware, and which optimization algorithms are involved.</p>
 
-<p>I (equipped with <a href="https://claude.com/product/claude-code"><img class="fav" src="https://www.google.com/s2/favicons?domain=claude.com&sz=32" alt="">Claude Code</a>) doubled down on the <code>*.so</code> files of <a href="https://www.qualcomm.com/developer/software/neural-processing-sdk-for-ai"><img class="fav" src="https://www.google.com/s2/favicons?domain=qualcomm.com&sz=32" alt="">QNPU SDK</a> (v2.46.0.260424), and banked on the unmangled names that survived stripping, the raw machine code decompiled with <a href="https://github.com/NationalSecurityAgency/ghidra"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">Ghidra</a>, and some empirical parameter sweeping on my Linux.</p>
+<p>I (equipped with <a href="https://claude.com/product/claude-code">Claude Code</a>) doubled down on the <code>*.so</code> files of <a href="https://www.qualcomm.com/developer/software/neural-processing-sdk-for-ai">QNPU SDK</a> (v2.46.0.260424), and banked on the unmangled names that survived stripping, the raw machine code decompiled with <a href="https://github.com/NationalSecurityAgency/ghidra">Ghidra</a>, and some empirical parameter sweeping on my Linux.</p>
 
 <p>Some of the novel findings are (no one has the attention span to read the entire writeup anyway):</p>
 
 <ol>
-  <li>HTP solves VTCM placement as an MILP and solves it using <a href="https://highs.dev/"><img class="fav" src="https://www.google.com/s2/favicons?domain=highs.dev&sz=32" alt="">HiGHS</a> (optimization solver rather than heuristics) which was completely unknown publicly</li>
+  <li>HTP solves VTCM placement as an MILP and solves it using <a href="https://highs.dev/">HiGHS</a> (optimization solver rather than heuristics) which was completely unknown publicly</li>
   <li>VTCM placement uses a recursive backtracking allocator operating in a 3D coordinate space</li>
   <li>The compiler can automatically alter weight precision (without you knowing) during placement to relieve memory pressure</li>
   <li>The effective fit/spill boundary depends on the target architecture even when different SoCs report the same <code>vtcmSize</code></li>
@@ -205,7 +119,7 @@
 
 <p>It does this with something called "Priority BFS". It walks the graph, and measures the peak VTCM that order would require, and then <code>peak_tcm &lt;= tcm_capacity</code>-s it. It returns SMALL/LARGE after this, indicating no spill/spill respectively. The fill/spill decision is therefore the outcome of whether the best order it found keeps the peak working set under capacity. Then the ordering metric underneath is an op's position in a depth first topological sort of the graph, which has a nice property of keeping a value's producer and consumer as close together in time as possible. When two ops are tied, that tie is broken with a stack of heuristics, some of them being graph distance between an op's inputs and outputs, depth within a branch, scheduling the heaviest branch first etc.</p>
 
-<p>Once the order is fixed, the compiler has to physically place each tensor on the VTCM. It sorts tensors with the longest lived one first, and eventually the short lived ones next, to cut down fragmentation. The placement is not a simple 1D address by the way, the code assigns each block a <a href="https://stackoverflow.com/questions/2192087/3-dimensional-bin-packing-algorithms"><img class="fav" src="https://www.google.com/s2/favicons?domain=stackoverflow.com&sz=32" alt="">three dimensional coordinate</a> <code>(d0, d1, d2)</code> in the tile space, and the packer (which is recursive) backtracks. The exact retry condition lived in a few kilobytes of inlined SIMD which I didn't try to decode, yet.</p>
+<p>Once the order is fixed, the compiler has to physically place each tensor on the VTCM. It sorts tensors with the longest lived one first, and eventually the short lived ones next, to cut down fragmentation. The placement is not a simple 1D address by the way, the code assigns each block a <a href="https://stackoverflow.com/questions/2192087/3-dimensional-bin-packing-algorithms">three dimensional coordinate</a> <code>(d0, d1, d2)</code> in the tile space, and the packer (which is recursive) backtracks. The exact retry condition lived in a few kilobytes of inlined SIMD which I didn't try to decode, yet.</p>
 
 <p>That backtracking packer is the fallback path. When the compiler runs its full optimizer instead, placement takes a more striking form, which is a formal optimization problem I had seen before elsewhere.</p>
 
@@ -267,7 +181,7 @@ time = bytes/bandwidth</code></pre>
   <li><code>spillFillBufferSize</code> can be used a static fit/spill oracle</li>
 </ol>
 
-<p>Whether it directly helps anyone, or simply quenches anyone's curiousity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - <a href="mailto:datavorous.work@gmail.com"><img class="fav" src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="">I'd like that</a>.</p>
+<p>Whether it directly helps anyone, or simply quenches anyone's curiousity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - <a href="mailto:datavorous.work@gmail.com">I'd like that</a>.</p>
 
 <h2>Notes</h2>
 
@@ -282,7 +196,6 @@ time = bytes/bandwidth</code></pre>
 </article>
 
 <footer style="margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--border)">
-  <p class="meta"><a href="/"><- Back to datavorous.github.io</a></p>
 </footer>
 
 </main>

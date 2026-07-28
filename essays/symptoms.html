@@ -21,9 +21,6 @@
 <meta name="twitter:image" content="https://datavorous.github.io/media/me.jpg">
 <link rel="canonical" href="https://datavorous.github.io/essays/symptoms.html">
 <link rel="icon" type="image/x-icon" href="/media/favicon/favicon.ico">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../index.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
 <script type="application/ld+json">
@@ -44,9 +41,10 @@
 <main>
 
   <nav class="top">
-    <a href="./"><img class="fav" src="https://www.google.com/s2/favicons?domain=datavorous.github.io&sz=32" alt="">All Essays</a>
-    <a href="https://x.com/datavorous_"><img class="fav" src="https://www.google.com/s2/favicons?domain=x.com&sz=32" alt="">Twitter</a>
-    <a href="mailto:datavorous.work@gmail.com"><img class="fav" src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="">Email</a>
+    <a href="/">Home</a>
+    <a href="/#writeups">Writeups</a>
+    <a href="/essays/">Essays</a>
+    <a href="mailto:datavorous.work@gmail.com">Email</a>
   </nav>
 
   <article>
@@ -57,9 +55,9 @@
 
     <p>Programming is, in a sense, a way of making art -- and with time, one can do a great deal with nothing but imagination. I have been programming since the age of seven or eight, mostly as an amateur. Now, about a decade later, LLMs have upended the landscape. Whether that is for the greater good is not something I can judge yet.</p>
 
-    <p>Instead, I want to describe, in plain terms, how self-taught amateurs (like me and my friends) have navigated this space over the last decade. I came across Paul Graham's <a href="https://paulgraham.com/hp.html"><img class="fav" src="https://www.google.com/s2/favicons?domain=paulgraham.com&sz=32" alt="">"Hackers and Painters"</a> in 2017, and that essay, alongside Peter Naur's <a href="https://pages.cs.wisc.edu/~remzi/Naur.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=cs.wisc.edu&sz=32" alt="">"Programming as Theory Building"</a>, shaped how I think and how I work today.</p>
+    <p>Instead, I want to describe, in plain terms, how self-taught amateurs (like me and my friends) have navigated this space over the last decade. I came across Paul Graham's <a href="https://paulgraham.com/hp.html">"Hackers and Painters"</a> in 2017, and that essay, alongside Peter Naur's <a href="https://pages.cs.wisc.edu/~remzi/Naur.pdf">"Programming as Theory Building"</a>, shaped how I think and how I work today.</p>
 
-    <p>I want to present what I call "Symptom Driven Learning", which is a distant cousin of Constructionism (Seymour Papert's <a href="https://dailypapert.com/constructionism-vs-instructionism/"><img class="fav" src="https://www.google.com/s2/favicons?domain=dailypapert.com&sz=32" alt="">Constructionism</a>). It is the antithesis of curriculum based, linear learning, and it is not the same as a top down methodology either. Its three components are desire, humiliation, and embarrassment.</p>
+    <p>I want to present what I call "Symptom Driven Learning", which is a distant cousin of Constructionism (Seymour Papert's <a href="https://dailypapert.com/constructionism-vs-instructionism/">Constructionism</a>). It is the antithesis of curriculum based, linear learning, and it is not the same as a top down methodology either. Its three components are desire, humiliation, and embarrassment.</p>
 
     <p><strong>Desire</strong> is the starting material. For most people, it begins with wanting to build a game (it's a near universal cause) or breaking something just for the sake of it. The high of playing god is what hooks most of us in the first place.</p>
 
@@ -67,7 +65,7 @@
 
     <p>When reality humbles you at every turn, desperation sets in -- and the situation, the cause, the effect, and the solution all become fixed in memory. I believe pain catalyzes strong memory. That's why people who have been humiliated by a problem before can pattern match their way to a solution faster than someone just starting out. It becomes a reflex.</p>
 
-    <p>But there's a limit to this model. Some obstacles are simply inherent to building anything, or simply called non trivial by nature. The symptoms they produce would be near universal. Borrowing the idea of skill trees from <a href="https://www.justinmath.com/most-people-dont-realize-they-can-climb-skill-trees/"><img class="fav" src="https://www.google.com/s2/favicons?domain=justinmath.com&sz=32" alt="">Justin Skycak's blog</a>, I'd call these the foundational spine of the tree. Topics like memory management, basic data structures, understanding how a program executes from the moment a machine powers on etc. are a part of the spine.</p>
+    <p>But there's a limit to this model. Some obstacles are simply inherent to building anything, or simply called non trivial by nature. The symptoms they produce would be near universal. Borrowing the idea of skill trees from <a href="https://www.justinmath.com/most-people-dont-realize-they-can-climb-skill-trees/">Justin Skycak's blog</a>, I'd call these the foundational spine of the tree. Topics like memory management, basic data structures, understanding how a program executes from the moment a machine powers on etc. are a part of the spine.</p>
 
     <p>The next layer of topics is summoned by whatever domain you happen to be working in. If I were building something concurrent, like a large sand simulator, I would go learn multithreading. If I were writing a library meant to work across types, I would explore templates or generics. Someone can be a genuinely excellent engineer for years and never touch templates, simply because their career never demanded it of them.</p>
 
@@ -77,23 +75,23 @@
 
     <p>This is where <strong>embarrassment</strong> enters, as the final and hardest earned component. Humiliation is the machine punishing you or me directly; but embarrassment is discovering, usually from someone more experienced, that your reasoning was wrong all along. In one of my failed attempts to contribute to LiteRT, I ran into several design decisions that made no sense to me. I still don't fully understand why a certain abstraction was chosen when it didn't seem necessary -- or perhaps it only seemed unnecessary to me. The walls in this territory are invisible until someone more experienced points them out. Judgment, unlike syntax, can't be discovered through introspection alone. It has to be given to you, usually at the cost of your ego.</p>
 
-    <p>Read this on <a href="https://datavorous.substack.com/symptoms"><img class="fav" src="https://www.google.com/s2/favicons?domain=substack.com&sz=32" alt="">Substack</a>.</p>
+    <p>Read this on <a href="https://datavorous.substack.com/symptoms">Substack</a>.</p>
 
     <p>A few writers and pieces that shaped this thinking:</p>
 
     <ul>
-      <li><a href="https://jvns.ca/"><img class="fav" src="https://www.google.com/s2/favicons?domain=jvns.ca&sz=32" alt="">jvns.ca</a></li>
-      <li><a href="https://web.eecs.umich.edu/~weimerw/2018-481/readings/mythical-man-month.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=umich.edu&sz=32" alt="">The Mythical Man Month (excerpt) - Fred Brooks</a></li>
-      <li><a href="https://raw.githubusercontent.com/zwan074/technical-books/master/Advanced.Programming.in.the.UNIX.Environment.3rd.Edition.0321637739.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">Advanced Programming in the UNIX Environment - Stevens &amp; Rago</a></li>
-      <li><a href="http://steve-yegge.blogspot.com/2006/03/execution-in-kingdom-of-nouns.html?m=1"><img class="fav" src="https://www.google.com/s2/favicons?domain=blogspot.com&sz=32" alt="">Execution in the Kingdom of Nouns - Steve Yegge</a></li>
-      <li><a href="https://www.lysator.liu.se/c/pikestyle.html"><img class="fav" src="https://www.google.com/s2/favicons?domain=lysator.liu.se&sz=32" alt="">Notes on Programming in C - Rob Pike</a></li>
-      <li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd2ndEdExtract.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=stanford.edu&sz=32" alt="">A Philosophy of Software Design (excerpt) - John Ousterhout</a></li>
-      <li><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/SimpleMadeEasy.md"><img class="fav" src="https://www.google.com/s2/favicons?domain=github.com&sz=32" alt="">Simple Made Easy - Rich Hickey</a></li>
-      <li><a href="http://doc.cat-v.org/bell_labs/utah2000/utah2000.pdf"><img class="fav" src="https://www.google.com/s2/favicons?domain=cat-v.org&sz=32" alt="">Systems Software Research is Irrelevant</a></li>
-      <li><a href="https://linuxreviews.org/WE_DO_NOT_BREAK_USERSPACE"><img class="fav" src="https://www.google.com/s2/favicons?domain=linuxreviews.org&sz=32" alt="">We Don't Break Userspace</a></li>
-      <li><a href="https://courses.cs.washington.edu/courses/cse452/23wi/papers/yegge-platform-rant.html"><img class="fav" src="https://www.google.com/s2/favicons?domain=washington.edu&sz=32" alt="">Platforms Rant - Steve Yegge</a></li>
-      <li><a href="https://www.reddit.com/r/ExperiencedDevs/s/eUXN5ZIJkJ"><img class="fav" src="https://www.google.com/s2/favicons?domain=reddit.com&sz=32" alt="">r/ExperiencedDevs thread</a></li>
-      <li><a href="https://www.cs.virginia.edu/~robins/YouAndYourResearch.html"><img class="fav" src="https://www.google.com/s2/favicons?domain=virginia.edu&sz=32" alt="">You and Your Research - Richard Hamming</a></li>
+      <li><a href="https://jvns.ca/">jvns.ca</a></li>
+      <li><a href="https://web.eecs.umich.edu/~weimerw/2018-481/readings/mythical-man-month.pdf">The Mythical Man Month (excerpt) - Fred Brooks</a></li>
+      <li><a href="https://raw.githubusercontent.com/zwan074/technical-books/master/Advanced.Programming.in.the.UNIX.Environment.3rd.Edition.0321637739.pdf">Advanced Programming in the UNIX Environment - Stevens &amp; Rago</a></li>
+      <li><a href="http://steve-yegge.blogspot.com/2006/03/execution-in-kingdom-of-nouns.html?m=1">Execution in the Kingdom of Nouns - Steve Yegge</a></li>
+      <li><a href="https://www.lysator.liu.se/c/pikestyle.html">Notes on Programming in C - Rob Pike</a></li>
+      <li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd2ndEdExtract.pdf">A Philosophy of Software Design (excerpt) - John Ousterhout</a></li>
+      <li><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/SimpleMadeEasy.md">Simple Made Easy - Rich Hickey</a></li>
+      <li><a href="http://doc.cat-v.org/bell_labs/utah2000/utah2000.pdf">Systems Software Research is Irrelevant</a></li>
+      <li><a href="https://linuxreviews.org/WE_DO_NOT_BREAK_USERSPACE">We Don't Break Userspace</a></li>
+      <li><a href="https://courses.cs.washington.edu/courses/cse452/23wi/papers/yegge-platform-rant.html">Platforms Rant - Steve Yegge</a></li>
+      <li><a href="https://www.reddit.com/r/ExperiencedDevs/s/eUXN5ZIJkJ">r/ExperiencedDevs thread</a></li>
+      <li><a href="https://www.cs.virginia.edu/~robins/YouAndYourResearch.html">You and Your Research - Richard Hamming</a></li>
     </ul>
   </article>
 
