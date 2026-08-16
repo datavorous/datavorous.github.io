@@ -1,0 +1,27 @@
+# Your harness design is probably bad.
+
+August 16, 2026 - datavorous
+
+Harness engineering is the new buzzterm, but given its effectiveness, it's hard to deny the need of it. Most of the literature on the internet about harnesses revolve around coding, and sometimes proving math theorems, but often does anyone try to figure out how would one design a harness, given the task is neither of those.
+
+I came up with a formulation to tackle that problem. In short, we try to classify the task topology, then choose how explicitly search should be controlled.
+
+Task topology can be thought of as a vector consisting of feedback density, search geometry, horizon, evaluation cost, constraints.
+Whereas, search control could be a spectrum, procedure based on one end, agent based on the other, it would say where adaptation is allowed to happen.
+
+Procedural harnesses like AlphaEvolve fix the loop and let a designed evaluator drive selection. Agent based ones like Claude Code let a general purpose agent watch feedback, inspect traces, decide what to try next, more flexible, but it drifts as artifacts pile up. I read about the two "camps" of harnesses in [here](https://arxiv.org/abs/2605.13821).
+
+How do we use this taxonomy? Rule of thumb. 
+
+Say you're working on to build a harness for scientific discovery where the hypothesis space is huge and eval is sparse, so improving one hypothesis locally can trap the whole search in the wrong representation. What would matter then? Diversity, exploration/exploitation, and letting search history guide what gets tried next, closer to agentic evolution than fixed loops.
+
+Similarly, coding sits at another extreme where dense and cheap feedbacks+ hard constraints are available. The right fault is usually findable and verification is near instant, so a procedural loop with local repair does most of the work
+ 
+A point to note, harnesses like that of Deepmind's Co Scientist sit on sparse feedback and yet it's control is still low. Instead the agents fill roles like generate and reflect without ever touching the process. So procedural doesn't mean rigid and instead should mean that the algorithm is provided by the designer even while the agents inside it move freely.
+
+And then both camps kept failing the same way anyway. Stuck in a local optimum. Fixed rules can't climb out of a bad basin, roaming agents can climb out but lose the thread doing it. Which is what pushed me past both axes into a third question I don't have an answer to yet, can the search representation itself change mid run.
+
+Soemthing needs to shout: "Stop optimizing this scaffold, try a different chemotype!" 
+That's not a topology property and not a control setting, it's something else I'm still trying to figure out. 
+
+I wonder, what if there existed a "harness compiler"? 

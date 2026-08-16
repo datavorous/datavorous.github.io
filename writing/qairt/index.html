@@ -1,58 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Reverse engineering the Qualcomm NPU compiler - datavorous</title>
+<title>Reverse engineering the Qualcomm NPU compiler</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.">
-<meta name="keywords" content="QAIRT, Qualcomm Hexagon, HTP, NPU compiler, VTCM, spillFillBufferSize, HiGHS, MILP, Hextimate, roofline model, edge inference, reverse engineering, Ghidra, libHtpPrepare, on-device AI, tensor placement, relaxed_precision_cast, SM8350, SM8650, Priority BFS, im2col">
-<meta name="author" content="datavorous">
-<meta property="og:title" content="Reverse Engineering the Qualcomm NPU Compiler">
-<meta property="og:description" content="I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.">
-<meta property="og:url" content="https://datavorous.github.io/writing/qairt/">
-<meta property="og:type" content="article">
-<meta property="og:image" content="https://datavorous.github.io/media/me.jpg">
-<meta property="article:author" content="https://datavorous.github.io/">
-<meta property="article:published_time" content="2026-06-19T00:00:00Z">
-<meta property="article:tag" content="QAIRT">
-<meta property="article:tag" content="Qualcomm Hexagon">
-<meta property="article:tag" content="NPU compiler">
-<meta property="article:tag" content="reverse engineering">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@datavorous_">
-<meta name="twitter:title" content="Reverse Engineering the Qualcomm NPU Compiler">
-<meta name="twitter:description" content="I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.">
-<meta name="twitter:image" content="https://datavorous.github.io/media/me.jpg">
-<link rel="canonical" href="https://datavorous.github.io/writing/qairt/">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "TechArticle",
-  "headline": "Reverse Engineering the Qualcomm NPU Compiler",
-  "description": "I reverse engineered the Qualcomm NPU compiler to find out about an optimization solver, secret precision rewrites, and a simulator nobody mentions.",
-  "author": {
-    "@type": "Person",
-    "name": "datavorous",
-    "url": "https://datavorous.github.io/"
-  },
-  "datePublished": "2026-06-19",
-  "url": "https://datavorous.github.io/writing/qairt/",
-  "image": "https://datavorous.github.io/media/me.jpg",
-  "publisher": {
-    "@type": "Person",
-    "name": "datavorous",
-    "url": "https://datavorous.github.io/"
-  },
-  "keywords": ["QAIRT", "Qualcomm Hexagon", "HTP", "NPU compiler", "VTCM", "HiGHS", "MILP", "Hextimate", "edge inference", "reverse engineering", "spillFillBufferSize"],
-  "about": [
-    {"@type": "Thing", "name": "Qualcomm Hexagon HTP"},
-    {"@type": "Thing", "name": "NPU compiler"},
-    {"@type": "Thing", "name": "VTCM tensor placement"},
-    {"@type": "Thing", "name": "Mixed Integer Linear Programming"},
-    {"@type": "Thing", "name": "On-device AI inference"}
-  ]
-}
-</script>
 <link rel="icon" type="image/x-icon" href="/media/favicon/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/media/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/media/favicon/favicon-16x16.png">

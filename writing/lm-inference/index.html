@@ -1,57 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>What I learned trying to break a single GPU with mixed traffic - datavorous</title>
+<title>What I learned trying to break a single GPU with mixed traffic</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. i want to go the other way. the actual job is not picking the optimization but figuring out what's slow and why, before reaching for the toolbox.">
-<meta name="keywords" content="vllm, llm inference, prefix caching, chunked prefill, awq quantization, inference optimization, qwen2.5, rtx 6000 ada, goodput, kv cache, ttft, itl, mixed traffic">
-<meta name="author" content="datavorous">
-<meta property="og:title" content="what i learned trying to break a single gpu with mixed traffic">
-<meta property="og:description" content="most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. i want to go the other way. the actual job is not picking the optimization but figuring out what's slow and why.">
-<meta property="og:url" content="https://datavorous.github.io/writing/lm-inference/">
-<meta property="og:type" content="article">
-<meta property="og:image" content="https://datavorous.github.io/media/me.jpg">
-<meta property="article:author" content="https://datavorous.github.io/">
-<meta property="article:published_time" content="2026-06-14T00:00:00Z">
-<meta property="article:tag" content="vLLM">
-<meta property="article:tag" content="LLM inference">
-<meta property="article:tag" content="KV cache">
-<meta property="article:tag" content="prefix caching">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@datavorous_">
-<meta name="twitter:image" content="https://datavorous.github.io/media/me.jpg">
-<meta name="twitter:title" content="what i learned trying to break a single gpu with mixed traffic">
-<meta name="twitter:description" content="most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. i want to go the other way. the actual job is figuring out what's slow and why.">
-<link rel="canonical" href="https://datavorous.github.io/writing/lm-inference/">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "TechArticle",
-  "headline": "What I Learned Trying to Break a Single GPU With Mixed Traffic",
-  "description": "most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. the actual job is figuring out what's slow and why, before reaching for the toolbox.",
-  "author": {
-    "@type": "Person",
-    "name": "datavorous",
-    "url": "https://datavorous.github.io/"
-  },
-  "datePublished": "2026-06-14",
-  "url": "https://datavorous.github.io/writing/lm-inference/",
-  "image": "https://datavorous.github.io/media/me.jpg",
-  "publisher": {
-    "@type": "Person",
-    "name": "datavorous",
-    "url": "https://datavorous.github.io/"
-  },
-  "keywords": ["vLLM", "LLM inference", "prefix caching", "chunked prefill", "AWQ quantization", "KV cache", "TTFT", "goodput", "mixed traffic"],
-  "about": [
-    {"@type": "Thing", "name": "LLM Inference Optimization"},
-    {"@type": "Thing", "name": "vLLM"},
-    {"@type": "Thing", "name": "KV Cache"},
-    {"@type": "Thing", "name": "GPU Scheduling"}
-  ]
-}
-</script>
 <link rel="icon" type="image/x-icon" href="/media/favicon/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/media/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/media/favicon/favicon-16x16.png">
