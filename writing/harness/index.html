@@ -41,13 +41,13 @@
 
 <p>Say you're working on to build a harness for scientific discovery where the hypothesis space is huge and eval is sparse, so improving one hypothesis locally can trap the whole search in the wrong representation. What would matter then? Diversity, exploration/exploitation, and letting search history guide what gets tried next, closer to agentic evolution than fixed loops.</p>
 
-<p>Similarly, coding sits at another extreme where dense and cheap feedbacks+ hard constraints are available. The right fault is usually findable and verification is near instant, so a procedural loop with local repair does most of the work</p>
+<p>Similarly, coding sits at another extreme where dense and cheap feedbacks + hard constraints are available. The right fault is usually findable and verification is near instant, so a procedural loop with local repair does most of the work</p>
 
 <p>A point to note, harnesses like that of Deepmind's Co Scientist sit on sparse feedback and yet it's control is still low. Instead the agents fill roles like generate and reflect without ever touching the process. So procedural doesn't mean rigid and instead should mean that the algorithm is provided by the designer even while the agents inside it move freely.</p>
 
-<p>And then both camps kept failing the same way anyway. Stuck in a local optimum. Fixed rules can't climb out of a bad basin, roaming agents can climb out but lose the thread doing it. Which is what pushed me past both axes into a third question I don't have an answer to yet, can the search representation itself change mid run.</p>
+<p>But both camps would keep failing the same way anyway, if stuck in a local optimum. Fixed rules can't climb out of a bad basin, roaming agents can climb out but <i>might</i> lose the thread doing it. Which is what pushed me past both axes into a third question I don't have an answer to yet, <i>can the search representation itself change mid run?</i></p>
 
-<p>Soemthing needs to shout: "Stop optimizing this scaffold, try a different chemotype!" That's not a topology property and not a control setting, it's something else I'm still trying to figure out.</p>
+<p>Something needs to shout: "Stop optimizing this scaffold, try a different chemotype!" That's not a topology property and not a control setting, it's something else I'm still trying to figure out.</p>
 
 <p>I wonder, what if there existed a "harness compiler"?</p>
 
