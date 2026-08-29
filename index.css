@@ -204,11 +204,13 @@ article img:not(.avatar){
 
 .essay-hero{
   margin:0 0 2em;
+  aspect-ratio:21 / 9;
+  overflow:hidden;
 }
 
 .essay-hero img{
   width:100%;
-  aspect-ratio:21 / 9;
+  height:100%;
   object-fit:cover;
   object-position:center center;
 }
