@@ -378,4 +378,10 @@ footer{
   .top{
     margin-bottom:1.5em;
   }
+
+  .essay-hero{
+    margin-left:-.45em;
+    margin-right:-.45em;
+    aspect-ratio:16 / 9;
+  }
 }
