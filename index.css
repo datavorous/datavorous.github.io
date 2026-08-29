@@ -202,6 +202,17 @@ article img:not(.avatar){
   margin:1.4em auto;
 }
 
+.essay-hero{
+  margin:0 0 2em;
+}
+
+.essay-hero img{
+  width:100%;
+  aspect-ratio:21 / 9;
+  object-fit:cover;
+  object-position:center center;
+}
+
 figure{
   margin:1.5em 0;
 }
