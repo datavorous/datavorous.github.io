@@ -1,0 +1,45 @@
+*{box-sizing:border-box}
+body{max-width:690px;margin:0 auto;padding:4.5rem 1.25rem 6rem;background:#fbfbf8;color:#222;font:16px/1.6 Helvetica,Arial,sans-serif;text-align:left;word-spacing:normal;letter-spacing:normal;text-rendering:auto}
+main{min-width:0}
+.top{display:flex;gap:1rem;margin:0 0 2.5rem;font-size:16px}
+a{color:#0645ad}
+a:visited{color:#3366bb}
+p{margin:0 0 1rem;text-align:left;word-spacing:normal;letter-spacing:normal;white-space:normal;text-wrap:pretty}
+img{display:block;max-width:100%;height:auto;border-radius:6px}
+p:has(>img){margin:1.4rem 0;text-align:center}
+p:has(>img) img,.hero{margin:0 auto}
+.hero{margin-bottom:1.4rem}
+h1,h2,h3{line-height:1.2;letter-spacing:normal;text-wrap:pretty}
+h1{margin:0 0 .25rem;font-size:1.85rem}
+h2{margin:2rem 0 .8rem;font-size:1.35rem}
+h3{margin:1.6rem 0 .5rem;font-size:1rem}
+.home h2{margin:0 0 .45rem;font-size:1.6rem}
+.home p:has(>img){margin-bottom:1.8rem}
+.dek{margin:.15rem 0;color:#555}
+.meta{margin:.35rem 0 2rem;color:#666}
+.home p:nth-of-type(1){margin-bottom:.6rem}
+.home p:nth-of-type(2){margin-bottom:.35rem}
+.home p:has(a[href^="mailto:"]){margin-bottom:1.55rem}
+.home p:has(a[href^="mailto:"]) a{margin-right:.75rem}
+.home h3{margin-top:1.45rem}
+.home ol,.home ul{list-style:none;margin:.35rem 0 1.35rem;padding:0}
+.home li{display:grid;grid-template-columns:1fr auto;gap:1rem;margin:.38rem 0;padding:0}
+.home li a{color:#0645ad}
+.home li a:visited{color:#3366bb}
+.date{color:#666;white-space:nowrap}
+article:not(.home) ol{padding-left:1.5rem}
+article:not(.home) ul{padding-left:1.25rem}
+article:not(.home) li{margin:.35rem 0}
+article:not(.home) p:has(>img) img{max-height:520px}
+code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+code{font-size:.9em}
+pre{overflow:auto;padding:1rem;border:1px solid #ddd;white-space:pre}
+blockquote{margin:1.2rem 0;padding-left:1rem;border-left:3px solid #ddd;color:#555}
+hr{border:0;border-top:1px solid #ddd;margin:2rem 0}
+@media(max-width:640px){
+  body{padding:2rem 1rem 4rem}
+  .top{margin-bottom:2rem}
+  .home li{display:block}
+  .date{display:block;margin-top:.05rem;white-space:normal}
+  article:not(.home) p:has(>img) img{max-height:none}
+}
