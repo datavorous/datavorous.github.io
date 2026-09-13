@@ -20,5 +20,6 @@ Hi, I'm Sagnik Bhattacharjee (alias: _datavorous_), a sophomore working on sched
 
 ### Posts
 
-1. [human.c](blog/human.md) September 1, 2026
-2. [2026.txt](blog/2026.md) August 29, 2026
+1. [ml.cu](blog/ml.md) September 13, 2026
+2. [human.c](blog/human.md) September 1, 2026
+3. [2026.txt](blog/2026.md) August 29, 2026
