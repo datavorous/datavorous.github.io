@@ -55,7 +55,7 @@ body_html() {
     NR == 1 && $0 == "---" { fm = 1; next }
     fm && $0 == "---" { fm = 0; next }
     !fm { print }
-  ' "$1" | cmark
+  ' "$1" | cmark --unsafe
 }
 
 first_heading() {

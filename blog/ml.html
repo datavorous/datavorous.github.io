@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ml.cu</title>
+<title>A little rant about ML</title>
 <link rel="stylesheet" href="../style.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
 </head>
@@ -11,7 +11,7 @@
 <nav class="top"><a href="../index.html">Home</a><a href="mailto:datavorous.work@gmail.com">Email</a></nav>
 <main><article>
 <header>
-<h1>ml.cu</h1>
+<h1>A little rant about ML</h1>
 <p class="meta">September 13, 2026 / datavorous</p>
 </header>
 <p>Today I tried to go through the /careers and /blog pages of various ai labs &amp; startups because job postings reveal what labs believe is scarce before it becomes a course or a textbook chapter, haha.
@@ -37,6 +37,14 @@ As I increasingly map the landscape, it seems that learning the common substrate
 <p>I'm fed up with college, and how it's trying to bottleneck my progress. All I understand is that, to accelerate scientific progress, we need AI. We need to generate intelligence, build the platform to execute it, and then amplify it. Then use intelligence to improve all three. Open science and open intelligence. That's it.</p>
 <p>I, the stupid intern, might read agent rollouts, inspect behaviour, check what the grader says, tweak the harness, hill climb the benchmark again. That's evals! Agent failed? Bad task? Weak verifier? Sparse reward? Reward hacking? Context bloated? Tool call broke? State contaminated? Maybe the whole multi agent topology is stupid. Supervisor? Islands? Swarms? Population search? Who talks to whom? Who gets compute? Who gets killed? Fine, let's change. Still bad? Maybe the environment is the problem. Better sandbox! Faster resets! More parallel copies! Better rewards, partial credit, curriculum, self play (yes, what??) synthetic tasks. Whoops! post training! Now I need rollouts, lots of them. Stragglers? Async workers? Long horizon credit assignment? GPUs sitting idle because env are slow? No data? Generate synthetic data! filter, dedup-rank, balance &amp; ask which samples are even worth? Still nothing? Maybe the model simply cannot do it. Time to pretrain. Better data? Better architecture? Dense or MoE? Long context? Better optimizer? Scaling laws? Loss spikes? Expert collapse? Doesn't fit? More GPUs! Now distributed trainingn!! Sharding, tensor parallel? pipeline parallel! expert parallel?? checkpointing, communication, AllReduce, all-to-all, what lol? Done? Need inference. Prefill, decode, KV cache, batching, speculative decoding, quantization. Throughput improved but latency got worse? Great, now serving! Routing, autoscaling, model placement, load balancing, tail latency, queuing, idle GPUs here, overloaded GPUs?? Profiler says one operator dominates? Kernel time! CUDA, Triton, fusion, tiling, memory bandwidth, Tensor Cores, occupancy. Nice, kernel is 25% faster! End to end got slower? Of course. Runtime changed. Shapes changed too! Compiler in the way? Graph capture, fusion, lowering, codegen. Still slow? Hardware! HBM, interconnects, racks, power, cooling. Fix that, inference is cheaper, which means more rollouts, which means more RL data! which means a better policy! which means different agent behaviour! which means new trajectories! new failure modes, new evals, which means I stay employed!! So I'm back reading the rollout again. Why am I manually dealing with the entire mess? Let agents generate hypotheses, run experiments, allocate compute, mutate code, optimize kernels, synthesize data, train models, deploy them, evaluate them, and feed failures back into the next round. Did that work? No? Fine. Back to the rollout.</p>
 <p>YES, it's an entire loop-ity loop. Yes, I have my mid semester exams in 20 days, I don't want to go back there.</p>
+<p>Some references pages:</p>
+<ol>
+<li><a href="https://openai.com/careers/research-engineer-frontier-evals-and-environments-san-francisco/">OpenAI: Research Engineer, Frontier Evals and Environments</a></li>
+<li><a href="https://openai.com/careers/research-engineerresearch-scientist-rlreasoning-san-francisco/">OpenAI: Research Engineer/Research Scientist, RL/Reasoning</a></li>
+<li><a href="https://job-boards.greenhouse.io/anthropic/jobs/5183051008?gh_src=Menlo+Ventures+job+board">Anthropic: Research Engineer, Evals</a></li>
+<li><a href="https://qwen.ai/blog?id=qwen3-coder">Qwen3-Coder</a></li>
+<li><a href="https://modal.com/blog/introducing-auto-endpoints">Modal: Introducing Auto Endpoints</a></li>
+</ol>
 </article></main>
 </body>
 </html>

@@ -1,5 +1,5 @@
 ---
-title: ml.cu
+title: A little rant about ML
 date: September 13, 2026
 author: datavorous
 ---
@@ -36,8 +36,8 @@ I, the stupid intern, might read agent rollouts, inspect behaviour, check what t
 YES, it's an entire loop-ity loop. Yes, I have my mid semester exams in 20 days, I don't want to go back there. 
 
 Some references pages:
-1. https://openai.com/careers/research-engineer-frontier-evals-and-environments-san-francisco/
-2. https://openai.com/careers/research-engineerresearch-scientist-rlreasoning-san-francisco/
-3. https://job-boards.greenhouse.io/anthropic/jobs/5183051008?gh_src=Menlo+Ventures+job+board
-4. https://qwen.ai/blog?id=qwen3-coder 
-5. https://modal.com/blog/introducing-auto-endpoints
+1. [OpenAI: Research Engineer, Frontier Evals and Environments](https://openai.com/careers/research-engineer-frontier-evals-and-environments-san-francisco/)
+2. [OpenAI: Research Engineer/Research Scientist, RL/Reasoning](https://openai.com/careers/research-engineerresearch-scientist-rlreasoning-san-francisco/)
+3. [Anthropic: Research Engineer, Evals](https://job-boards.greenhouse.io/anthropic/jobs/5183051008?gh_src=Menlo+Ventures+job+board)
+4. [Qwen3-Coder](https://qwen.ai/blog?id=qwen3-coder)
+5. [Modal: Introducing Auto Endpoints](https://modal.com/blog/introducing-auto-endpoints)

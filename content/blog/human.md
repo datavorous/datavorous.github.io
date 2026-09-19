@@ -1,5 +1,5 @@
 ---
-title: human.c
+title: What happens to us now?
 date: September 1, 2026
 author: datavorous
 ---
