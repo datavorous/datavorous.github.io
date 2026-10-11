@@ -55,3 +55,7 @@ hr{border:0;border-top:1px solid var(--rule);margin:2rem 0}
   article:not(.home) p:has(>img) img{max-height:none}
   .problem-tuple div{grid-template-columns:1fr;gap:.05rem}
 }
+
+/* The unlisted harness draft omits these old figure elements. */
+.harness .breadth,.harness .comparison-gain{display:none!important}
+.harness .lineage-edge,.harness .lineage-node{opacity:1!important;transition:none!important}

@@ -2,6 +2,8 @@
   'use strict';
 
   const byId = (id) => document.getElementById(id);
+  // Keep the omitted draft figure out of the page if stale markup is restored.
+  byId('breadth-figure')?.closest('figure')?.remove();
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const chartWidth = (element) => Math.max(280, Math.round(element.getBoundingClientRect().width));
   const text = (x, y, value, className = 'chart-tick', anchor = 'middle') =>
@@ -59,10 +61,10 @@
   }
 
   const communication = [
-    { name: 'Single agent', efficiency: 58.44, tokens: '1.0x', gain: '0%', className: 'single-agent' },
-    { name: 'Independent sampling', efficiency: 75.86, tokens: '13.7x', gain: '+29.8%', className: 'sampling' },
-    { name: 'Swarm + communication', efficiency: 57.10, tokens: '27.4x', gain: '-2.3%', className: 'communication-only' },
-    { name: 'Our harness', efficiency: 84.10, tokens: '25.5x', gain: '+43.9%', className: 'our-harness' },
+    { name: 'Single agent', efficiency: 58.44, tokens: '1.0x', className: 'single-agent' },
+    { name: 'Independent sampling', efficiency: 75.86, tokens: '13.7x', className: 'sampling' },
+    { name: 'Swarm + communication', efficiency: 57.10, tokens: '27.4x', className: 'communication-only' },
+    { name: 'Our harness', efficiency: 84.10, tokens: '25.5x', className: 'our-harness' },
   ];
 
   function renderCommunication() {
@@ -74,12 +76,11 @@
             <div class="comparison-bar" style="width:${row.efficiency}%"><span>${row.efficiency.toFixed(2)}%</span></div>
           </div>
           <div class="comparison-tokens">${row.tokens} tokens</div>
-          <div class="comparison-gain">${row.gain} vs single</div>
         </div>`).join('')}
       <div class="comparison-axis"><span>0%</span><span>50%</span><span>100%</span></div>` +
       dataTable('DiscoveryWorld experimental efficiency by approach',
-        ['Approach', 'Experimental efficiency', 'Token multiple', 'Gain versus single agent'],
-        communication.map((row) => [row.name, `${row.efficiency.toFixed(2)}%`, row.tokens, row.gain]));
+        ['Approach', 'Experimental efficiency', 'Token multiple'],
+        communication.map((row) => [row.name, `${row.efficiency.toFixed(2)}%`, row.tokens]));
   }
 
   const made = [
@@ -308,6 +309,7 @@
   }
 
   renderCommunication();
+  document.querySelectorAll('.comparison-gain').forEach((element) => element.remove());
   renderLith();
   renderBoard();
   resizeFigures();
