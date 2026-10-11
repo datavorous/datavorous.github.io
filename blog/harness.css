@@ -181,36 +181,13 @@
   color: var(--quiet);
   font: .76rem/1.35 var(--sans);
 }
-.harness .board-window {
-  --row-height: 3.85rem;
-  height: calc(3 * var(--row-height));
-  overflow: hidden;
-  position: relative;
-}
-.harness .board-stack { position: relative; height: 100%; }
 .harness .board-entry {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--row-height);
-  padding: .3rem 0;
-  overflow: hidden;
-  transform: translateY(calc(var(--slot) * var(--row-height)));
-  transition: transform .43s ease, opacity .43s ease;
-  font: .75rem/1.4 var(--sans);
+  padding: .35rem 0;
+  font: .7rem/1.3 var(--sans);
 }
-.harness .board-entry.entering,
-.harness .board-entry.leaving { opacity: 0; }
-.harness .board-from { color: var(--quiet); font-size: .69rem; }
+.harness .board-from { color: var(--quiet); font-size: .66rem; }
 .harness .board-sender { color: var(--ink); }
-.harness .board-entry p { margin: .1rem 0 0; font: .75rem/1.4 var(--sans); }
-.harness .board-reset { opacity: 0; transition: opacity .35s ease; }
-.harness .board-all .board-entry {
-  position: static;
-  height: auto;
-  transform: none;
-}
+.harness .board-entry p { margin: .05rem 0 0; font: inherit; }
 
 .harness .footnotes {
   margin-top: 2.4rem;
@@ -247,10 +224,4 @@
   .harness .comparison-axis { margin: -.25rem 0 0; font-size: .62rem; }
   .harness .lith-measure { grid-template-columns: 4.4rem minmax(0, 1fr) 3.6rem; gap: .35rem; }
   .harness .lith-axis { margin-left: 4.75rem; margin-right: 3.95rem; }
-  .harness .board-window { --row-height: 4.75rem; }
-  .harness .board-entry,
-  .harness .board-entry p { font-size: .74rem; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .harness .board-entry { transition: none; }
 }

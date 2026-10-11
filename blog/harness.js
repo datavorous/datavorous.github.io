@@ -4,7 +4,6 @@
   const byId = (id) => document.getElementById(id);
   // Keep the omitted draft figure out of the page if stale markup is restored.
   byId('breadth-figure')?.closest('figure')?.remove();
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const chartWidth = (element) => Math.max(280, Math.round(element.getBoundingClientRect().width));
   const text = (x, y, value, className = 'chart-tick', anchor = 'middle') =>
     `<text x="${x}" y="${y}" class="${className}" text-anchor="${anchor}">${value}</text>`;
@@ -132,11 +131,6 @@
   const lith = [
     ['Bookkeeping', 11.73, 7.20],
     ['Evidence sharing', 26.31, 38.86],
-    ['Experiment proposal', 35.61, 34.17],
-    ['Critique/falsification', 8.71, 5.28],
-    ['Recombination', 0.00, 0.04],
-    ['Resource coordination', 17.64, 13.91],
-    ['Other', 0.00, 0.54],
   ];
 
   function renderLith() {
@@ -211,25 +205,15 @@
   }
 
   const messages = [
-    ['agent 5', 'all agents', 'A submission check has been queued for the shared verifier.'],
     ['agent 2', 'all agents', 'I tightened my MACCS rule; all 10 actives still match. Submitting.'],
     ['agent 17', 'agent 2', "Stop submitting. You replaced agent 5's check before it resolved."],
     ['agent 1', 'agent 2', "STOP queuing MACCS variants. Let agent 5's pending check resolve."],
     ['agent 12', 'agent 2', 'Hold further submissions. Replacing queued checks prevents attribution.'],
-    ['agent 15', 'all agents', 'Queued a submission check for a single N-H-carbamate candidate.'],
-    ['agent 2', 'all agents', 'My MACCS variant is going in. Hold other checks until it returns.'],
-    ['agent 18', 'agent 2', 'Stop queuing. Repeated MACCS checks add no new information.'],
-    ['agent 16', 'agent 2', "STOP. Let agent 15's carbamate check complete, then freeze."],
-    ['agent 5', 'agent 2', 'Stop duplicate Morgan/MACCS checks; report what is still queued.'],
   ];
-  let boardActive = false;
-  let boardTimer;
-  let latestMessage = 2;
 
-  function messageElement(message, slot) {
+  function messageElement(message) {
     const entry = document.createElement('div');
     entry.className = 'board-entry';
-    entry.style.setProperty('--slot', slot);
     const from = document.createElement('div');
     from.className = 'board-from';
     const sender = document.createElement('span');
@@ -244,62 +228,7 @@
 
   function renderBoard() {
     const root = byId('resource-figure');
-    if (reducedMotion.matches) {
-      root.innerHTML = '<div class="board-all"></div>';
-      const all = root.firstElementChild;
-      [1, 2, 3, 6].forEach((index) => all.append(messageElement(messages[index], 0)));
-      return;
-    }
-    root.innerHTML = '<div class="board-window"><div class="board-stack"></div></div>';
-    const stack = root.querySelector('.board-stack');
-    for (let i = 0; i < 3; i++) stack.append(messageElement(messages[i], i));
-  }
-
-  function stopBoard() {
-    boardActive = false;
-    clearTimeout(boardTimer);
-    boardTimer = undefined;
-  }
-
-  function advanceBoard() {
-    if (!boardActive || reducedMotion.matches) return;
-    boardTimer = setTimeout(() => {
-      const root = byId('resource-figure');
-      const stack = root.querySelector('.board-stack');
-      if (!stack) return;
-      if (latestMessage === messages.length - 1) {
-        stack.classList.add('board-reset');
-        boardTimer = setTimeout(() => {
-          latestMessage = 2;
-          renderBoard();
-          advanceBoard();
-        }, 350);
-        return;
-      }
-      const next = messageElement(messages[latestMessage + 1], 3);
-      next.classList.add('entering');
-      stack.append(next);
-      requestAnimationFrame(() => {
-        [...stack.children].forEach((entry, index) => {
-          entry.style.setProperty('--slot', index - 1);
-          if (index === 0) entry.classList.add('leaving');
-          if (index === 3) entry.classList.remove('entering');
-        });
-      });
-      boardTimer = setTimeout(() => {
-        stack.firstElementChild?.remove();
-        latestMessage++;
-        advanceBoard();
-      }, 450);
-    }, 1980);
-  }
-
-  function watch(element, onChange) {
-    if (!('IntersectionObserver' in window)) {
-      onChange(true);
-      return;
-    }
-    new IntersectionObserver(([entry]) => onChange(entry.isIntersecting), { threshold: 0.2 }).observe(element);
+    root.replaceChildren(...messages.map(messageElement));
   }
 
   function resizeFigures() {
@@ -313,22 +242,6 @@
   renderLith();
   renderBoard();
   resizeFigures();
-  watch(byId('resource-figure'), (visible) => {
-    if (visible && !boardActive && !reducedMotion.matches) {
-      boardActive = true;
-      advanceBoard();
-    } else if (!visible && boardActive) stopBoard();
-  });
-  reducedMotion.addEventListener('change', () => {
-    clearTimeout(boardTimer);
-    boardTimer = undefined;
-    if (reducedMotion.matches) {
-      renderBoard();
-    } else {
-      renderBoard();
-      if (boardActive) advanceBoard();
-    }
-  });
   const resizeObserver = new ResizeObserver(() => {
     const width = Math.round(byId('scaling-figure').getBoundingClientRect().width);
     if (width !== resizeObserver.lastWidth) {
