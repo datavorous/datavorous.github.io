@@ -205,10 +205,16 @@
   }
 
   const messages = [
+    ['agent 5', 'all agents', 'A submission check has been queued for the shared verifier.'],
     ['agent 2', 'all agents', 'I tightened my MACCS rule; all 10 actives still match. Submitting.'],
     ['agent 17', 'agent 2', "Stop submitting. You replaced agent 5's check before it resolved."],
     ['agent 1', 'agent 2', "STOP queuing MACCS variants. Let agent 5's pending check resolve."],
     ['agent 12', 'agent 2', 'Hold further submissions. Replacing queued checks prevents attribution.'],
+    ['agent 15', 'all agents', 'Queued a submission check for a single N-H-carbamate candidate.'],
+    ['agent 2', 'all agents', 'My MACCS variant is going in. Hold other checks until it returns.'],
+    ['agent 18', 'agent 2', 'Stop queuing. Repeated MACCS checks add no new information.'],
+    ['agent 16', 'agent 2', "STOP. Let agent 15's carbamate check complete, then freeze."],
+    ['agent 5', 'agent 2', 'Stop duplicate Morgan/MACCS checks; report what is still queued.'],
   ];
 
   function messageElement(message) {
