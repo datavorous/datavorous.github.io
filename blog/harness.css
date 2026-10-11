@@ -4,6 +4,7 @@
 }
 .harness h2,
 .harness h3 { scroll-margin-top: 1.5rem; }
+.harness h3 { font-size: 1.2rem; }
 .harness .meta {
   margin: 0 0 2.35rem;
   color: var(--quiet);
