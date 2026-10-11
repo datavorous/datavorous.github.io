@@ -10,7 +10,7 @@ img{display:block;max-width:100%;height:auto;border-radius:6px}
 p:has(>img){margin:1.4rem 0;text-align:center}
 p:has(>img) img,.hero{margin:0 auto}
 .hero{margin-bottom:1.4rem}
-h1,h2,h3{font-family:var(--sans);line-height:1.2;letter-spacing:normal;text-wrap:pretty}
+h1,h2,h3{font-family:var(--sans);font-weight:500;line-height:1.2;letter-spacing:-.035em;text-wrap:pretty}
 h1{margin:0 0 .25rem;font-size:1.85rem}
 h2{margin:2rem 0 .8rem;font-size:1.35rem}
 h3{margin:1.6rem 0 .5rem;font-size:1rem}
@@ -20,7 +20,7 @@ h3{margin:1.6rem 0 .5rem;font-size:1rem}
 .home p:nth-of-type(1){max-width:42rem;margin-bottom:.45rem;text-wrap:pretty}
 .home p:has(a[href^="mailto:"]){display:flex;flex-wrap:wrap;gap:.45rem 1rem;margin-bottom:1.7rem;font:.95rem/1.5 var(--sans)}
 .home p:has(a[href^="mailto:"]) a{white-space:nowrap}
-.home h3{border-top:1px solid var(--rule);margin:1.9rem 0 .65rem;padding-top:1rem;font-size:1.18rem;font-weight:500;letter-spacing:-.01em;position:relative}
+.home h3{border-top:1px solid var(--rule);margin:1.9rem 0 .65rem;padding-top:1rem;font-size:1.18rem;position:relative}
 .home h3:before{content:"";position:absolute;top:-5px;left:0;width:9px;height:9px;background:linear-gradient(var(--faint),var(--faint)) 50%/1px 9px no-repeat,linear-gradient(var(--faint),var(--faint)) 50%/9px 1px no-repeat,var(--paper)}
 .home ol,.home ul{list-style:none;margin:.35rem 0 1.35rem;padding:0}
 .home li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem 1rem;align-items:baseline;margin:.55rem 0;padding:0 0 0 .85rem;position:relative}
