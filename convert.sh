@@ -4,6 +4,7 @@ set -eu
 content_dir="${1:-content}"
 output_dir="${2:-.}"
 stylesheet="style.css"
+css_version="$(cksum "$stylesheet" | awk '{print $1}')"
 
 content_dir="${content_dir%/}"
 output_dir="${output_dir%/}"
@@ -110,7 +111,7 @@ render_page() {
     ---) has_front_matter=1 ;;
   esac
   home_href="$(realpath --relative-to="$(dirname "$out")" "$output_dir/index.html")"
-  css_href="$(realpath --relative-to="$(dirname "$out")" "$output_dir/$stylesheet")"
+  css_href="$(realpath --relative-to="$(dirname "$out")" "$output_dir/$stylesheet")?v=$css_version"
   body="$(body_html "$src" | filter_html)"
 
   {
