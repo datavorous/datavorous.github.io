@@ -19,9 +19,9 @@ Additionally, in order to make sure we don’t drift away to a wonderland. We wi
 <aside class="problem-tuple">
 <h3>Example #1</h3>
 <dl>
-<div><dt>object</dt><dd>file</dd></div>
-<div><dt>moves</dt><dd>read, write, compress, search</dd></div>
-<div><dt>pressure</dt><dd>100gb of garbage values</dd></div>
+<div><dt>noun</dt><dd>file</dd></div>
+<div><dt>verbs</dt><dd>read, write, compress, search</dd></div>
+<div><dt>absurdity factor</dt><dd>100gb of garbage values</dd></div>
 </dl>
 </aside>
 
@@ -56,9 +56,9 @@ Similarly you can go on to explore chunk, hash, search, sort, dedup, sync etc.
 <aside class="problem-tuple">
 <h3>Example #2</h3>
 <dl>
-<div><dt>object</dt><dd>coordinates</dd></div>
-<div><dt>moves</dt><dd>index, encode, tile</dd></div>
-<div><dt>pressure</dt><dd>ten billion (x, y) on your laptop</dd></div>
+<div><dt>noun</dt><dd>coordinates</dd></div>
+<div><dt>verbs</dt><dd>index, encode, tile</dd></div>
+<div><dt>absurdity factor</dt><dd>ten billion (x, y) on your laptop</dd></div>
 </dl>
 </aside>
 
@@ -91,9 +91,9 @@ and then there's matching/routing on top.
 <aside class="problem-tuple">
 <h3>Example #3</h3>
 <dl>
-<div><dt>object</dt><dd>vector</dd></div>
-<div><dt>moves</dt><dd>retrieve, compress, truncate</dd></div>
-<div><dt>pressure</dt><dd>tradeoffs{billions in number, memory is expensive, updates cannot stop, accuracy cannot collapse}</dd></div>
+<div><dt>noun</dt><dd>vector</dd></div>
+<div><dt>verbs</dt><dd>retrieve, compress, truncate</dd></div>
+<div><dt>absurdity factor</dt><dd>tradeoffs{billions in number, memory is expensive, updates cannot stop, accuracy cannot collapse}</dd></div>
 </dl>
 </aside>
 
