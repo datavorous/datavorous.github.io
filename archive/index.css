@@ -1,0 +1,139 @@
+/* Archive pages use the site's current typography and colors. */
+@import url("../style.css");
+
+/* Layout for the older, hand-written archive markup. */
+.section-note,
+.post-subtitle,
+.dim {
+  color: var(--quiet);
+}
+
+.section-note {
+  margin: var(--space-1) 0 var(--space-4);
+}
+
+.essays {
+  list-style: none;
+  margin: var(--space-2) 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.essays li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-1) var(--space-2);
+  align-items: baseline;
+  margin: 0;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.post-title {
+  margin-bottom: var(--space-1);
+}
+
+.post-subtitle {
+  margin: 0 0 var(--space-1);
+}
+
+.post-meta {
+  margin: 0 0 var(--space-4);
+  color: var(--quiet);
+  font: var(--text-small)/1.5 var(--sans);
+}
+
+figure {
+  margin: var(--space-3) 0;
+}
+
+figure img {
+  margin-inline: auto;
+}
+
+figcaption {
+  margin-top: var(--space-1);
+  color: var(--quiet);
+  font: var(--text-small)/1.5 var(--sans);
+  text-align: center;
+}
+
+.post-body code:not(pre code) {
+  padding: .1em .25em;
+  background: var(--wash);
+  overflow-wrap: anywhere;
+}
+
+pre code {
+  font-size: inherit;
+}
+
+table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: var(--space-3) 0;
+  font-size: var(--text-small);
+}
+
+th, td {
+  border: 1px solid var(--rule);
+  padding: .35rem .6rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--wash);
+  font-weight: 600;
+}
+
+.cell-hi {
+  background: #e8f1f8;
+}
+
+.callout,
+.psa {
+  margin: var(--space-3) 0;
+  padding: var(--space-1) var(--space-2);
+  border-left: 2px solid var(--rule);
+  color: var(--quiet);
+}
+
+.callout > :last-child,
+.callout-body > :last-child {
+  margin-bottom: 0;
+}
+
+.psa-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.q-link {
+  font-size: var(--text-small);
+}
+
+.q-link.copied::after {
+  content: " copied";
+}
+
+.refs,
+footer:not(:empty) {
+  margin-top: var(--space-5);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+
+.refs p {
+  margin-bottom: var(--space-1);
+  overflow-wrap: anywhere;
+  font-size: var(--text-small);
+}
+
+@media (max-width: 640px) {
+  .essays li {
+    display: block;
+  }
+}
