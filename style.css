@@ -48,6 +48,11 @@ article:not(.home) p:has(>img) img{max-height:520px}
 code,pre{font-family:var(--mono)}
 code{font-size:.9em}
 pre{overflow:auto;padding:var(--space-2);border:1px solid var(--rule);background:var(--wash);white-space:pre}
+.ohev-code{margin:var(--space-3) 0;padding:var(--space-2);border:1px solid var(--rule);border-radius:6px;background:#f8f9fb;color:var(--ink);font-size:.8125rem;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:2}
+.ohev-code code{font-size:inherit}
+.ohev-code .code-keyword{color:var(--visited);font-weight:600}
+.ohev-code .code-function{color:var(--link)}
+.ohev-code .code-string{color:#326655}
 blockquote{margin:var(--space-3) 0;padding-left:var(--space-2);border-left:3px solid var(--faint);color:var(--quiet)}
 hr{border:0;border-top:1px solid var(--rule);margin:var(--space-4) 0}
 p.faded{color:var(--postscript)}

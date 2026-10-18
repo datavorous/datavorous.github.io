@@ -17,4 +17,4 @@ Lately, I have been working on agent evals, harness design, and RL environments.
 1. [Reverse engineering the Qualcomm NPU compiler](writing/qairt/index.md) June 19, 2026
 2. [NPUs: What, and where they break](writing/npu/index.md) May 21, 2026
 
-I keep a running collection of notes [here](blog/index.md). I was hardcoded to go on side quests.
+My blog posts can be found [here](blog/index.md). I was hardcoded to go on side quests.
