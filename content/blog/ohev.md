@@ -46,11 +46,11 @@ result = ohev.<span class="code-function">judge</span>(
 
 ## Testing in the Wild
 
-I convinced (read: *forced*) 4-5 friends to attempt the eval, and benchmarked a few small LMs (+ Sonnet 5.5 and Gemini 3). The  X-axis refers to their mean performance over 5 runs. We measure the alignment with the held out labels (not a real life guarantee).
+I convinced (read: *forced*) 4-5 friends to attempt the eval, and benchmarked a few small LMs (+ Sonnet 5.5 and Gemini 3). The  X-axis refers to their mean performance over 5 runs. We measure the alignment with the held out labels (again, this is not a real life guarantee).
 
 ![local_model_comparison](media/ohev/local_model_comparison.png)
 
-Convinced, I deployed it to do post-hoc analysis of my exported chats. I did rolling-window-context aggregation, and picked two messages at a time to plot the findings. There were 20k messages.
+Next I deployed it to do post-hoc analysis of my exported chats. I did rolling-window-context aggregation, and picked two messages at a time to plot the findings. There were 20k messages.
 
 Here are my messages with respect to the other person’s:
 
