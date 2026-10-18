@@ -25,7 +25,7 @@ We will be dealing with proxies all the way down because messages are imperfect 
 
 My first idea was to synthetically generate a lot of conversations. I used GPT 6 Luna to pump out a few hundred conversations, then started reading them. It was simply a waste of tokens as the entire corpus was a caricature of flirting. All I found were variations of “just the two of us” phrases and awkward confessions.
 
-In search of a “high quality” dataset, I read a few papers on flirting styles, conversational pragmatics, and communication styles. Then I went to Reddit and started OCR-ing screenshots that I felt could be useful. I built a rubric using my findings. Each synthetic situation had variables like relationship history, familiarity, intention, reciprocity and competing explanations for the behavior (thanks to Reddit comments). I started with 60 examples, then manually audited them to use as a seed. At the end, I had 200 examples divided ~equally among romantic/platonic/ambiguous situations.
+In search of a “high quality” dataset, I read a few papers on flirting styles, conversational pragmatics, and communication styles. Then I went to Reddit and started OCR-ing screenshots that I felt could be useful. I built a rubric using my findings. Each synthetic situation had variables like relationship history, familiarity, intention, reciprocity and competing explanations for the behavior (thanks to Reddit comments). I started with 60 examples, then manually audited them to use as a seed. At the end, I had 200 examples divided ~equally among romantic, platonic and ambiguous situations.
 
 ## We need an eval
 
