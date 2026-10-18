@@ -11,7 +11,7 @@ I decided to throw compute and data into this heavyweight problem.
 
 Flirting is similar to an imperfect and incomplete information game, given the underlying preferences are private and whatever interaction we have is only a *partial* view of the situation. Additionally, meaning isn’t dependent upon the words themselves, things are dependent upon conversational context and what the speak is trying to accomplish. Nevertheless, getting nerd-snipped by linguistics barely helped me anytime.
 
-This is why I’ll be putting small local models into use.
+I wanted to put a few small local models to the test.
 
 ## Will it even work?
 
@@ -29,7 +29,7 @@ In search of a “high quality” dataset, I read a few papers on flirting style
 
 ## We need an eval
 
-We ought to have a “hard” eval now. I used GPT Sol to generate a few situations, then picked the ones I could not understand at all (even after using my heuristics). I used them to generate 50 high quality entires. Then I convinced (read: *forced*) a few friends, and made them attempt the eval (blindly) three times. I calibrated the keys using their input, and then let Qwen 3.5 4B attempt them multiple times. It correctly inferred ~32% of the situations. I am not particularly satisfied with the eval suite though.
+We ought to have an eval now. I used GPT Sol to generate a few situations, then picked the ones I could not understand at all (even after using my heuristics). I used them to generate 50 high quality entires. Then I convinced (read: *forced*) a few friends, and made them attempt the eval (blindly) three times. I calibrated the keys using their input, and then let Qwen 3.5 0.8B attempt them multiple times. It correctly inferred ~46% of the situations. I am not satisfied with the final eval suite though -- it still feels inadequate.
 
 ## It’s time to (post) train
 
@@ -46,11 +46,11 @@ result = ohev.<span class="code-function">judge</span>(
 
 ## Testing in the Wild
 
-I convinced (read: *forced*) a few friends to attempt the eval, and benchmarked a few small LMs (+ Sonnet 5.5 and Gemini 3). The  X-axis refers to their mean performance over 5 runs. We measure the alignment with the held out labels (not a real life guarantee).
+I convinced (read: *forced*) 4-5 friends to attempt the eval, and benchmarked a few small LMs (+ Sonnet 5.5 and Gemini 3). The  X-axis refers to their mean performance over 5 runs. We measure the alignment with the held out labels (not a real life guarantee).
 
 ![local_model_comparison](media/ohev/local_model_comparison.png)
 
-Convinced, I deployed it to do post-hoc analysis of my exported chats. I did rolling-window-context aggregation, and picked two messages at a time to plot the findings.
+Convinced, I deployed it to do post-hoc analysis of my exported chats. I did rolling-window-context aggregation, and picked two messages at a time to plot the findings. There were 20k messages.
 
 Here are my messages with respect to the other person’s:
 
