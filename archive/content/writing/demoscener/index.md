@@ -23,13 +23,13 @@ description: On the grammar of demoscenes and the possibilities of unfinished co
 
 <p>In linguistics, language is productive i.e. a finite vocabulary and a finite set of grammatical rules permit an <em>enormous</em> number of different expressions. Programming languages share this property too. Now let’s consider the aforementioned Dweets. They contain overlapping substrings, but their rendered results differ. Suppose you take a 140 character program, and remove its final 30 characters. Even with a hypothetical alphabet of just 64 character, there are almost 1.5 x 10^54 possible completion strings that can be formed. Almost all will be syntactically invalid or produce uninteresting results. Nevertheless, the number of possibilities is astronomical. </p>
 
-<p>It’s not humanly possible to enumerate all of them exhaustively. and it would be foolish to to generate and test all possible strings. However, the continuations of a partial program are not equally plausible.</p>
+<p>It’s not humanly possible to enumerate all of them exhaustively and it would be foolish to to generate and test all possible strings. However, the continuations of a partial program are not equally plausible.</p>
 
 <p>Given a partial program, certain characters and expressions are considerably more likely to follow than others. This is pretty much how autoregressive language models work. I wondered whether I could use such a model to sample plausible continuations of unfinished Dweets and visualize the different directions each program could have taken. </p>
 
 <p>And then, I could surgically delete substrings or mix-and-match them to my own aesthetic taste. </p>
 
-<p>I had also grown rather frustrated with my own ability to “finish” a demo after starting one, so having an autocomplete that understood the peculiar language of Dweeting rather looked like am appealing prospect to me.</p>
+<p>I had also grown rather frustrated with my own ability to “finish” a demo after starting one, so having an autocomplete that understood the peculiar language of Dweeting rather looked like an appealing prospect to me.</p>
 
 <p>Around the same time, I came across <a href="https://x.com/evilmathkid/status/2112509398883164162?a=roNzU625eISWnnvSnnU&amp;s=20">Mithil Vakde’s tweet</a> (you might have seen him on <a href="https://news.ycombinator.com/item?id=49519939">HackerNews</a> recently).</p>
 
