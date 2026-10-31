@@ -4,18 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reverse engineering the Qualcomm NPU compiler</title>
-<link rel="stylesheet" href="../../style.css?v=585513386">
+<meta name="description" content="An investigation into the Qualcomm NPU compiler, including VTCM placement and Hextimate.">
+<link rel="canonical" href="https://datavorous.com/writing/qairt/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Reverse engineering the Qualcomm NPU compiler">
+<meta property="og:description" content="An investigation into the Qualcomm NPU compiler, including VTCM placement and Hextimate.">
+<meta property="og:url" content="https://datavorous.com/writing/qairt/">
+<link rel="stylesheet" href="../../style.css?v=2997673050">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
 </head>
 <body>
-<nav class="top"><a href="../../index.html">Home</a><a href="mailto:datavorous.work@gmail.com">Email</a></nav>
+<nav class="top"><a href="../../index.html">Home</a><a href="mailto:hi@datavorous.com">Email</a></nav>
 <main><article>
-<header>
+<header class="article-header">
 <h1>Reverse engineering the Qualcomm NPU compiler</h1>
 <p class="dek">What I pulled out of a stripped QAIRT binary</p>
-<p class="meta">June 19, 2026 / datavorous</p>
+<p class="meta">June 19, 2026</p>
 </header>
-<p>My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. But NPU documentation on the web is basically nonexistent, and the little that's out there was so disappointing that at one point I thought of quitting - so I reverse engineered the compiler instead. I previously wrote a small primer on <a href="https://datavorous.github.io/writing/npu/">NPUs: what, and where they break</a>, it should be enough to understand for what's coming next.</p>
+<p>My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. But NPU documentation on the web is basically nonexistent, and the little that's out there was so disappointing that at one point I thought of quitting - so I reverse engineered the compiler instead. I previously wrote a small primer on <a href="https://datavorous.com/writing/npu/">NPUs: what, and where they break</a>, it should be enough to understand for what's coming next.</p>
 <p>For none of the SoC's did Qualcomm publish the memory capacity of VTCMs. How am I supposed to understand whether my tensors were spilling all over? Or whether quantisation is really needed? Add to that my curiousty to know how they simulate the working of a model even before it runs on the actual hardware, and which optimization algorithms are involved.</p>
 <p>I (equipped with <a href="https://claude.com/product/claude-code">Claude Code</a>) doubled down on the <code>*.so</code> files of <a href="https://www.qualcomm.com/developer/software/neural-processing-sdk-for-ai">QNPU SDK</a> (v2.46.0.260424), and banked on the unmangled names that survived stripping, the raw machine code decompiled with <a href="https://github.com/NationalSecurityAgency/ghidra">Ghidra</a>, and some empirical parameter sweeping on my Linux.</p>
 <p>Some of the novel findings are (no one has the attention span to read the entire writeup anyway):</p>
@@ -80,7 +86,7 @@ time = bytes/bandwidth
 <li>Precision is a knob the solver will pull whether you asked or not, hence quality can differ in actual hardware</li>
 <li><code>spillFillBufferSize</code> can be used a static fit/spill oracle</li>
 </ol>
-<p>Whether it directly helps anyone, or simply quenches anyone's curiousity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - <a href="mailto:datavorous.work@gmail.com">I'd like that</a>.</p>
+<p>Whether it directly helps anyone, or simply quenches anyone's curiousity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - <a href="mailto:hi@datavorous.com">I'd like that</a>.</p>
 <h2>Notes</h2>
 <p>The question is how much to trust it. The file (<code>libHtpPrepare.so</code>) was our sole target (x86_64 host build, QAIRT 2.46.0.260424). My previous RE attempts were easy/medium crackmes, not proprietary compilers, and this one was only possible with the help of Claude Code. Hence read every claim with that grain of salt. I will wait till I figure out all the legalities before publishing the steps I perfomed to get the insights.</p>
 <ol>
@@ -88,6 +94,8 @@ time = bytes/bandwidth
 <li>This is one SDK version of one binary. The numbers (the 33x DDR jump, the 5.46/33.9 MB spill/fill, the <code>spillFillBufferSize</code> verdicts) are reproducible on my box with Qualcomm's own tools as the oracle, but a different QAIRT release could reshuffle any of it.</li>
 <li>The binary is littered with names like <code>dp_tcm_threshold_selector</code>, <code>TCM_THRESH_75_predictor</code>, <code>special_mlp_features</code>, it really looks like as if there's a trained model in there choosing when to spill. There isn't, at least not in this binary. I could not find any weight matrix, no forward pass, nothing that smells like inference. <code>special_mlp_features</code> turned out to be a function that exports features to Python i.e. training data going out. The cost path is a plain CSV lookup table. So the learned part, if it exists, lives upstream at Qualcomm's training time and ships as a table. I could not prove a weight bearing model runs at compile time, and I'd bet against it</li>
 </ol>
-</article></main>
+</article>
+<nav class="article-back" aria-label="Writing"><a href="../">← Back to writing</a></nav>
+</main>
 </body>
 </html>

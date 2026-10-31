@@ -15,7 +15,7 @@
 
   <nav class="top">
     <a href="/">Home</a>
-    <a href="mailto:datavorous.work@gmail.com">Email</a>
+    <a href="mailto:hi@datavorous.com">Email</a>
   </nav>
 
   <article>
@@ -28,7 +28,7 @@
       <b>July to mid-August, 2026</b><br>
       <i>Working alongside a former OpenAI Evals Lead</i><br>
       1. Did literature review of various harnesses for scientific discovery with LMs, and built one for <b>small molecule drug design</b> dominating 4/5 task families in <a href="https://arxiv.org/abs/2605.21740">SMDD-Bench</a>.<br> 
-      2. Came up with a <a href="https://datavorous.github.io/writing/harness/">methodology to design harnesses</a> based on task topology and search control. <br>
+      2. Came up with a <a href="https://datavorous.com/writing/harness/">methodology to design harnesses</a> based on task topology and search control. <br>
       3. Independently discovered the concepts of "<a href="https://arxiv.org/abs/2603.28052">Meta Harness</a>", <a href="https://arxiv.org/abs/2508.10295v1">Inductive Bias</a> in LM prompts.<br>
       4. Mapped Bulk Synchronous Parallel, and other distributed computing concepts to our harness design. <br>
     </p>
@@ -36,8 +36,8 @@
       <b>May to July, 2026</b><br>
       <i>Summer research at <a href="https://ltrc.iiit.ac.in/">LTRC</a> (known for building India's first computational grammar model)</i><br>
       1. Did literature review of <a href="https://arxiv.org/abs/1901.02051">DPPNets</a>, and ran ablation experiments to turn it size agnostic.<br>
-      2. <a href="https://datavorous.github.io/writing/qairt/">Reverse engineered the compiler binary</a> of Qualcomm's QAIRT, and got approached by <a href="janjongboom.com/">Jan Jongboom</a> from Qualcomm Netherlands for the same. <br>
-      3. Published a <a href="https://datavorous.github.io/writing/npu/">technical writeup</a> on NPUs + why certain quantization formats fail, after a discussion with the founders of RunAnywhere (YC W26).
+      2. <a href="https://datavorous.com/writing/qairt/">Reverse engineered the compiler binary</a> of Qualcomm's QAIRT, and got approached by <a href="janjongboom.com/">Jan Jongboom</a> from Qualcomm Netherlands for the same. <br>
+      3. Published a <a href="https://datavorous.com/writing/npu/">technical writeup</a> on NPUs + why certain quantization formats fail, after a discussion with the founders of RunAnywhere (YC W26).
     </p>
     <p>
       <b>January to April, 2026</b><br>

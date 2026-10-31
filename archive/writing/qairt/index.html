@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex">
 <title>Reverse engineering the Qualcomm NPU compiler</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +19,7 @@
 
 <nav class="top">
 <a href="/">Home</a>
-<a href="mailto:datavorous.work@gmail.com">Email</a>
+<a href="mailto:hi@datavorous.com">Email</a>
 </nav>
 
 <h1 class="post-title">Reverse engineering the Qualcomm NPU compiler</h1>
@@ -27,7 +28,7 @@
 
 <article class="post-body">
 
-<p>My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. But NPU documentation on the web is basically nonexistent, and the little that's out there was so disappointing that at one point I thought of quitting - so I reverse engineered the compiler instead. I previously wrote a small primer on <a href="https://datavorous.github.io/writing/npu/">NPUs: what, and where they break</a>, it should be enough to understand for what's coming next.</p>
+<p>My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. But NPU documentation on the web is basically nonexistent, and the little that's out there was so disappointing that at one point I thought of quitting - so I reverse engineered the compiler instead. I previously wrote a small primer on <a href="https://datavorous.com/writing/npu/">NPUs: what, and where they break</a>, it should be enough to understand for what's coming next.</p>
 
 <p>For none of the SoC's did Qualcomm publish the memory capacity of VTCMs. How am I supposed to understand whether my tensors were spilling all over? Or whether quantisation is really needed? Add to that my curiousty to know how they simulate the working of a model even before it runs on the actual hardware, and which optimization algorithms are involved.</p>
 
@@ -129,7 +130,7 @@ time = bytes/bandwidth</code></pre>
   <li><code>spillFillBufferSize</code> can be used a static fit/spill oracle</li>
 </ol>
 
-<p>Whether it directly helps anyone, or simply quenches anyone's curiousity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - <a href="mailto:datavorous.work@gmail.com">I'd like that</a>.</p>
+<p>Whether it directly helps anyone, or simply quenches anyone's curiousity is a separate question in itself, but I got the answers I was unable to find everywhere. If you've done edge work on Hexagon and want to compare notes - or tell me where I'm wrong - <a href="mailto:hi@datavorous.com">I'd like that</a>.</p>
 
 <h2>Notes</h2>
 

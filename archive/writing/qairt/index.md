@@ -1,6 +1,6 @@
 # Reverse Engineering the Qualcomm NPU Compiler
 
-My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. The publicly available documentation on NPUs were so disappointing that at one point I thought of quitting. I previously wrote a small primer on [NPUs: what, and where they break](https://datavorous.github.io/writing/npu/), it should be enough to understand for what's coming next.
+My work is to maximise the usage of NPUs to make edge deployment faster for whatever models we want to run on them. The publicly available documentation on NPUs were so disappointing that at one point I thought of quitting. I previously wrote a small primer on [NPUs: what, and where they break](https://datavorous.com/writing/npu/), it should be enough to understand for what's coming next.
 
 For none of the SoC's did Qualcomm publish the memory capacity of VTCMs. How am I supposed to understand whether my tensors were spilling all over? Or whether quantisation is really needed? Add to that my curiousty to know how they simulate the working of a model even before it runs on the actual hardware, and which optimization algorithms are involved. 
 

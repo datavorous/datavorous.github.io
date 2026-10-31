@@ -1,0 +1,176 @@
+---
+title: Writing a Garbage Collector
+description: I wrote a mark and sweep garbage collector in Python
+date: October 21, 2025
+---
+
+<p>
+    On a boring saturday night, right after my midterm exams ended, I sat down with a strange urge to build a garbage collector from scratch. We all benefit from it, but most of us never question <i>how</i>. This is the summary of what I found, and what I understood.
+</p>
+<p>
+    If a program has no way to access a piece of memory anymore, that memory is garbage, so the garbage collector should reclaim it. In low level languages like C/C++, we allocate and free memory manually. If we forget to free memory, we leak it, or if we free the wrong thing, we crash. <br>
+    The GC automates this, so the programmer does not need to track memory lifetime, explicitly.<br>
+    Programs create tons of temporary objects, we only want to keep memory for data that is reachable and still needed. <br>
+    A GC asks two questions:<br>
+    1. What memory is still in use (reachable)?<br>
+    2. What can be freed safely (unreachable)?<br>
+</p>
+<p>
+    This blog is my dev-journal of understanding that system, starting from the original Mark-and-Sweep algorithm John McCarthy created for Lisp in 1959, and slowly building up a working GC of my own in Python.
+</p>
+<p>
+    I think to fully appreciate the brilliance of something, one needs to know the history of it.<br>Before diving into code, it helps to know where garbage collection actually came from. The idea is not modern, its origin goes all the way back to John McCarthy, the creator of Lisp in 1959. Lisp introduced dynamic data structures made of linked lists, but manual memory management quickly became a nightmare. He proposed a simple yet powerful idea that: <i>the system itself should detect unused objects and reclaim memory automatically</i>. His paper, <b>"Recursive Functions of Symbolic Expressions"</b> (1960), introduced what became the first widely known GC algorithm: Mark and Sweep.
+    From there things evolved gradually: <br>
+    1. 1959-60: Mark and Sweep (McCarthy): Trace reachable objects and delete others<br>
+    2. Early 60s: Reference counting (Colling et al.): keep a reference counter on each object<br>
+    3. Late 60s: Copying GC (Cheney, 1970): Move reachable data to a fresh space and compact it
+</p>
+<p>
+    Despite all the variations since then, the core principle has never changed.
+    Since the programs form object graphs, the rule becomes simple: whenever we can reach from the roots (globals, stack, and registers), must stay. Everything else can be collected.
+    <br><br>
+    That's exactly the model I used for my implementation. Now that the "why" and "where it came from" is clear, let's look at the "how" - starting with the basic blocks of the collector.<br><br>
+    The code can be found <a href="https://github.com/datavorous/garbage-collector-py">here</a>. Personally, diagrams make sense to me much faster than piles of syntax. So we will take that route.
+</p>
+<h2>The Building Blocks</h2>
+<p>
+    To simulate memory, I created a few simple structures:<br>
+</p>
+<p><strong>_Obj</strong> - This is like a node in a graph. It has an <code>id</code> (unique identifier), <code>value</code> (the actual data stored), <code>fields</code> (references to OTHER objects, like links in a graph), <code>marked</code> (used during GC to track 'I have been visited'), and <code>freed</code> (tracks if this object has been deleted).</p>
+<p><strong>ObjectRef</strong> - A wrapper that lets us safely reference objects. Nothing serious.</p>
+<p><strong>MarkSweepGC</strong> - This is the main class for memory management. It has a <code>heap</code> where all objects live (dictionary: id -> object), and <code>roots</code> which are objects that must NOT be garbage collected.</p>
+<h2>Creating Objects</h2>
+<p><img src="media/1.png" alt="initial objects"></p>
+<p>Before any collection happens, we need something in memory to work with. Using the GC’s <code>alloc()</code> function, we can create objects on the heap:</p>
+
+<pre><code class="language-python">gc = MarkSweepGC()
+
+obj_a = gc.alloc("Node A")
+obj_b = gc.alloc("Node B")
+obj_c = gc.alloc("Node C")
+obj_d = gc.alloc("Node D")
+
+print(gc.heap_snapshot())</code></pre>
+
+<pre><code class="language-none">HEAP size=4, ROOTS=[]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+<p>4 objects have been allocated, and each has got a unique ID (1,2,3,4). No roots yet, that means everything is eligible for garbage collection. NO fields yet too, so objects are all isolated.</p>
+<h2>Building Graph Structure</h2>
+<p><img src="media/2.png" alt="graph structure"></p>
+
+<pre><code class="language-python">gc.set_field(obj_a, "left", obj_b)
+gc.set_field(obj_a, "right", obj_d)
+gc.set_field(obj_b, "child", obj_c)
+
+print(gc.heap_snapshot())</code></pre>
+
+<pre><code class="language-none">HEAP size=4, ROOTS=[]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2, right -> #4])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+<p>Still no roots, if we run GC now, EVERYTHING gets deleted.</p>
+<h2>Marking a Root</h2>
+<p><img src="media/3.png" alt="marking root"></p>
+
+<pre><code class="language-python">gc.add_root(obj_a)
+print(gc.heap_snapshot())</code></pre>
+
+<pre><code class="language-none">HEAP size=4, ROOTS=[1]
+... rest remain same ...</code></pre>
+<p>Now object #1 (A) is a root. It's like saying "this is a global variable, don't delete it".</p>
+<h2>First Garbage Collection</h2>
+
+<pre><code class="language-python">gc.gc()
+print(gc.heap_snapshot())</code></pre>
+
+<pre><code class="language-none">HEAP size=4, ROOTS=[1]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2, right -> #4])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+<p>Things remain same. What happened when we called <code>gc()</code>?</p>
+<p><strong>MARK PHASE:</strong> We start at root A (id=1), mark it. A has fields: left -> B(2) and right -> D(4). Visit B, mark it. B has child -> C(3). We visit C, mark it. C has no children. Visit D, mark it. D has no children.</p>
+<p><strong>SWEEP PHASE:</strong> Check Object 1: marked? YES -> keep, reset mark. Check Object 2: marked? YES -> keep, reset mark. Check Object 3: marked? YES -> keep, reset mark. Check Object 4: marked? YES -> keep, reset mark.</p>
+<p>Everything reachable from root A(1) was kept.</p>
+<h2>Creating Garbage</h2>
+<p><img src="media/4.png" alt="creating garbage"></p>
+<p>We create an orphan that's NOT connected to any root. We remove the connection A -> D:</p>
+
+<pre><code class="language-python">gc.set_field(obj_a, "right", None)
+print(gc.heap_snapshot())</code></pre>
+
+<pre><code class="language-none">_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])
+_Obj #4 (val='Node D', marked=False, freed=False, fields=[])</code></pre>
+<p>Now we do garbage collection again:</p>
+
+<pre><code class="language-python">gc.gc()
+print(gc.heap_snapshot())</code></pre>
+
+<pre><code class="language-none">HEAP size=3, ROOTS=[1]
+_Obj #1 (val='Node A', marked=False, freed=False, fields=[left -> #2])
+_Obj #2 (val='Node B', marked=False, freed=False, fields=[child -> #3])
+_Obj #3 (val='Node C', marked=False, freed=False, fields=[])</code></pre>
+<p>D is gone, just like ...</p>
+<h2>Creating a Cycle</h2>
+<p><img src="media/5.png" alt="cycle 1"></p>
+<p><img src="media/6.png" alt="cycle 2"></p>
+<p>One of the key strengths of using mark-and-sweep over reference counting is that it can handle cyclic relations. Say, for A -> B -> C -> A (cycle): each object has a reference count > 0, so none get deleted even if unreachable from roots.</p>
+<p>Let's build a cycle:</p>
+
+<pre><code class="language-python">node_a = gc.alloc("A")
+node_b = gc.alloc("B")
+node_c = gc.alloc("C")
+gc.add_root(node_a)
+
+gc.set_field(node_a, "next", node_b)
+gc.set_field(node_b, "next", node_c)
+gc.set_field(node_c, "next", node_a)
+print(gc.heap_snapshot())</code></pre>
+<p>This cycle constitutes of the root (A(1)):</p>
+
+<pre><code class="language-none">HEAP size=3, ROOTS=[1]
+_Obj #1 (val='A', marked=False, freed=False, fields=[next -> #2])
+_Obj #2 (val='B', marked=False, freed=False, fields=[next -> #3])
+_Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])</code></pre>
+<p>Hence it is a <em>reachable</em> cycle, and if we run GC, all of them survive. We can trace through <code>_mark()</code>: starting at root A(1), is A marked? no. Mark A. A has field: next -> B(2), recursively call <code>_mark(B)</code>. At B(2), is B marked? no. Mark B. B has field: next -> C(3), recursively call <code>_mark(C)</code>. Same procedure. Back at A(1): is A marked? YES (BAM!), return immediately (to avoid infinite loop).</p>
+<p><img src="media/7.png" alt="unreachable cycle"></p>
+<p>Let's make an unreachable cycle, which will be collected:</p>
+
+<pre><code class="language-python">orphan_x = gc.alloc("X")
+orphan_y = gc.alloc("Y")
+orphan_z = gc.alloc("Z")
+
+gc.set_field(orphan_x, "next", orphan_y)
+gc.set_field(orphan_y, "next", orphan_z)
+gc.set_field(orphan_z, "next", orphan_x)
+print(gc.heap_snapshot())</code></pre>
+
+<pre><code class="language-none">HEAP size=6, ROOTS=[1]
+_Obj #1 (val='A', marked=False, freed=False, fields=[next -> #2])
+_Obj #2 (val='B', marked=False, freed=False, fields=[next -> #3])
+_Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])
+_Obj #4 (val='X', marked=False, freed=False, fields=[next -> #5])
+_Obj #5 (val='Y', marked=False, freed=False, fields=[next -> #6])
+_Obj #6 (val='Z', marked=False, freed=False, fields=[next -> #4])</code></pre>
+<p>Well, now if we run GC:</p>
+
+<pre><code class="language-python">gc.gc()
+print(gc.heap_snapshot())</code></pre>
+<p>The unreachable cycle gets removed:</p>
+
+<pre><code class="language-none">HEAP size=3, ROOTS=[1]
+_Obj #1 (val='A', marked=False, freed=False, fields=[next -> #2])
+_Obj #2 (val='B', marked=False, freed=False, fields=[next -> #3])
+_Obj #3 (val='C', marked=False, freed=False, fields=[next -> #1])</code></pre>
+<p><strong>MARK PHASE:</strong> We start at root A (id=1), mark it. A has fields: left -> B(2) and right -> C(3) (stops when hitting already-marked A(1)). X(4), Y(5), Z(6) are NEVER visited.</p>
+<p><strong>SWEEP PHASE:</strong> A, B, C all are marked, so keep. X, Y, Z none of them are marked, so all three of them get deleted.</p>
+<h2>Wrapping It Up</h2>
+<p>That's it.<br>
+    This toy implementation is intentionally simple. It runs in one thread, pauses the world, doesn’t handle fragmentation, and skips real-world optimizations like generations, compaction, or tri-color marking.<br>The next steps on this journey could be implementing a copying collector, adding generations, or experimenting with incremental "stop-less" GC, etc.<br><br>Maybe, someday...
+</p>

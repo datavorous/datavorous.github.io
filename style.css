@@ -8,7 +8,6 @@
   /* 16px reading text; 14–15px supporting text; 18/24/32px headings. */
   --text-body:1rem;--text-small:.875rem;--text-nav:.9375rem;
   --heading-page:2rem;--heading-section:1.5rem;--heading-subsection:1.125rem;
-  --heading-home:clamp(2.25rem,7vw,3rem);
   /* An 8px based spacing scale for page rhythm. */
   --space-1:.5rem;--space-2:1rem;--space-3:1.5rem;--space-4:2rem;--space-5:3rem;
 }
@@ -30,24 +29,35 @@ h1,h2,h3{font-family:var(--sans);font-weight:500;line-height:1.2;letter-spacing:
 h1{margin:0 0 var(--space-1);font-size:var(--heading-page)}
 h2{margin:var(--space-4) 0 var(--space-1);font-size:var(--heading-section)}
 h3{margin:var(--space-3) 0 var(--space-1);font-size:var(--heading-subsection)}
-.home h1{margin:0 0 var(--space-2);font-size:var(--heading-home);line-height:1;letter-spacing:-.035em}
 .dek{margin:var(--space-1) 0;color:var(--quiet)}
 .meta{margin:var(--space-1) 0 var(--space-4);color:var(--quiet);font:var(--text-small)/1.5 var(--sans)}
+.article-header{margin-bottom:var(--space-4)}
+.article-header h1{margin:0 0 var(--space-1)}
+.article-header .dek{margin:0 0 var(--space-1);font-size:var(--text-body);color:var(--quiet)}
+.article-header .meta{margin:0;color:var(--quiet);font:var(--text-small)/1.5 var(--sans)}
+.article-back{margin-top:var(--space-4);font:var(--text-small)/1.5 var(--sans)}
 .home p:nth-of-type(1){margin-bottom:var(--space-1);text-wrap:pretty}
-.home p:has(a[href^="mailto:"]){display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-2);margin-bottom:var(--space-3);font:var(--text-nav)/1.5 var(--sans)}
-.home p:has(a[href^="mailto:"]) a{white-space:nowrap}
-.home h2{margin:var(--space-4) 0 var(--space-1)}
 .home ol,.home ul{list-style:none;margin:var(--space-1) 0 var(--space-3);padding:0}
-.home li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-1) var(--space-2);align-items:baseline;margin:var(--space-1) 0;padding:0 0 0 var(--space-2);position:relative}
-.home li:before{content:"";position:absolute;left:0;top:.72em;width:.28rem;height:.28rem;border-radius:50%;background:var(--faint)}
+.home ul{list-style:disc;padding-left:var(--space-3)}
+.home li{margin:0;line-height:1.5}
 .date{color:var(--quiet);white-space:nowrap;font:var(--text-small)/1.4 var(--sans);font-variant-numeric:tabular-nums}
+.home li .date{display:block;margin:0;line-height:1.5;white-space:nowrap}
 article:not(.home) ol{padding-left:var(--space-3)}
 article:not(.home) ul{padding-left:var(--space-3)}
 article:not(.home) li{margin:var(--space-1) 0}
+article.writing-index ol{list-style:none;margin:0;padding:0}
+article.writing-index li{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--space-2);align-items:baseline;margin:0 0 var(--space-1)}
+.writing-index time{color:var(--quiet);font:var(--text-small)/1.5 var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap}
 article:not(.home) p:has(>img) img{max-height:520px}
 code,pre{font-family:var(--mono)}
 code{font-size:.9em}
 pre{overflow:auto;padding:var(--space-2);border:1px solid var(--rule);background:var(--wash);white-space:pre}
+pre .token.keyword,pre .token.boolean{color:#765a87}
+pre .token.class-name,pre .token.builtin,pre .token.constant{color:#45627b}
+pre .token.function{color:#3c6589}
+pre .token.string,pre .token.char{color:#54714b}
+pre .token.number{color:#8c693c}
+pre .token.comment{color:#747b79}
 .ohev-code{margin:var(--space-3) 0;padding:var(--space-2);border:1px solid var(--rule);border-radius:6px;background:#f8f9fb;color:var(--ink);font-size:.8125rem;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:2}
 .ohev-code code{font-size:inherit}
 .ohev-code .code-keyword{color:var(--visited);font-weight:600}
@@ -68,10 +78,9 @@ p.faded a:hover{color:var(--link-hover)}
 .export-list{margin:var(--space-1) 0;padding-left:var(--space-3)}
 .export-list .export-list{margin:var(--space-1) 0;padding-left:var(--space-3)}
 @media(max-width:640px){
+  :root{--text-body:.875rem;--text-small:.78125rem;--text-nav:.8125rem;--heading-page:1.625rem;--heading-section:1.25rem;--heading-subsection:1rem}
   body{padding:var(--space-4) var(--space-2) var(--space-5)}
   .top{margin-bottom:var(--space-4)}
-  .home li{display:block;padding-left:var(--space-2)}
-  .home li .date{grid-column:2}
   .date{display:block;margin-top:.05rem;white-space:normal}
   article:not(.home) p:has(>img) img{max-height:none}
   .problem-tuple div{grid-template-columns:1fr;gap:.05rem}

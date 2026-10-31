@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>On Designing a Harness for Scientific Discovery</title>
+<meta name="description" content="A draft on designing scientific agent harnesses for sparse feedback, expensive experiments, and open-ended discovery.">
+<link rel="canonical" href="https://datavorous.com/writing/harness/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="On Designing a Harness for Scientific Discovery">
+<meta property="og:description" content="A draft on designing scientific agent harnesses for sparse feedback, expensive experiments, and open-ended discovery.">
+<meta property="og:url" content="https://datavorous.com/writing/harness/">
+<link rel="stylesheet" href="../../style.css?v=2997673050">
+<link rel="stylesheet" href="harness.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
+<script defer src="harness.js"></script>
+</head>
+<body>
+<nav class="top"><a href="../../index.html">Home</a><a href="mailto:hi@datavorous.com">Email</a></nav>
+<main><article class="harness">
+<header class="article-header">
+<h1>On Designing a Harness for Scientific Discovery</h1>
+<p class="dek">A draft on designing scientific agent harnesses for sparse feedback, expensive experiments, and open-ended discovery.</p>
+</header>
+
+<p>Scientific agents have to be designed differently from the ones built for coding. Unlike the latter where feedback is dense and cheap, scientific experiments can be very expensive, feedback can be partial, and a plausible hypothesis may survive for a long time without being decisively tested. These can lead an agent to spend more and more compute refining the same representation, rationalising failed experiments, or producing several variations of the same underlying idea. More test-time compute would not necessarily result into a broader search of the solution space.</p>
+<p>For the last few months, we have been studying what harness design should look like in this regime. We wanted a system that could utilise sparse verification to the fullest and guide an agent to search unexplored territories, instead of wasting inference with no information gain over time. This would lead to better experiment selection and reuse of evidence in an intelligent manner.</p>
+<h2 id="cant-force-science-to-happen">Can’t force “science” to happen</h2>
+<p>We tried out various approaches in order to figure out how we may aid the agents. We started out with fixed workflows and progressively made the harness leaner to give agents more autonomy.</p>
+<h3 id="fixed-workflows-are-brittle">Fixed Workflows are Brittle</h3>
+<p>Initially, we made an agent pass through different phases like hypotheses generation, reflection and ranking. We wrapped the process like an evolutionary search, in order to select the best candidate after a few iterations. This harness performed poorly on small molecule drug discovery benchmark, as the agents kept on refining the same underlying ideas. We merely saw a rise in implementation diversity. The “self criticism” phase caused rationalisation of existing wrong assumptions only. Letting the agent rank its own hypotheses (in a tournament style) allowed no improvement, as it failed to decisively select the right candidate solution. Without any external anchor (eg. open web search or simulator feedback, the agent failed to hill climb, and only made the search deeper in the wrong exploratory basin.</p>
+<p>We had to counter a bunch of problems:</p>
+<ol>
+<li>Agents can’t back track reliably from their own initial assumptions, without an external cheap feedback. They get stuck in their localized idea basins.</li>
+<li>We had to prevent agents from overfitting on the given data, and make them trade immediate fit for a generalised solution.</li>
+</ol>
+<p>Unfortunately, adding more phases did not solve either problem.</p>
+<h3 id="breadth-without-continuity">Breadth without Continuity</h3>
+<p>We then tried out multi agent systems. We kept a scheduler (the ”main” agent), which would spawn different role based subagents in isolated workspaces. Often times, all of them would converge on the same set of solutions, so we provided an evaluation rubric to help the scheduler choose what’s needed to be done. This time, we saw that if correlation emerged in more than two lineages, the scheduler would collapse them into one, and create a new lineage to try out something different. This did improve breadth, and made the agents re-use failures as new information to adapt their search.</p>
+<p>We tested it on DiscoverPhysics benchmark, and found some of the models to perform 2-3% better. But when we tested it on AstraZeneca NMR dataset, it performed nearly 30% worse than a bare Codex agent.</p>
+<p>At this point, we assumed the harness itself was making the wrong decisions. So we added a Meta Harness, whose job was to inspect the traces and hill climb the harness design over time. It could modify prompts and coordination policies. After going through the traces, it identified that partial clues were scattered all around the isolated workspaces, and they never got synthesised — the agents could <em>generate</em> the right components for a correct solution, but could not <em>select</em> them. It then spawned an agent to utilise the frozen traces and artefacts, giving a 12% better performance than the Codex agent.</p>
+<p>This made us realise that if we force isolation (to preserve diversity), we lose continuity. The balance between the two would have to change across problems, as each requires a different search pattern.</p>
+<h3 id="adaptive-search-using-collaboration">Adaptive Search using Collaboration</h3>
+<p>The Meta Harness could not make useful evidence flow through the population while the experiment was still running; most of its interventions were post-failure repair.</p>
+<p>More importantly, hill climbing the harness would itself require a reliable progress signal. That simply pushed the original problem one level higher. If we <em>already</em> knew how to measure scientific progress cheaply enough to optimise the harness, we would have solved a large part of the experiment selection problem in the first place!</p>
+<p>By this point, we pin pointed the failure mode patterns which kept appearing:</p>
+<ol>
+<li>The search policy of the agent(s) should depend upon the task topology <a id="footnote-ref-1" href="#footnote-1" aria-label="Footnote 1">[1]</a></li>
+<li>Manually or agentically crafting them will not scale, and we won’t know whether it’d be the right way</li>
+</ol>
+<p>Everything pointed towards one direction, that is to let agents figure out what’s needed to be done. We pivoted hard, and built our swarm harness — <code>em</code>. We put each agent in their own sandboxes, provided the same tools and task, and let them communicate over a message board. This also lets us scale context horizontally, with agents maintaining separate reasoning histories while sharing useful evidence, and fresh contexts allowing the search to move beyond assumptions accumulated in earlier trajectories.</p>
+<h2 id="results">Results</h2>
+<p>We test whether additional test-time compute can be turned into higher experimental efficiency by broadening the search across diverse trajectories.</p>
+<p>We evaluate this on DiscoveryWorld <a id="footnote-ref-2" href="#footnote-2" aria-label="Footnote 2">[2]</a> with a swarm of twenty GPT-6 Luna agents, where they act as scientists inside a fictional world with unfamiliar rules. This forces them to move beyond prior knowledge and infer the underlying mechanisms by forming hypotheses, running experiments under a budget, and updating their beliefs from evidence.</p>
+<h3 id="scaling-sideways">Scaling Sideways</h3>
+<figure class="harness-figure scaling"><figcaption>DiscoveryWorld</figcaption><div id="scaling-figure" class="dynamic-figure"></div></figure>
+<p>Twenty researchers reached 50% completion with <strong>42% fewer experimental steps</strong>, and raised final completion from <strong>69.5% to 92.0%</strong>.</p>
+<h3 id="communication-isnt-enough">Communication isn’t Enough</h3>
+<figure class="harness-figure communication"><div id="communication-figure" class="dynamic-figure"></div></figure>
+<p>Independent sampling gave most of the initial gain. Communication alone did not help. The full harness reached <strong>84.1%</strong> experimental efficiency, but used <strong>25.5x</strong> the inference of a single agent. The harness only started paying off once communication was supported by persistent shared memory and a population level view of the swarm’s search.</p>
+<h3 id="can-it-transfer-to-material-science">Can it transfer to material science?</h3>
+<p>In order to test if the harness transfers to something grounded in actual computational material science, we evaluated it on MADE <a id="footnote-ref-4" href="#footnote-4" aria-label="Footnote 4">[4]</a>, which is a benchmark for testing agentic closed loop material discovery. Agents propose crystal structures, evaluate their stability using computational energy models, and use the feedback to decide what to explore next. We measure how many novel, stable materials are discovered and how different those discoveries are from one another.</p>
+<figure class="harness-figure made"><figcaption>MADE</figcaption><div id="made-figure" class="dynamic-figure"></div></figure>
+<p>The swarm harness explored 31% more chemical regions than a single researcher within 30 expensive oracle calls, and this gap widened to 43% as we doubled the number of calls. This broader exploration came at the cost of immediate discovery yield, with the swarm finding 7% fewer computationally stable structures than a single researcher. Single agent used 9.5x less inference tokens per task on average.</p>
+<p>This suggests that scaling sideways can expand the range of scientific possibilities investigated, even when broader exploration does not immediately translate into more discoveries.</p>
+<h2 id="what-emerged">What Emerged</h2>
+<p>We wanted to understand what actually let the harness turn more inference into better use of the experimental budget. Apart from observing roles emerge transiently from interaction, we share a few of our findings.</p>
+<h3 id="recombination">Recombination</h3>
+<p>We found agents actively recombining ideas across branches. Partial solutions from different agents became parents of later experiments rather than being discarded after failure.</p>
+<p>In one separate deployment, a passing candidate emerged through several rounds of recombination across <strong>four failed</strong> branches. No single branch produced the final solution independently.</p>
+<figure class="harness-figure lineage"><figcaption>SMDD</figcaption><div id="lineage-figure" class="dynamic-figure"></div></figure>
+<h3 id="memory-awareness">Memory &amp; Awareness</h3>
+<p>As the population grew, a large fraction of communication was spent on coordination. Agents repeatedly asked who had tried what, what the verifier returned, and which approaches had already failed. We moved this bookkeeping into a small shared memory layer called Lith, short for links and things. Lith avoids prescribing an ontology, and simply lets agents append entries, search prior work and link new work to existing entries.</p>
+<figure class="harness-figure lith"><figcaption>Lith</figcaption><div id="lith-figure" class="dynamic-figure"></div></figure>
+<p>In matched trials, Lith reduced conversational bookkeeping while preserving access to prior experimental evidence. Bookkeeping messages fell by about 19% in absolute count (from 11.7% to 7.2% of traffic), even as total message volume rose 32%. The growth came mainly from evidence sharing, which nearly doubled.</p>
+<p>But memory solved only half the problem. Agents could know what the swarm had already tried without knowing <em>where</em> the population was currently spending its effort. Multiple agents could still explore the same representation at once — which is a major problem in agent swarms.</p>
+<p>We therefore built Iris, a projection over Lith. It periodically compresses the swarm’s activity into a coarse population level view of where experiments and compute are accumulating and which parts of the search have stopped changing. Iris deliberately makes no recommendation about what agents should do next.</p>
+<p>The aim was to give each agent awareness of the swarm without giving any agent control over it. <a id="footnote-ref-3" href="#footnote-3" aria-label="Footnote 3">[3]</a></p>
+<h3 id="resource-allocation">Resource Allocation</h3>
+<p>As the swarm grew in size, access to the verifier became a shared resource problem. A few agents would repeatedly submit experiments and crowd out everyone else. Peers often told them to stop and implicitly developed norms around verifier usage, but those norms were not reliable enough.</p>
+<figure class="harness-figure resource"><figcaption>SMDD</figcaption><div class="figure-subtitle">Message board</div><div id="resource-figure" class="dynamic-figure" aria-live="off"></div></figure>
+<p>Hence, a harness intervention was needed.</p>
+<p>We tried per agent limits and cooldowns, but both were crude. We eventually moved to queues with leases and fair share access, so that no single process could consume the entire experimental budget.</p>
+<p>Queue capacity changed the behaviour of agents. With very little capacity, agents tended to submit one experiment and keep refining the same idea while waiting. With slightly more capacity, they maintained several experiments in flight and explored multiple branches at once. Some also used the waiting period to inspect or extend another agent’s work instead of continuing to refine their own branch.</p>
+<h2 id="limitations">Limitations</h2>
+<p>Our search for a general scientific harness continues, as several limitations remain.</p>
+<ol>
+<li>In our experiments, the advantage of swarms appeared mostly on harder problems where multiple search trajectories had time to diverge and combine. On shorter ones, coordination cost us.</li>
+<li>Communication <em>does</em> create convergence pressure. Giving the agents a population level awareness was our attempt to counter it, but we did not isolate its effect.</li>
+<li>Memory design, queue capacity and verifier access changes how agents search. We therefore cannot treat them as neutral infrastructure. They are part of the search policy itself.</li>
+</ol>
+<p>Our quantitative scaling result is not a universal claim about swarms. We have shown that, in this regime, additional inference can be converted into fewer experimental steps. Whether the same tradeoff holds across models, scientific domains and feedback structures remains an open question.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The more scientific structure we encoded, the more brittle the harness became across problems. Removing those assumptions often worked better. That brought us back to Sutton’s bitter lesson. Harnesses may face the same pressure as learning systems. What scales with computation tends to outlive what we try to encode manually.</p>
+<p>So we stopped forcing structure, and let emergence talk.</p>
+<div class="footnotes" role="doc-endnotes" aria-label="Footnotes"><p><a id="footnote-1" href="#footnote-ref-1" aria-label="Back to footnote 1 reference">[1]</a> By <em>task topology</em>, we mean the structure of the search problem consisting of feedback density, search geometry, evaluation cost, horizon, constraints, and whether the representation itself may need to change.</p>
+<p><a id="footnote-2" href="#footnote-ref-2" aria-label="Back to footnote 2 reference">[2]</a> We exclude DiscoveryWorld’s linguistic interpretation task from this evaluation.</p>
+<p><a id="footnote-3" href="#footnote-ref-3" aria-label="Back to footnote 3 reference">[3]</a> Prior work suggests that team performance depends strongly on information flow and awareness of distributed reasoning. Iris was motivated by this idea, but we did not independently ablate its causal contribution.</p>
+<p><a id="footnote-4" href="#footnote-ref-4" aria-label="Back to footnote 4 reference">[4]</a> We measured discovery using MADE’s mSUN metric, which counts unique, novel crystal structures predicted to be stable, and exploration by averaging the number of distinct chemical regions tested across runs.</p></div>
+<footer class="article-footer"><p>Filed under: Research</p><p>Author: Sagnik Bhattacharjee</p></footer>
+</article>
+<nav class="article-back" aria-label="Writing"><a href="../">← Back to writing</a></nav>
+</main>
+</body>
+</html>

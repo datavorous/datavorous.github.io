@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 set -eu
 
-content_dir="${1:-content}"
+content_dir="${1:-archive/content}"
 output_dir="${2:-.}"
 stylesheet="style.css"
 css_version="$(cksum "$stylesheet" | awk '{print $1}')"
 
 content_dir="${content_dir%/}"
 output_dir="${output_dir%/}"
-[ -n "$content_dir" ] || content_dir="content"
+[ -n "$content_dir" ] || content_dir="archive/content"
 [ -n "$output_dir" ] || output_dir="."
 
 if [ ! -d "$content_dir" ]; then
@@ -76,7 +76,7 @@ filter_html() {
     -e 's/href="github\.com\//href="https:\/\/github.com\//g' \
     -e 's/href="substack\.com\//href="https:\/\/substack.com\//g' \
     -e 's/href="linkedin\.com\//href="https:\/\/linkedin.com\//g' \
-    -e 's/href="datavorous\.github\.io\//href="https:\/\/datavorous.github.io\//g' |
+    -e 's/href="datavorous\.com\//href="https:\/\/datavorous.com\//g' |
     sed -E \
       -e 's#<li>(<a href="[^"]+">[^<]+</a>) \(([A-Z][a-z]+ [0-9]{1,2}, [0-9]{4})\)</li>#<li>\1 <span class="date">(\2)</span></li>#' \
       -e 's#<li>(<a href="[^"]+">[^<]+</a>) ([A-Z][a-z]+ [0-9]{1,2}, [0-9]{4})</li>#<li>\1 <span class="date">\2</span></li>#'
@@ -101,11 +101,16 @@ render_page() {
   date="$(field date "$src")"
   author="$(field author "$src")"
   image="$(field image "$src")"
+  description="$(field description "$src")"
+  canonical_url="https://datavorous.com/${rel%index.md}"
+  og_type="website"
+  case "$rel" in writing/*/index.md) og_type="article" ;; esac
   title_html="$(html_escape "$title")"
   subtitle_html="$(html_escape "$subtitle")"
   date_html="$(html_escape "$date")"
   author_html="$(html_escape "$author")"
   image_html="$(html_escape "$image")"
+  description_html="$(html_escape "$description")"
   has_front_matter=0
   case "$(sed -n '1p' "$src")" in
     ---) has_front_matter=1 ;;
@@ -121,28 +126,57 @@ render_page() {
     printf '<meta charset="utf-8">\n'
     printf '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
     printf '<title>%s</title>\n' "$title_html"
+    printf '<meta name="description" content="%s">\n' "$description_html"
+    printf '<link rel="canonical" href="%s">\n' "$canonical_url"
+    printf '<meta property="og:type" content="%s">\n' "$og_type"
+    printf '<meta property="og:title" content="%s">\n' "$title_html"
+    printf '<meta property="og:description" content="%s">\n' "$description_html"
+    printf '<meta property="og:url" content="%s">\n' "$canonical_url"
     printf '<link rel="stylesheet" href="%s">\n' "$css_href"
     printf '<script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>\n'
+    if is_home "$src"; then
+      printf '<meta name="google-site-verification" content="RM0Usoor9mkR_B6WmiJ-G83wdgVEesVfr3Z_ET0CRPs" />\n'
+    fi
+    case "$rel" in
+      writing/raytracer/index.md|writing/garbage-collector/index.md)
+        printf '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>\n'
+        printf '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>\n'
+        ;;
+    esac
     printf '</head>\n'
     printf '<body>\n'
     if is_home "$src"; then
       printf '<main><article class="home">\n'
     else
-      printf '<nav class="top"><a href="%s">Home</a><a href="mailto:datavorous.work@gmail.com">Email</a></nav>\n' "$home_href"
-      printf '<main><article>\n'
-      if [ "$has_front_matter" -eq 1 ]; then
-        printf '<header>\n'
+      printf '<nav class="top"><a href="%s">Home</a><a href="mailto:hi@datavorous.com">Email</a></nav>\n' "$home_href"
+      if [ "$rel" = "writing/index.md" ]; then
+        printf '<main><article class="writing-index">\n'
+      else
+        printf '<main><article>\n'
+      fi
+      if [ "$has_front_matter" -eq 1 ] && [ "$rel" != "writing/index.md" ]; then
+        case "$rel" in
+          writing/*/index.md) printf '<header class="article-header">\n' ;;
+          *) printf '<header>\n' ;;
+        esac
       printf '<h1>%s</h1>\n' "$title_html"
       if [ -n "$subtitle" ]; then
         printf '<p class="dek">%s</p>\n' "$subtitle_html"
       fi
-      if [ -n "$date" ] || [ -n "$author" ]; then
-        printf '<p class="meta">'
-        [ -z "$date" ] || printf '%s' "$date_html"
-        [ -z "$date" ] || [ -z "$author" ] || printf ' / '
-        [ -z "$author" ] || printf '%s' "$author_html"
-        printf '</p>\n'
-      fi
+      case "$rel" in
+        writing/*/index.md)
+          [ -z "$date" ] || printf '<p class="meta">%s</p>\n' "$date_html"
+          ;;
+        *)
+          if [ -n "$date" ] || [ -n "$author" ]; then
+            printf '<p class="meta">'
+            [ -z "$date" ] || printf '%s' "$date_html"
+            [ -z "$date" ] || [ -z "$author" ] || printf ' / '
+            [ -z "$author" ] || printf '%s' "$author_html"
+            printf '</p>\n'
+          fi
+          ;;
+      esac
       if [ -n "$image" ]; then
         printf '<img class="hero" src="%s" alt="%s">\n' "$image_html" "$title_html"
       fi
@@ -150,7 +184,12 @@ render_page() {
       fi
     fi
     printf '%s\n' "$body"
-    printf '</article></main>\n'
+    case "$rel" in
+      writing/*/index.md)
+        printf '</article>\n<nav class="article-back" aria-label="Writing"><a href="../">← Back to writing</a></nav>\n</main>\n'
+        ;;
+      *) printf '</article></main>\n' ;;
+    esac
     printf '</body>\n'
     printf '</html>\n'
   } > "$out"

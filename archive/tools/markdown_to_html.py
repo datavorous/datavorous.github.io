@@ -12,7 +12,7 @@ from pathlib import Path
 
 NAV = """  <nav class="top">
     <a href="/">Home</a>
-    <a href="mailto:datavorous.work@gmail.com">Email</a>
+    <a href="mailto:hi@datavorous.com">Email</a>
   </nav>"""
 
 

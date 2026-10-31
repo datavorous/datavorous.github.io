@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://datavorous.github.io/</loc>
-    <lastmod>2026-09-01</lastmod>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://datavorous.com/</loc></url>
+  <url><loc>https://datavorous.com/writing/</loc></url>
+  <url><loc>https://datavorous.com/writing/qairt/</loc></url>
+  <url><loc>https://datavorous.com/writing/npu/</loc></url>
+  <url><loc>https://datavorous.com/writing/raytracer/</loc></url>
+  <url><loc>https://datavorous.com/writing/garbage-collector/</loc></url>
+  <url><loc>https://datavorous.com/writing/ohev/</loc></url>
+  <url><loc>https://datavorous.com/writing/fernweh/</loc></url>
+  <url><loc>https://datavorous.com/writing/unvibecodable/</loc></url>
+  <url><loc>https://datavorous.com/writing/ml/</loc></url>
+  <url><loc>https://datavorous.com/writing/human/</loc></url>
+  <url><loc>https://datavorous.com/writing/2026/</loc></url>
+  <url><loc>https://datavorous.com/writing/impermanence/</loc></url>
 </urlset>
