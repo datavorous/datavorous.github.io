@@ -197,7 +197,7 @@ render_page() {
   printf '%s -> %s\n' "$src" "$out"
 }
 
-find "$content_dir" -type f ! -name '*.md' ! -name '*.html' ! -name 'convert.sh' -print | while IFS= read -r asset; do
+find "$content_dir" -type f ! -name '*.md' ! -name 'convert.sh' -print | while IFS= read -r asset; do
   rel="${asset#"$content_dir"/}"
   mkdir -p "$output_dir/$(dirname "$rel")"
   cp "$asset" "$output_dir/$rel"

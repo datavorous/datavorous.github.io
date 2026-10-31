@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What I learned trying to break a single GPU with mixed traffic</title>
+<meta name="description" content="Not all inference optimizations are worth your bucks">
+<link rel="canonical" href="https://datavorous.com/writing/lm-inference/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="What I learned trying to break a single GPU with mixed traffic">
+<meta property="og:description" content="Not all inference optimizations are worth your bucks">
+<meta property="og:url" content="https://datavorous.com/writing/lm-inference/">
+<link rel="stylesheet" href="../../style.css?v=3110169138">
+<link rel="stylesheet" href="article.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="e63babdf-cd85-4481-ba03-cebb2ac1e44b"></script>
+</head>
+<body>
+<nav class="top"><a href="../../index.html">Home</a><a href="mailto:hi@datavorous.com">Email</a></nav>
+<main>
+<header class="article-header">
+<h1>What I learned trying to break a single GPU with mixed traffic</h1>
+<p class="dek">Not all inference optimizations are worth your bucks</p>
+<p class="meta">Jun 2026</p>
+</header>
+<article class="post-body">
+
+<p>Most inference posts pick a shiny optimization, run it against a vague benchmark, and report a percentage. I want to go the other way.</p>
+
+<p>Last weekend, while talking with <a href="https://x.com/anand_404">Tanay</a> from Sarvam AI, I first came across this phrase: "token factory". Now, sitting in a lab full of idle GPUs, I got this idea to simulate different workload profiles for different "token factories".</p>
+
+<p>Not every optimization helps every workload. For a company which deals only with RAG and summarisation, I would not bother with speculative decoding. Similarly for something like Character AI, with short conversations as the main goal, I would focus heavily on optimizing the decode stage.</p>
+
+<p>I couldn't find any case-by-case study on this exact topic, so I tried to do it myself.</p>
+
+<h2>The setup</h2>
+
+<p>A single RTX 6000 Ada for now, running vLLM. We will be serving <a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct">Qwen2.5-14B-Instruct</a> with an 8k context window and at 90% GPU memory utilization. I created a small harness using Claude Code to make it easier to iterate between configurations, launch experiments, and collect metrics, along with a workload generator that produces four request classes: SISO (short input, short output), SILO (short input, long output), LISO (long input, short output), and LILO (long input, long output).</p>
+
+<p>For the baseline, I wanted something resembling a busy Monday morning. Requests arrive according to a Poisson process at 32 requests/sec, with up to 128 concurrent requests in flight. The workload is intentionally mixed - hundreds of short chat style requests, long form summarization jobs, code generation heavy prompts, and long context generation tasks all competing for the same GPU. Now we can observe which bottlenecks emerge naturally under realistic pressure.</p>
+
+<img src="img/screenshots/config.png" alt="config yaml structure for the experiment harness">
+
+<p>I use a <code>config.yaml</code> file to carry out my experiments. The default <code>run:</code> block is overridden under the <code>experiments:</code> block. In this case, the baseline is just the defaults plus a few key overrides (Poisson at 32 RPS, 128 concurrent). Sweep mode exists in the harness but the baseline doesn't touch it.</p>
+
+<p>This whole setup is a proxy. Real production traffic is unavailable and would be unrepeatable anyway. The shape of the curves and the relative effect of each optimization will transfer to a similarly configured production environment, it'd be just the deltas.</p>
+
+<h2>The eyes they never lie, except when they do.</h2>
+
+<p>The first thing I did after the baseline run was build the heatmap of prompt tokens against completion tokens, expecting four neat clusters at the four corners of the workload.</p>
+
+<img src="img/image 1.png" alt="heatmap of prompt tokens vs completion tokens">
+
+<p>Look at the title. The heatmap draws roughly a fifth of the requests the run actually sent. The other four-fifths are not in the picture because the y axis is completion tokens and a request that never completed has no value to place there. So they vanish from the figure entirely. Looking at where the density lives, the only region that read as a real distribution is the SISO cluster at the bottom-left, while the others are pretty scattered.</p>
+
+<p>Now this is lowkey survivorship bias. I wanted to see how many survived and how many did not, so I plotted completed and failed requests together against input token length.</p>
+
+<img src="img/image 2.png" alt="completed vs failed requests by input token length">
+
+<p>Roughly four out of every five requests offered to this server did not come back. And the failure percentage points all hover around 78 to 81%. Uniformity...what can that mean?</p>
+
+<p>One hypothesis is that, if the server were doing anything intelligent under pressure (say fair share scheduling, biased toward cheap requests) i.e. anything intelligent under pressure which <em>could have</em> prioritized one shape over another then things could have looked different.</p>
+
+<p>Things are flat because the scheduler, when it runs out of room, is not choosing. Requests arrive faster than the server can finish them, so they pile up in vLLM's waiting queue. The scheduler tried to admit as many as fit in KV memory, the KV fills, the scheduler has to preempt already-running sequences to make room for new ones, the preempted sequences go back to the queue to be recomputed later, and the loop continues until the client times out. As nothing is being chosen against, the damage falls on everything.</p>
+
+<div class="callout">
+  <div class="callout-body">
+    <p>The vLLM scheduler does ship a priority based policy that would preempt the <i>lowest</i> priority running request instead of just popping whatever sits at the back of the queue, but it requires clients to pass a non standard <code>priority</code> field on every request, and no off the shelf OpenAI compatible client does that. What you get is the FCFS behaviour I just described.</p>
+    <img src="img/image 3.png" alt="vllm scheduler fcfs behavior diagram">
+  </div>
+</div>
+
+<p>What this gives us, at the close of the diagnostic stage, is a sense of where each of the four traffic shapes will need attention.</p>
+
+<p>SISO loses most of its requests despite each one being trivially small to serve, which means the bottleneck for short traffic is the queue. SILO loses most of its requests with the longest output bins dying most, which means the bottleneck there is decode throughput per stream. LISO loses most of its requests with the longest input bins dying most, which means the bottleneck is prefill cost. LILO loses most of its requests for both reasons at once.</p>
+
+<p>These are the four hypotheses which I will be testing, but before that we need to define what counts as "good". We need to know what this hardware should be capable of because an honest optimization story needs to know <b>how close we are</b> to them.</p>
+
+<h2>What counts as good</h2>
+
+<p>Throughput is the number which every inference benchmark reports, and (if I understand correctly) is the easiest to lie with. Instead, the honest metric is goodput. <a href="https://bentoml.com/llm/llm-inference-basics/llm-inference-metrics#goodput">BentoML</a> explains it aptly:</p>
+
+<img src="img/image 4.png" alt="goodput definition from bentoml">
+
+<p>The SLOs for the rest of this post I will keep deliberately generous such that our otherwise good optimizations are not accidentally invalidated.</p>
+
+<p>SISO: TTFT &lt;5s. SILO: ITL P95 &lt;250ms. LISO: TTFT &lt;5s. LILO: ITL P95 &lt;250ms.</p>
+
+<p>The disaster baseline's goodput against these SLOs is close to 0. Moreover, I came across Gil Tene's presentation on coordinated omission (slides <a href="https://www.slideshare.net/slideshow/how-not-to-measure-latency-london-oct-2013/27088981">here</a>) during my research and I think they are worth mentioning here.</p>
+
+<p>In simple words, under overload, even the load generator can fall behind schedule. Measuring latency from when a request actually left the client hides the time the user was already waiting, so we measure from when the request was <em>supposed</em> to be sent.</p>
+
+<p>Similarly, the beginning and end of a load test contain startup and shutdown effects that do not reflect normal operation. We therefore compute percentiles only over the stable middle portion of the run.</p>
+
+<img src="img/image 5.png" alt="stable window for latency measurement">
+
+<div class="callout">
+  <div class="callout-body">
+    <p>A later audit found two bugs: latency is measured from actual send time, not the intended Poisson arrival time, and per profile %iles skip the stable window trim. Both make the absolute numbers in this post optimistic. The relative ordering of optimizations is unaffected. Fix is in the followup.</p>
+  </div>
+</div>
+
+<h2>What this hardware should actually do</h2>
+
+<p>All references were taken from Nvidia's <a href="https://images.nvidia.com/aem-dam/en-zz/Solutions/technologies/NVIDIA-ADA-GPU-PROVIZ-Architecture-Whitepaper_1.1.pdf">Ada architecture whitepaper</a> (pages 28-30 are relevant).</p>
+
+<img src="img/image 6.png" alt="nvidia rtx 6000 ada specs table">
+
+<p>We get a BF16 dense tensor compute of 364.2 TFLOPS, memory bandwidth of 960 GB/s, and 48GB of VRAM.</p>
+
+<p>There is the prefill phase, and there's the decode one. Prefill is compute bound, and most of the computations are in the form of GEMMs. With our model (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct">Qwen2.5-14B</a>), we would need roughly 28 GFLOPs per prompt token (2 * params * tokens). That gives us the theoretical prefill ceiling of around 13k toks/s <em>before</em> overhead.</p>
+
+<p>Decode is memory bound. It's just a matrix-vector op (GEMV) with nearly zero arithmetic intensity. The bottleneck is entirely consumed by streaming ~28 GB of weights across the bus for every single token. Dividing 960 GB/s by 28 GB caps a single stream at ~34 tokens/sec (<a href="https://images.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf">Nvidia Ada whitepaper</a>), which is the upper bound before KV reads, attention compute, and kernel launch overhead are accounted for. The only way to save throughput here is batching.</p>
+
+<img src="img/image 7.png" alt="kv cache memory layout and sizing">
+
+<p>Coming back to KV cache, every active sequence holds a key value tensor of roughly 196kb per token. After vLLM loads ~28 GB of BF16 weights and reserves overhead, ~15-17GB of the 48GB is left. That's around 80k to 90k KV tokens in flight.</p>
+
+<p>Now an average LILO holds around 3,000 KV tokens at steady state, meaning just 25 concurrent requests would completely use up our ~80k token budget. This is why our physical memory caps our effective concurrency at ~28 before pinning KV at 100%. That's why the baseline collapsed! The card simply lacks the memory depth to hold this many long context requests at once. vLLM's actual KV budget after framework overhead lands closer to 57k tokens, which is what shows up in the experiments below.</p>
+
+<h2>Predictions before measuring</h2>
+
+<p class="dim">Some of them failed after I ran the experiments on real hardware.</p>
+
+<ol>
+  <li>If we use prefix caching then the cache would be storing KV blocks for token sequences it has seen and would reuse them on subsequent requests that start the same way, skipping the prefill GEMM for the shared portions. LILO and LISO should have their TTFT drop substantially (as long prompts overlap due to their code file corpus), and SISO and SILO would barely move.</li>
+  <li>Chunked prefill in here would break prefills into pieces and interleave them with decode steps. A large token prefill on the baseline would be monopolizing the GPU for over a second, starving every other request's decode. I am predicting that LISO/LILO TTFT would improve dramatically, SISO would improve indirectly, and SILO would get slightly worse.</li>
+  <li>Quantization (AWQ to 4bit) would roughly quarter weight memory and should double decode throughput, as each step will read a fraction of the bytes from the HBM. SILO and LILO are direct beneficiaries. Similarly SISO would benefit indirectly. LISO would benefit least for being prefill bound.</li>
+  <li>Stacking multiple methods (chunked prefill + AWQ) i.e. stacking two known good levers to see if they compose well. Perhaps the best for LILO.</li>
+</ol>
+
+<p>I have intentionally scoped down my experiments to these 4 cases, otherwise the post will be longer than my will to live.</p>
+
+<h2>Prefix caching</h2>
+
+<p>I turned on automatic prefix caching, left every other variable identical to the baseline, and reran. Overall, the completion rate rose from 21% to 75%, and throughput increased 4.6x.</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>Baseline</th><th>Cache on</th></tr></thead>
+  <tbody>
+    <tr><td>Completion rate</td><td>21%</td><td><strong>75%</strong></td></tr>
+    <tr><td>Throughput</td><td>144 tok/s</td><td><strong>661 tok/s</strong></td></tr>
+    <tr><td>P50</td><td>40.9 s</td><td><strong>4.5 s</strong></td></tr>
+    <tr><td>Cache hit rate</td><td>-</td><td><strong>71.60%</strong></td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <div class="callout-body">
+    <p>Throughput increased 4.6x - I would like to be very careful with this claim. Prefix caching skips prefill work for tokens it has seen before. More requests fit through, so aggregate output goes up. No individual stream is generating tokens faster. The 4.6x is the <i>system breathing again</i>, not a decode speedup (<a href="https://github.com/vllm-project/vllm/blob/469f3dcf/benchmarks/benchmark_prefix_caching.py#L4">benchmark</a>, <a href="https://github.com/vllm-project/vllm/blob/469f3dcf/docs/design/prefix_caching.md?plain=1#L1">design doc</a>).</p>
+  </div>
+</div>
+
+<p>What the cache is actually catching is the file bodies in the LISO and LILO corpus, being reused across requests after the model sees each file once. With five source files in the corpus and a few hundred requests drawing from them, every file ends up cached after a few sightings, and the rest of the requests effectively skip the expensive prefill entirely - which is exactly the workload that prefix caching is designed for: document QA, code review, RAG style workloads where the same content reoccurs across many user queries.</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>Baseline (s)</th><th>Cache on (s)</th><th>Speedup</th></tr></thead>
+  <tbody>
+    <tr><td>SISO</td><td>56.6</td><td><strong>4.67</strong></td><td><strong>12x</strong></td></tr>
+    <tr><td>SILO</td><td>35.5</td><td><strong>4.56</strong></td><td><strong>7.8x</strong></td></tr>
+    <tr><td>LISO</td><td>22</td><td><strong>4.4</strong></td><td><strong>5x</strong></td></tr>
+    <tr><td>LILO</td><td>38.1</td><td><strong>3.92</strong></td><td><strong>9.7x</strong></td></tr>
+  </tbody>
+</table>
+
+<p>The surprise was in the profile breakdown though. I predicted that LISO and LILO would benefit most, since they were the profiles with the long shared prefixes, and they did benefit, but SISO benefited <em>more</em>.</p>
+
+<img src="img/prefix_surprise.png" alt="per-profile ttft speedup with prefix caching">
+
+<p>Which made no sense if you assume the cache is only helping the profiles whose prompts it can actually reuse. It took me a minute to see the most plausible (causal?) explanation. The timing is consistent with SISO sitting in vLLM's waiting queue behind LISO and LILO requests whose long prefills were monopolizing the GPU: in the baseline, SISO's TTFT P50 is 56.6s despite a median prompt of 83 tokens, while LISO's TTFT P50 is 21.9s with a median prompt of 1440 tokens. From there we can see that a 17x shorter request waiting 2.6x longer for first token is hard to explain without queue contention. Turning on the cache made LISO and LILO prefills largely disappear (73.7% cache hit rate), and SISO TTFT dropped to 4.67s. The bottleneck for the cheap profiles was most likely the expensive profiles' prefill cost. The per profile queue time (vLLM's <code>vllm:request_queue_time_seconds</code> split by request tag) would confirm this directly.</p>
+
+<h2>Chunked prefill</h2>
+
+<p>As we saw earlier, a long prefill monopolizes the GPU until it's done, during which every other request's decode is frozen. Chunked prefill breaks the prefill into pieces (in this case I tried it with 2048 tokens at a time) and interleaves them with decode steps for in flight requests. That makes a 4000 token prefill become two chunks with decode work happening in between.</p>
+
+<p>I expected this to improve LISO/LILO TTFT (their prefills no longer block others), improve SISO indirectly (it stops queuing behind those prefills), and mildly hurt SILO ITL (its decode now shares the GPU with prefill chunks of other requests).</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>Baseline</th><th>Chunked prefill</th></tr></thead>
+  <tbody>
+    <tr><td>Completion rate</td><td>21%</td><td>32%</td></tr>
+    <tr><td>Throughput</td><td>144</td><td>251</td></tr>
+    <tr><td>TTFT P50</td><td>40.9 s</td><td>188 s</td></tr>
+    <tr><td>ITL P50 (SISO)</td><td>182 ms</td><td><strong>101 ms</strong></td></tr>
+    <tr><td>ITL P50 (LILO)</td><td>216 ms</td><td><strong>111 ms</strong></td></tr>
+    <tr><td>Preemptions</td><td>262</td><td>412</td></tr>
+  </tbody>
+</table>
+
+<p>The metric I predicted it would show up in was wrong, though the mechanism I predicted was partially right.</p>
+
+<p>Chunked prefill spreads each prefill across multiple scheduler iterations, which keeps decode progressing instead of freezing it. But it also means any individual request's prefill takes longer wall clock time to complete, because it's now competing with decode for slots. TTFT got worse because the cost of slicing appears to have exceeded the benefit of unblocking at this arrival rate. Chunked prefill is designed to let new requests start sooner instead of waiting behind a monolithic prefill, but at sustained overload, every request pays the slicing tax and only some of them benefit from the unblocking. ITL improved because no single prefill can monopolize the GPU anymore, so decode steps come out more regularly.</p>
+
+<p>The throughput number counts both prefill and decode tokens. Chunked prefill spreads prefill work across more iterations, so per-iteration token counts go up while per-request wall-clock latency goes up too. The aggregate metric and the per-user metric are measuring different things.</p>
+
+<p>If I only looked at TTFT, I would probably call this a regression. If I only looked at aggregate throughput, I would probably call it an improvement. Preemptions also rose from 262 to 412 because chunked prefill keeps more prefills concurrently in flight instead of serializing them, which raises sustained KV pressure and triggers more preemptions.</p>
+
+<p>KV usage still sits at 100%. Chunked prefill, like caching before it, is now changing how the scheduler spends that budget.</p>
+
+<h2>Quantization, with a surprise</h2>
+
+<p>Decode is memory-bandwidth-bound, so if weights go from BF16 to 4 bit (<a href="https://huggingface.co/Qwen/Qwen2.5-14B-Instruct-AWQ">Qwen2.5-14B-Instruct-AWQ</a>), each decode step should have to pull roughly a quarter of the bytes from HBM. You don't quite get a 4x speedup because dequantization still exists, but nearly 2x improvement in single stream decode didn't seem unreasonable. The other thing I expected was that the smaller weights would leave a lot more VRAM available for KV. On this setup, that should have been almost comically helpful because the workload is visibly KV bound. In practice, the in flight KV budget jumps from around 57k tokens to 171k tokens.</p>
+
+<p>The freed VRAM did get handed back to the KV pool, the budget really did triple, and preemptions dropped from 262 to 132 because the scheduler could now afford to keep more sequences resident instead of constantly evicting and re-admitting them.</p>
+
+<table>
+  <thead><tr><th></th><th>Baseline (BF16)</th><th>AWQ (INT4)</th></tr></thead>
+  <tbody>
+    <tr><td>Completion rate</td><td>21%</td><td>34%</td></tr>
+    <tr><td>Throughput</td><td>144 tok/s</td><td>189 tok/s</td></tr>
+    <tr><td>TTFT P50</td><td>40.9 s</td><td>57.6 s</td></tr>
+    <tr><td>ITL P50 (SISO)</td><td>182 ms</td><td>557 ms</td></tr>
+    <tr><td>ITL P50 (LILO)</td><td>216 ms</td><td>316 ms</td></tr>
+    <tr><td>Preemptions</td><td>262</td><td><strong>132</strong></td></tr>
+    <tr><td>KV budget</td><td>57k tok</td><td><strong>171k tok</strong></td></tr>
+  </tbody>
+</table>
+
+<p>But the decode got slower. SISO ITL is roughly 3x worse and LILO degraded by almost 50%.
+<br>
+Though LILO degraded less than SISO likely because LILO runs at effectively higher per step batch (more concurrent decode tokens), which is closer to the regime where AWQ kernels amortize dequantization cost. <br>
+Throughput did get better, but only from 144 tok/s to 189 tok/s, probably because the larger KV budget was just allowing more requests to coexist. Hence the extra throughput wasn't coming from any individual request with faster decoding.</p>
+
+<img src="img/divergence.png" alt="throughput vs itl divergence under awq">
+
+<p>The server is doing more work overall, but each stream is progressing more slowly. From a user's perspective, every token arrives later even though the dashboard says throughput went up.</p>
+
+<p>The regression had to be somewhere higher in the stack, and once I looked at what AWQ kernels actually do, it was obvious. AWQ is a W4A16 storage scheme, where weights are stored as INT4 with FP16 scaling factors, but every matmul dequantizes them back to FP16 and runs the GEMM in FP16 (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu">vLLM source</a>). At high batch sizes the dequantization overhead disappears into the pipeline. At the m=1 GEMV shape that decode uses, the dequantization cost sits on the critical path without being amortized across a batch dimension. (This is a documented behavior btw <a href="https://github.com/vllm-project/vllm/pull/2566">PR #2566</a>, <a href="https://github.com/vllm-project/vllm/issues/2268">issue #2268</a>) vLLM's AWQ path was designed for prefill-heavy throughput, not interactive decode .</p>
+
+<p>The system level scheduler becomes happier because memory pressure drops, while the individual decode path becomes slower because each token now carries extra work that the hardware shape can't hide. These are the two things happen simultaneously.</p>
+
+<h2>AWQ + chunked prefill</h2>
+
+<p>The obvious question after the previous two sections was whether these two techniques can fix each other's weaknesses. AWQ's biggest problem was per-token decode latency, especially on SISO where ITL had exploded to 557ms. Chunked prefill's biggest win was making decode more regular by preventing long prefills from monopolizing the GPU.</p>
+
+<p>Intuitively, they seemed complementary. AWQ gives me a much larger KV pool, chunked prefill gives decode more opportunities to run, and maybe the ugly ITL numbers disappear. So I turned both on and reran everything.</p>
+
+<p>The answer? <i>Yes.</i><br>And, <i>uh..not really</i></p>
+
+<table>
+  <thead><tr><th></th><th>Baseline</th><th>AWQ</th><th>Stack</th></tr></thead>
+  <tbody>
+    <tr><td>Completion rate</td><td>21%</td><td>34%</td><td>36%</td></tr>
+    <tr><td>Throughput</td><td>144 tok/s</td><td>189 tok/s</td><td>197 tok/s</td></tr>
+    <tr><td>E2E P50</td><td>110 s</td><td>119 s</td><td><strong>91 s</strong></td></tr>
+    <tr><td>ITL P50 (SISO)</td><td>182 ms</td><td>557 ms</td><td><strong>367 ms</strong></td></tr>
+    <tr><td>Preemptions</td><td>262</td><td>132</td><td>258</td></tr>
+  </tbody>
+</table>
+
+<p>Chunked prefill does pull AWQ's ITL back in the right direction. SISO drops from 557ms to 367ms, which is still substantially worse than baseline but no longer catastrophic. E2E latency also falls to 91 seconds, which actually ends up being the <i>best E2E number in this entire post</i>. So if the thing you care about is getting long jobs finished sooner, the stack genuinely works.</p>
+
+<p>The part I didn't expect was what happened to preemptions. AWQ by itself had cut them almost in half because the scheduler suddenly had three times more KV headroom. After enabling chunked prefill, they climbed back to roughly the original disaster baseline level (~260). The KV budget is still at 171k tokens. But chunked prefill admits more concurrent in flight prefills instead of serializing them, which is consistent with what consumed the additional headroom which AWQ prevoiously provided.</p>
+
+<p>So the two optimizations both operate on the same resource from different directions. Stacking them doesn't preserve both benefits.</p><p>:(</p>
+
+<p>This also ended up being one of the most deceptive results in the entire experiment. When I looked at per profile SLO compliance, it was among the <b>worst</b> configurations: 1% on SISO, 1% on SILO, 9% on LISO, and 15% on LILO. The stack really is getting more work done. It's just getting more work done by fitting more requests into the same period of time, not by making any individual request feel faster. The server is happier. The users definitely won't be.</p>
+
+<h2>The tradeoff matrix</h2>
+
+<p>This is my entire post summarised. Two additional configurations appear that weren't covered in their own sections. Admission control caps the number of concurrently running requests (I used vLLM's <code>--max-num-seqs</code>) to keep KV from filling and triggering cascading preemptions, it helped with long output profiles, but does nothing for SISO. Similarly prefix + chunked stacks automatic prefix caching with chunked prefill was pretty much identical to prefix caching alone, at higher preemption cost.</p>
+
+<table>
+  <thead><tr><th></th><th>Baseline</th><th>Prefix</th><th>Chunked</th><th>AWQ</th><th>Stack</th><th>Admit</th><th>Prefix+chunk</th></tr></thead>
+  <tbody>
+    <tr><td><strong>SISO</strong> (chat)</td><td>0%</td><td><strong>43%</strong></td><td>1%</td><td>0%</td><td>1%</td><td>0%</td><td><strong>44%</strong></td></tr>
+    <tr><td><strong>SILO</strong> (code gen)</td><td>20%</td><td><strong>68%</strong></td><td>44%</td><td>0%</td><td>1%</td><td>52%</td><td><strong>68%</strong></td></tr>
+    <tr><td><strong>LISO</strong> (review/RAG)</td><td>6%</td><td><strong>56%</strong></td><td>6%</td><td>5%</td><td>9%</td><td>6%</td><td><strong>56%</strong></td></tr>
+    <tr><td><strong>LILO</strong> (refactor)</td><td>19%</td><td><strong>74%</strong></td><td>32%</td><td>2%</td><td>15%</td><td>41%</td><td><strong>74%</strong></td></tr>
+  </tbody>
+</table>
+
+<p class="dim"><em>SLO compliance: fraction of offered requests that met the per-profile latency budget. SISO/LISO: TTFT &lt;5s. SILO/LILO: ITL P95 &lt;250ms. Bold = above 40%.</em></p>
+
+<p>Look at the AWQ column. 189 tok/s throughput, sounds fine, but zero SISO compliance, zero SILO compliance, 2% LILO. Nobody is getting a usable response. And that's <i>THE GAP</i> between throughput and goodput.</p>
+
+<p>The prefix caching column is the only one that doesn't look broken. Every profile above 40%, 4/4. Everything else either flatlines on SISO or has at least one profile in crisis. Automatic prefix caching is enabled by default in vLLM v1 (<a href="https://docs.vllm.ai/en/latest/design/v1/prefix_caching.html">docs</a>), which has been the default engine since 0.8.1. If you're on a recent vLLM, this is already on. If you're on an older version, then turn it on, perhaps?</p>
+
+<p>Two things in the matrix are unintuitive in my opinion.</p>
+
+<p>Admission control helped SILO and LILO (52%, 41%) but did nothing for SISO SLO compliance, it stayed at 0% even though completion rate hit 44%. <br>Lower in flight concurrency does help the queue drain faster, but at 32 RPS the HTTP queue still grows unboundedly, and SISO's TTFT budget is too tight to survive any meaningful wait.</p>
+
+<p>Prefix caching plus chunked prefill is statistically identical to prefix caching alone. The reason is that prefix caching skipped 73.7% of the prefill work, which means there's almost nothing left for chunked prefill to chunk. It doesn't conflict - it just has nothing to do! And then it charges you 405 preemptions (up from 334) for the privilege of doing nothing.</p>
+
+<p>If you turn on prefix caching, you're mostly fine across all four profiles, given your workload has content overlap. Whereas chunked prefill alone is a worse production config than baseline for any SISO heavy product (1% SLO compliance vs 0% is not a win !!), AWQ is dangerous on interactive workloads because its kernel path dequantizes weights to FP16 before the matmul (<a href="https://github.com/vllm-project/vllm/blob/main/csrc/quantization/awq/gemm_kernels.cu">vLLM source</a>), and that overhead sits on the critical path (the bandwidth savings will show up in prefill sized batches) and therefore the stack is the clearest example in this post of an optimization that improves every aggregate metric while making the per user experience terribly worse.</p>
+
+<p>Hence, if your workload has prefix sharing, things like RAG, system prompts, document QA, code review over a known codebase - turn on prefix caching. Free lunch (even the docs call it that).
+
+  The next best option depends on your dominant profile would be admission control for long output traffic, separate clusters for short output traffic, because no vLLM flag fixes the waiting-in-line problem for SISO at 32 RPS.</p>
+
+<p>Essentially, everything else in the matrix earns its place by losing. The diagnosis of the entire thing was the fun part.</p>
+
+<h2>So what</h2>
+
+<p>Inference optimization is a diagnosis problem, much like a Sherlock Holmes' story line, except you just play with flags and kernels. <br>Every now and then someone comes up with a new optimization, and shows the exact benchmark where it outperforms others. But what happens when others are stacked together? What happens when my workload is totally different from theirs? Why should I care for long conversations when my entire work is to handle 10 words at a time?</p>
+
+<p>We also saw that AWQ and the stacked config are examples of the same failure mode because the aggregate metrics improve while per user experience degraded badly. Despite the throughput going up, the goodput goes to zero.</p>
+
+<p>The matrix is actully the whole post in one table. No column is uniformly green. No row is served well by everything. The right configuration is the one that matches the traffic shape, and most deployments don't know their traffic shape because they never measured it (or do they?)</p>
+
+<p>I think that's the actual job - not picking the optimization but figuring out what's slow and why, before reaching for the toolbox.</p>
+
+<p class="section-note">Code is at <a href="https://github.com/datavorous/to-fa">datavorous/to-fa</a>. If this is the kind of systems work you need done - <a href="mailto:hi@datavorous.com">get in touch</a> (I am looking for an internship)</p>
+
+<div class="refs">
+  <h3>References</h3>
+  <p><a href="https://www.slideshare.net/slideshow/how-not-to-measure-latency-london-oct-2013/27088981">Gil Tene - how not to measure latency</a></p>
+  <p><a href="https://bentoml.com/llm/llm-inference-basics/llm-inference-metrics#goodput">BentoML - LLM inference metrics / goodput</a></p>
+  <p><a href="https://images.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf">Nvidia Ada GPU architecture whitepaper</a></p>
+  <p><a href="https://en.wikipedia.org/wiki/Roofline_model">Roofline model</a></p>
+</div>
+
+<div class="refs">
+  <h3>Acknowledgements</h3>
+  <p>I built my own benchmarking harness for this, which was fine, but I later found out <a href="https://youtu.be/eJBjgakTulg?si=MhUwG0gBq6k7suna">GuideLLM</a> (RedHat) already does most of what I wrote. Legare Kerrison's Devoxx UK talk covers it well - would have saved me a weekend. Thanks for putting that out.</p>
+  <img src="img/screenshots/guideLLM_should_have_used.png" alt="guidellm benchmark tool by redhat">
+  <p>The SISO/SILO/LISO/LILO framing came from Mark Moyou's <a href="https://youtu.be/z2M8gKGYws4?si=5VgJBR47nREuAYsl">PyTorch talk</a> (Nvidia). Before watching it I hadn't thought to treat traffic shapes as distinct objects with different hardware bottlenecks. That framing is the whole premise of this post.</p>
+  <img src="img/screenshots/pytorch_talk_prompt_size.png" alt="mark moyou's pytorch talk - prompt size traffic shape breakdown">
+</div>
+
+</article>
+<nav class="article-back" aria-label="Writing"><a href="../">← Back to writing</a></nav>
+</main>
+</body>
+</html>
