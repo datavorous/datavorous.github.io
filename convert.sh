@@ -186,7 +186,7 @@ render_page() {
     printf '%s\n' "$body"
     case "$rel" in
       writing/*/index.md)
-        printf '</article>\n<nav class="article-back" aria-label="Writing"><a href="../">← Back to writing</a></nav>\n</main>\n'
+        printf '</article>\n<nav class="article-back" aria-label="Writing"><a href="../">Back to writing</a></nav>\n</main>\n'
         ;;
       *) printf '</article></main>\n' ;;
     esac

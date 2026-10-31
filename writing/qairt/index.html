@@ -95,7 +95,7 @@ time = bytes/bandwidth
 <li>The binary is littered with names like <code>dp_tcm_threshold_selector</code>, <code>TCM_THRESH_75_predictor</code>, <code>special_mlp_features</code>, it really looks like as if there's a trained model in there choosing when to spill. There isn't, at least not in this binary. I could not find any weight matrix, no forward pass, nothing that smells like inference. <code>special_mlp_features</code> turned out to be a function that exports features to Python i.e. training data going out. The cost path is a plain CSV lookup table. So the learned part, if it exists, lives upstream at Qualcomm's training time and ships as a table. I could not prove a weight bearing model runs at compile time, and I'd bet against it</li>
 </ol>
 </article>
-<nav class="article-back" aria-label="Writing"><a href="../">← Back to writing</a></nav>
+<nav class="article-back" aria-label="Writing"><a href="../">Back to writing</a></nav>
 </main>
 </body>
 </html>
