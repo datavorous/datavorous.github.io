@@ -45,6 +45,9 @@ h3{margin:var(--space-3) 0 var(--space-1);font-size:var(--heading-subsection)}
 article:not(.home) ol{padding-left:var(--space-3)}
 article:not(.home) ul{padding-left:var(--space-3)}
 article:not(.home) li{margin:var(--space-1) 0}
+article table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse;margin:var(--space-3) 0;font-size:var(--text-small)}
+article th,article td{padding:var(--space-1);border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+article th{font-weight:500}
 article.writing-index ol{list-style:none;margin:0;padding:0}
 article.writing-index li{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--space-2);align-items:baseline;margin:0 0 var(--space-1)}
 .writing-index time{color:var(--quiet);font:var(--text-small)/1.5 var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap}
