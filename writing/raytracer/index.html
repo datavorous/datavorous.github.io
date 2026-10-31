@@ -24,9 +24,8 @@
 <p class="meta">January 6, 2026</p>
 </header>
 <p><img src="media/render2.png" alt="render"></p>
-<p>At first glance, building a CPU ray tracer in 2026 seems misguided. Modern GPUs are architected specifically for ray traversal, massive SIMD execution, and high-throughput shading. A GPU implementation would be orders of magnitude faster.</p>
-<p>That was <em>never</em> the point.</p>
-<p>The goal of this project was not raw throughput but to build mechanical sympathy. The CPU exposes the full performance stack: branch prediction, cache coherence, memory latency, instruction scheduling and parallel scaling. On a GPU, many of these costs are amortized or hidden by hardware.</p>
+<p>At first glance, building a CPU ray tracer in 2026 seems misguided. Modern GPUs are architected specifically for ray traversal and high throughput shading. A GPU implementation would be orders of magnitude faster. So why bother?</p>
+<p>The goal of this project was to build mechanical sympathy. The CPU exposes the full performance stack consisting of branch prediction, cache coherence, memory latency, instruction scheduling and parallel scaling. On a GPU, many of these costs are amortized or hidden by hardware.</p>
 <p>This project was strongly influenced by Ulrich Drepper’s <a href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf"><em>What Every Programmer Should Know About Memory</em></a>. </p>
 <p>All experiments were conducted on an Intel i7-8650U. The same scene (5 spheres, 400px width, 16:9 ratio, 500 samples per pixel, and maximum bounce depth of 10; shown below) was used as the test sample.</p>
 <p><img src="media/render3.png" alt="test"></p>
