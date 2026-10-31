@@ -36,7 +36,7 @@ h3{margin:var(--space-3) 0 var(--space-1);font-size:var(--heading-subsection)}
 .article-header .dek{margin:0 0 var(--space-1);font-size:var(--text-body);color:var(--quiet)}
 .article-header .meta{margin:0;color:var(--quiet);font:var(--text-small)/1.5 var(--sans)}
 .article-back{margin-top:var(--space-4);font:var(--text-small)/1.5 var(--sans)}
-.home p:nth-of-type(1){margin-bottom:var(--space-1);text-wrap:pretty}
+.home h1{font-size:clamp(2rem,5vw,2.25rem)}
 .home ol,.home ul{list-style:none;margin:var(--space-1) 0 var(--space-3);padding:0}
 .home ul{list-style:disc;padding-left:var(--space-3)}
 .home li{margin:0;line-height:1.5}
@@ -52,6 +52,9 @@ article.writing-index ol{list-style:none;margin:0;padding:0}
 article.writing-index li{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:var(--space-2);align-items:baseline;margin:0 0 var(--space-1)}
 .writing-index time{color:var(--quiet);font:var(--text-small)/1.5 var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap}
 article:not(.home) p:has(>img) img{max-height:520px}
+.article-figure{margin:var(--space-3) 0;text-align:center}
+.article-figure img{margin:0 auto;max-height:520px}
+.article-figure--compact img{width:85%}
 code,pre{font-family:var(--mono)}
 code{font-size:.9em}
 pre{overflow:auto;padding:var(--space-2);border:1px solid var(--rule);background:var(--wash);white-space:pre}
@@ -86,6 +89,7 @@ p.faded a:hover{color:var(--link-hover)}
   .top{margin-bottom:var(--space-4)}
   .date{display:block;margin-top:.05rem;white-space:normal}
   article:not(.home) p:has(>img) img{max-height:none}
+  .article-figure img{max-height:none}
   .problem-tuple div{grid-template-columns:1fr;gap:.05rem}
 }
 
