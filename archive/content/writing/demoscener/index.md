@@ -1,8 +1,8 @@
 ---
-title: Post training a model to explore Demoscenes
-subtitle: On the grammar of demoscenes and the possibilities of unfinished code
+title: Post training a model to explore Demoscene
+subtitle: On the grammar of demos and the possibilities of unfinished code
 date: October 31, 2026
-description: On the grammar of demoscenes and the possibilities of unfinished code
+description: On the grammar of demos and the possibilities of unfinished code
 ---
 
 <p>Lately, I have been fascinated by the world of demoscening and sizecoding and eventually I came across HellMood’s remarkable MS DOS demo <em>“</em><em><a href="https://youtu.be/Imquk_3oFf4?si=1kp2qgkB6A5yzA4o">Memories</a></em><em>”. </em>Whilst reading through his <a href="http://www.sizecoding.org/wiki/Memories">writeup</a>, I became interested in <em>how</em> the author had <em>arrived</em> at some of its visual effects. I was struggling to create any of my own, so I hoped to squeeze out a little bit of inspiration out of that.   </p>

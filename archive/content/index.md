@@ -12,7 +12,7 @@ Currently, I'm interning at a neolab where we're trying to accelerate scientific
 
 Some of my featured work:
 
-- [Post training a model to explore demoscenes](writing/demoscener/)
+- [Post training a model to explore Demoscene](writing/demoscener/)
 - [Reverse engineering the Qualcomm NPU compiler](writing/qairt/)
 - [Sampling NCA trajectories to pretrain SLMs faster](https://openreview.net/forum?id=1ZNvqddAw7)
 - [NPUs: What they are and where they break](writing/npu/)

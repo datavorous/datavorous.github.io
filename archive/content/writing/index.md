@@ -3,7 +3,7 @@ title: Writing
 description: Writings by Sagnik Bhattacharjee (datavorous)
 ---
 
-1. <time datetime="2026-10-31">2026-10-31</time> [Post training a model to explore Demoscenes](demoscener/)
+1. <time datetime="2026-10-31">2026-10-31</time> [Post training a model to explore Demoscene](demoscener/)
 2. <time datetime="2026-10-18">2026-10-18</time> [Flirting with decision models](ohev/)
 3. <time datetime="2026-10-15">2026-10-15</time> [Fernweh](fernweh/)
 4. <time datetime="2026-09-19">2026-09-19</time> [Unvibecodable](unvibecodable/)
