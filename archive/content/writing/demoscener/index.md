@@ -17,7 +17,7 @@ description: On the grammar of demoscenes and the possibilities of unfinished co
 
 <p>Digging a little deeper, I noticed some remixes shared substantial portions of their source code, differing by only a few characters, whilst others achieved similar visual effects through entirely different implementations. </p>
 
-<p>Here is an example, I traced back d/36555 from d/367547 which in turn  is derived from d/36467. The gray underlined substrings show what is common across all of them. Blue shows what’s common in between the first two, and green shows for the next couple. </p>
+<p>Here is an example, I traced back d/36555 from d/36547 which in turn  is derived from d/36467. The gray underlined substrings show what is common across all of them. Blue shows what’s common in between the first two, and green shows for the next couple. </p>
 
 <p class="article-figure"><a href="media/figure-03.png"><img src="media/figure-03.png" alt="Shared substrings in three related Dweets"></a></p>
 
